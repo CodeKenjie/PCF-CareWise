@@ -1,8 +1,9 @@
 <?php
-
 require __DIR__ . '/../src/Core/AutoLoader.php';
-
 use App\Core\Router;
 
 $router = new Router();
-$router->direct($_SERVER['REQUEST_URI']);
+$router->get('/register', 'App\Controllers\RegisterController@index');
+$router->post('/register/store', 'App\Controllers\RegisterController@index');
+$router->get('/login', 'App\Controllers\LoginController@index');
+$router->direct($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);

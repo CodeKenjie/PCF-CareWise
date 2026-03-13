@@ -1,4 +1,5 @@
 <?php
+namespace App\Core;
 
 spl_autoload_register(function ($class){
     $prefix = 'App\\';
@@ -11,7 +12,7 @@ spl_autoload_register(function ($class){
 
     $relativeClass = substr($class, $len);
     
-    $file = $baseDIR . str_replace('\\', '/', $class) . '.php';
+    $file = $baseDIR . str_replace('\\', '/', $relativeClass) . '.php';
     
     if(file_exists($file)) {
         require $file;   

@@ -7,14 +7,19 @@ class Router {
     public function get($url, $controllerAction) {
         $this->routes['GET'][$url] = $controllerAction;
     }
+    
+    public function post($url, $controllerAction){
+        $this->routes['POST'][$url] = $controllerAction;
+    }
 
-    public function direct($uri) {
-        if(!isset($this->routes['Get'])) {
+    public function direct($uri, $method) {
+        $method = strtoupper($method);
+        if(!isset($this->routes[$method])) {
             echo 'No Request recieved';
             return;
         }
 
-        foreach($this->routes['GET'] as $route => $controllerAction){
+        foreach($this->routes[$method] as $route => $controllerAction){
             if ($uri === $route) {
                 [ $controller, $action ] = explode('@', $controllerAction);
                 return (new $controller)->$action();
