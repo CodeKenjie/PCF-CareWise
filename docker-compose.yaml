@@ -1,0 +1,52 @@
+version: '3.9'
+services:
+  php:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    restart: always
+    env_file: 
+      - .env
+    volumes:
+      - D:/Projects/website/PCF-CareWise:/var/www/html
+    networks:
+      - private
+
+  db:
+    image: postgres:16-alpine
+    container_name: postgres
+    restart: always
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - private
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+  
+  nginx:
+    image: nginx:stable-alpine
+    container_name: nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+    depends_on:
+      - php
+    networks:
+      - private
+
+volumes:
+  postgres_data:
+
+networks:
+  private:
+    driver: bridge
+
