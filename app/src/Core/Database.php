@@ -16,7 +16,7 @@ class Database {
         $this->pass = getenv('POSTGRES_PASS');
         $this->host = getenv('POSTGRES_HOST');
         $this->port = getenv('POSTGRES_PORT');
-        $this->name = getenv('POSTGRES_NAME');
+        $this->name = getenv('POSTGRES_DBNAME');
         $this->logger = new Logger();
     }
 
