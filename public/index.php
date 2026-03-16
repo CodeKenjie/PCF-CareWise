@@ -1,5 +1,5 @@
 <?php
-require __DIR__ . '/../src/Core/AutoLoader.php';
+require __DIR__ . '/../app/Core/AutoLoader.php';
 use App\Core\Router;
 
 $router = new Router();

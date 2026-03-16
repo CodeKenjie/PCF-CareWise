@@ -1,5 +1,5 @@
 <?php
-require __DIR__ . "/src/Core/Autoloader.php";
+require __DIR__ . "/../src/Core/Autoloader.php";
 use App\Core\Database;
 
 $tables = ['CREATE TABLE IF NOT EXISTS 

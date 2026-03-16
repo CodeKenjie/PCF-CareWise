@@ -20,7 +20,7 @@ class Database {
         $this->logger = new Logger();
     }
 
-    public function conn() {
+    protected function conn() {
         try{
             $pdo = new PDO('pgsql:host=' . $this->host . ';port=' . $this->port . ';dbname=' . $this->name , $this->user, $this->pass);
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);

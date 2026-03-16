@@ -12,6 +12,14 @@ class Router {
         $this->routes['POST'][$url] = $controllerAction;
     }
 
+    public function put($url, $controllerAction){
+        $this->routes['PUT'][$url] = $controllerAction;
+    }
+
+    public function delete($url, $controllerAction){
+        $this->routes['DELETE'][$url] = $controllerAction;
+    }
+
     public function direct($uri, $method) {
         $method = strtoupper($method);
         if(!isset($this->routes[$method])) {
