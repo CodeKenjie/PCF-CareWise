@@ -58,7 +58,7 @@ class User extends Database {
         } catch (PDOException $err) {
             $response = [ 'ok'=>false, 'code'=>500, 'error'=>'Server Error!' ];
             $this->logger->error($err->getMessage());
-            return json_encode($response);
+            return;
         }
     }
 
@@ -71,11 +71,11 @@ class User extends Database {
             $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             $response = [ 'ok' => true, 'code' => 200, 'collection'=> $users ];
-            return json_encode($response);
+            return;
         } catch (PDOException $err) {
             $response = [ 'ok' => false, 'code' => 500, 'error' => 'Sever Failed'];
             $this->logger->error($err->getMessage());
-            return json_encode($response);
+            return;
         }
 
     }

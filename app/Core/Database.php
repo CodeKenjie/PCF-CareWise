@@ -13,10 +13,10 @@ class Database {
     
     public function __construct() {
         $this->user = getenv('POSTGRES_USER');
-        $this->pass = getenv('POSTGRES_PASS');
+        $this->pass = getenv('POSTGRES_PASSWORD');
         $this->host = getenv('POSTGRES_HOST');
         $this->port = getenv('POSTGRES_PORT');
-        $this->name = getenv('POSTGRES_DBNAME');
+        $this->name = getenv('POSTGRES_DB');
         $this->logger = new Logger();
     }
 

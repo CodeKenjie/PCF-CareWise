@@ -65,6 +65,7 @@ class RegisterController extends Controller {
             ];
             $user = new User($db, $userData);
             $user->save(); 
+            $this->redirect('/login');
         }
     }
 }

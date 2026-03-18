@@ -1,9 +1,7 @@
 <?php
+use App\Core\Migration;
 
-require __DIR__ . "/../../app/Core/Autoloader.php";
-use App\Core\Database;
-
-class CreateUsersTable extends Database {
+class CreateUsersTable extends Migration {
     public function up(){
         $query = 'CREATE TABLE IF NOT EXISTS 
                     users (

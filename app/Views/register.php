@@ -3,7 +3,7 @@
     <button  id="loginButton" class="bigButton" type="button">Login</button>
     <form id="register"  method="post" action="/register/store">
         <header>
-            <img src="images/logo.png" alt="">
+            <img src="assets/images/logo.png" alt="">
             <h1>Register Account</h1>
         </header>
         <div>
@@ -35,13 +35,13 @@
             <h3 id="pl">Password</h3>
             <span>
                 <input name="password" id="password" class="textField" type="password" required>
-                <img id="viewPass" class="icon" src="/images/hide.svg" alt="view" role="button" tabindex="0" onclick="view(`viewPass`, `password`)">
+                <img id="viewPass" class="icon" src="assets/images/hide.svg" alt="view" role="button" tabindex="0" onclick="view(`viewPass`, `password`)">
             </span>
             <p id="strength"></p>
             <h3 id="cpl">Confirm Password</h3>
             <span>
                 <input name="conf_password" id="confPassword"class="textField" type="password" required>
-                <img id="viewConfPass" class="icon" src="/images/hide.svg" alt="view" role="button" tabindex="0" onclick="view(`viewConfPass`, `confPassword`)">
+                <img id="viewConfPass" class="icon" src="assets/images/hide.svg" alt="view" role="button" tabindex="0" onclick="view(`viewConfPass`, `confPassword`)">
             </span>               
             <span>
                <input name="accept" type="checkbox"><label id="terms" for="terms"> I accept <a href="">terms and condition</a></label>
