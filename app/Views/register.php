@@ -1,53 +1,71 @@
 <?php require __DIR__ . "/partials/header.php" ?>
-<main id="registerAccount">
-    <button  id="loginButton" class="bigButton" type="button">Login</button>
-    <form id="register"  method="post" action="/register/store">
-        <header>
-            <img src="assets/images/logo.png" alt="">
-            <h1>Register Account</h1>
-        </header>
-        <div>
-            <h3 id="ul">Username</h3>
-            <input name="username" id="username" class="textField" type="text" required>
-            <h3>First name</h3>
-            <input name="firstName" class="textField" type="text" required>
-            <h3>Last name</h3>
-            <input name="lastName" class="textField" type="text" required>
-            <h3>Birthdate</h3>
-            <input name="birthdate" class="textField" type="date" required>
-            <h3>Address</h3>
-            <input name="address" class="textField" type="text" required>
-            <section>
-                <input name="sex" id="sex" class="textField" value="male" type="text" hidden>
-                <select id="selectedSex" onchange="updateInput(`sex`, this.value)" required>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                </select>
-                <input name="role" id="position" class="textField" type="text" hidden>
-                <select id="selectedPosition" onchange="updateInput(`position`, this.value)" required>
-                    <option value="">Position</option>
-                    <option value="admin(editor)">ADMIN (editor)</option>
-                    <option value="staff(viewer)">staff (viewer)</option>
-                </select>
-            </section>
-            <h3 id="el">Email</h3>
-            <input name="email" id="email" class="textField" type="text" placeholder="example@example.com" required>
-            <h3 id="pl">Password</h3>
-            <span>
-                <input name="password" id="password" class="textField" type="password" required>
-                <img id="viewPass" class="icon" src="assets/images/hide.svg" alt="view" role="button" tabindex="0" onclick="view(`viewPass`, `password`)">
-            </span>
-            <p id="strength"></p>
-            <h3 id="cpl">Confirm Password</h3>
-            <span>
-                <input name="conf_password" id="confPassword"class="textField" type="password" required>
-                <img id="viewConfPass" class="icon" src="assets/images/hide.svg" alt="view" role="button" tabindex="0" onclick="view(`viewConfPass`, `confPassword`)">
-            </span>               
-            <span>
-               <input name="accept" type="checkbox"><label id="terms" for="terms"> I accept <a href="">terms and condition</a></label>
-            </span>
+<main id="register">
+    <a class="redirect p-md" href="/login">Login</a>
+    <img class="site" src="/assets/images/site.jpg" alt="">
+    <section>
+        <div class="header">
+            <img class="logo" src="/assets/images/logo.png" alt="">
+            <h2>PCF:CareWise</h2>
         </div>
-        <button class="bigButton" type="submit">Create Account</button>
-    </form>
+        <form action="/register/store method="post">
+            <h1 class="ctr-text">Join our team</h1>
+            <h2 class="ctr-text">help our community</h2>
+            <span>
+                <label for="displayName">Display Name</label>
+                <input name="displayName" type="text" maxlength="12">
+            </span>
+            <span>
+                <label for="firstName">First Name</label>
+                <input name="firstName" type="text">
+            </span>
+            <span>
+                <label for="lastName">Last Name</label>
+                <input name="lastName" type="text">
+            </span>
+            <span>
+                <label for="birthdate">Birthdate</label>
+                <input name="birthdate" type="date">
+            </span>
+            <div class="selections">
+                <input name="sex" type="text" value="Male" readonly hidden>
+                <select name="sexSelect" id="">
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+                <input name="role" type="text" value="staff" readonly hidden>
+                <select name="roleSelect" id="">
+                    <option value="staff">Staff</option>
+                    <option value="admin">Admin</option>
+                </select>
+            </div>
+            <span>
+                <label for="email">Email</label>
+                <input name="email" type="text">
+            </span>
+            <span>
+                <label for="password">Password</label>
+                <div class="password">
+                    <input name="password" type="password">
+                    <button type="button">
+                        <img class="icon" src="/assets/images/view.svg" alt="view">
+                    </button>
+                </div>
+            </span>
+            <span>
+                <label for="confPass">Confirm Password</label>
+                <div class="password">
+                    <input name="confPass" type="password">
+                    <button type="button">
+                        <img class="icon" src="/assets/images/view.svg" alt="view">
+                    </button>
+                </div>
+            </span>
+            <div class="p-md">
+                <input name="accept" type="checkbox">
+                <label for="accept">Accept the <a href="">terms and condition</a></label>
+            </div>
+            <input type="submit" value="Register Account">
+        </form>
+    </section>
 </main>
 <?php require __DIR__ . "/partials/footer.php" ?>

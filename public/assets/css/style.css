@@ -6,12 +6,12 @@
     --normal: clamp(1rem, 0.3vw + 0.95rem, 1.125rem);
     --small: clamp(0.85rem, 0.2vw + 0.8rem, 0.95rem);
     --super-small: clamp(0.7rem, 0.2vw + 0.65rem, 0.8rem);
-    --bold: 700;
+    --bold: 800;
     --semi-bold: 600;
     --thin: 300;
     --bg: rgb(255, 255, 255);
     --navbg: rgb(241, 241, 241);
-    --font-color: rgb(50, 50, 50);
+    --font-color: rgb(19, 19, 19);
     --radius: 0.5rem;
     --double-radius: 1rem;
     --alt-font-color: rgb(255, 255, 255);
@@ -20,14 +20,30 @@
     --transparent-bg: rgba(0, 0, 0, 0.5);
     --hover-color: rgb(230, 230, 230);
     --shadow: 0px 1px 5px rgba(0, 0, 0, .5);
-    --button-color: rgb(255, 255, 255);
-    --button-hover: rgba(90, 164, 255, 0.7);
+    --button-color: rgb(76, 214, 99);
+    --button-hover: rgb(127, 255, 101);
     --active-button: rgb(139, 138, 138);
     --border-color: rgb(170, 170, 170);
     --border: solid 1px var(--border-color);
     --critical: rgb(212, 66, 66);
     --moderate: rgb(219, 169, 75);
     --good: rgb(61, 161, 61);
+}
+
+.p-sm {
+    padding: 0.5em;
+}
+
+.p-md {
+    padding: 1em;
+}
+
+.p-lg {
+    padding: 2em;
+}
+
+.ctr-text {
+    text-align: center;
 }
 
 html {
@@ -37,7 +53,6 @@ html {
 }
 
 body {
-    background: var(--navbg);
     color: var(--font-color);
     font-size: var(--normal);
     font-family: Verdana, Geneva, Tahoma, sans-serif;
@@ -59,11 +74,147 @@ a, a:link, a:visited, a:active {
     height: fit-content;
 }
 
+.redirect {
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: var(--font-color);
+    font-size: var(--bigger);
+    font-weight: var(--bold);
+    margin: 1em;
+    background: var(--button-color);
+    border-radius: var(--radius);
+}
+
+.redirect:hover {
+    background: var(--button-hover);
+    transform: scale(1.1);
+    transition: transform 300ms ease;
+    box-shadow: var(--shadow);
+}
+
 h1, h2, h3, p {
     margin: 0;
     padding: 0;
 }
 
-input[type="text"], input[type="password"]{
+input[type="text"], input[type="password"], input[type="date"]{
+    font: var(--normal);
+    padding: 1em;
+    border: var(--border);
+    border-radius: var(--radius);
+    width: 100%;
+}
+
+input[type="password"] {
+    padding-right: 3em;
+}
+
+input[type="submit"] {
+    background: var(--button-color);
+    font-size: var(--bigger);
+    font-weight: var(--bold);
+    border: none;
+    border-radius: 20rem;
+    padding: 1em;
+}
+
+.logo{
+    max-width: 5rem;
+    max-height: 5rem;
+}
+
+.icon {
+    width: var(--headers);
+    height: var(--headers);
+}
+
+.password {
+    display: flex;
+    align-items: center;
+}
+
+.password button {
+    margin-left: -4em;
+    border: none;
+    background: transparent;
+}
+
+.header {
+    font-size: var(--bigger);
+    display: flex;
+    align-items: center;
+    padding: 2em;
+    gap: 1em;
+}
+
+#register input[type="submit"] {
+    min-width: 100%;
+}
+
+#register input[type="submit"]:hover {
+    background: var(--button-hover);
+    transform: scale(1.05);
+    transition: tranform 300sm ease;
+    box-shadow: var(--shadow);
+}
+
+#register {
+    display: flex;
+    justify-content: end;
+    min-width: 100%;
+    min-height: 100vh;
+}
+
+#register section{
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+}
+
+#register form {
+    flex: 1 1 0;
+    max-width: auto;
+    min-height: fit-content;
+    background: var(--bg);
+    padding:0 5em;
+}
+
+#register h1 {
+    font-size: var(--bigger-header);
+}
+
+#register span {
+    display: flex;
+    flex-direction: column;
     padding: 0.5em;
+}
+
+#register .site {
+    flex: 1 1 0;
+    height: 100vh;
+}
+
+#register .selections {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1em;
+    padding: 0.5em;
+}
+
+#register span label {
+    background:var(--bg);
+    font-size: var(--small);
+    font-weight: var(--bold);
+    transform: translate(1rem, 0.5rem);
+    max-width: fit-content;
+    padding: 0 0.5em;
+}
+
+#register select{
+    background: transparent;
+    font: var(--normal);
+    border: var(--border);
+    border-radius: var(--radius);
+    padding: 1em;
 }

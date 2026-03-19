@@ -7,7 +7,7 @@ class CreateUsersTable extends Migration {
                     users (
                         id SERIAL PRIMARY KEY, 
                         avatar VARCHAR(255),
-                        alias VARCHAR(50) NOT NULL, 
+                        display_name VARCHAR(50) NOT NULL, 
                         first_name VARCHAR(100) NOT NULL,
                         last_name VARCHAR(100) NOT NULL,
                         age INTEGER NOT NULL, 

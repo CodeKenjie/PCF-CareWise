@@ -10,7 +10,7 @@ class User extends Database {
     private $logger;
 
     private $_id;
-    private $alias;
+    private $displayName;
     private $name;
     private $birthdate;
     private $age;
@@ -25,7 +25,7 @@ class User extends Database {
     public function __construct(Database $db, array $data) {
         $this->db = $db->conn();
         $this->logger = new Logger();
-        $this->alias = strtoupper($data['alias'] ?? '');
+        $this->displayName = strtoupper($data['displayName'] ?? '');
         $this->name = ucwords($data['name'] ?? ''); 
         $this->birthdate = $data['birthdate'] ?? null;
         $this->age = $data['age'] ?? '';
@@ -39,10 +39,10 @@ class User extends Database {
     public function save(){
         $response = [];
         try {
-            $query = 'INSERT INTO users (alias, name, birthdate, age, sex, address, role) VALUES (:alias, :name, :birthdate, :age, :sex, :address, :role);';
+            $query = 'INSERT INTO users (display_name, name, birthdate, age, sex, address, role) VALUES (:display_name, :name, :birthdate, :age, :sex, :address, :role);';
             $stmt = $this->db->prepare($query);
             $stmt->execute([
-                ':alias' => $this->alias,
+                ':display_name' => $this->displayName,
                 ':name' => $this->name,
                 ':birthdate' => $this->birthdate,
                 ':age' => $this->age,

@@ -16,7 +16,7 @@ class RegisterController extends Controller {
 
     public function store() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $alias = $_POST['alias'] ?? '';
+            $alias = $_POST['displayName'] ?? '';
             $firstName = $_POST['firstName'] ?? '';
             $lastName = $_POST['lastName'] ?? '';
             $birthdate = $_POST['birthdate'] ?? '';
@@ -25,7 +25,7 @@ class RegisterController extends Controller {
             $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) ?? '';
             $password = $_POST['password'] ?? '';
             $role = $_POST['role'] ?? '';
-            $confPass = $_POST['conf_password'] ?? '';
+            $confPass = $_POST['confPass'] ?? '';
             $accept = isset($_POST['accept']);
             $bdateFormat = new DateTime($birthdate);
             $today = new DateTime('today');

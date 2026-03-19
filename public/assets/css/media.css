@@ -1,78 +1,33 @@
 @media ( max-width: 600px ) and (orientation: portrait){
-    #registerAccount, #loginAccount {
-        display: flex;
-        height: 100vh;
-        font-size: var(--normal);
-
-        form{
-            display: flex;
-            flex-direction: column;
-            place-items: center;
-            place-content: center;
-            width: 100%;
-            height: 100%;
-            padding: 2em;
-            gap: 1em;
-            
-            h3 {
-                font-size: var(--normal);
-            }
-
-            span {
-                .icon {
-                    width: 1.8em;
-                    height: 1.8em;
-                }
-            }
-        }
-        
+    .site {
+        display: none;
     }
 
+    .header {
+        justify-content: center;
+    }
 }
 
 @media (max-width: 1000px) and (orientation: landscape) {
-    #registerAccount{
-        display: flex;
+    .site {
+        display: none;
+    }
+
+    .logo {
+        max-width: 10rem;
+        max-height: 10rem;
+    }
+
+    .header {
+        flex-direction: column;
         justify-content: center;
-
-        form {
-            grid-template-columns: auto auto;
-            width: fit-content;
-            height: fit-content;
-            padding: 5em;
-            gap: 2em;
-            
-            header {
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-            }   
-
-            button {
-                grid-column: 2;
-            }
-        }
     }
 
-    #loginAccount {
-        display: flex;
-        place-content: center;
-        place-items: center;
-
-        form {
-            display: flex;
-            height: auto;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            gap: 1em;
-            div {
-                align-content: end;
-            }
-            button {
-                grid-column: 2;
-            }
-        }
+    #register section {
+        flex-direction: row;
     }
 
+    #register form {
+        padding: 2em;
+    }
 }
