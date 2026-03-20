@@ -16,7 +16,8 @@ class RegisterController extends Controller {
 
     public function store() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $alias = $_POST['displayName'] ?? '';
+            header('Content-Type: application/json');
+            $displayName = $_POST['displayName'] ?? '';
             $firstName = $_POST['firstName'] ?? '';
             $lastName = $_POST['lastName'] ?? '';
             $birthdate = $_POST['birthdate'] ?? '';
@@ -31,30 +32,35 @@ class RegisterController extends Controller {
             $today = new DateTime('today');
             $age = $bdateFormat -> diff($today) -> y;
 
-            if(strlen($alias) < 6) { 
+            if(strlen($displayName) < 6) { 
                 $response = ['ok' => false, 'error' => "Username must be 6 character or longer"];
-                return json_encode($response);
+                echo json_encode($response);
+                exit;
             }
 
             if($password !== $confPass) { 
                 $response = ['ok' => false, 'error' => "Password did not match"];
-                return json_encode($response);
+                echo json_encode($response);
+                exit;
             }
 
             if (!$email) { 
                 $response = ['ok' => false, 'error' => "Wrong email format"];
-                return json_encode($response);
+                echo json_encode($response);
+                exit;
             }
 
             if(!$accept) { 
                 $response = ['ok' => false, 'error' => "Please make sure to read and accept security privacy, terms and condition"];
-                return json_encode($response);
+                echo json_encode($response);
+                exit;
             }
             
             $db = new Database();
             $userData = [
-                'alias'=> $alias,
-                'name'=> "{$lastName}, {$firstName}",
+                'display_name'=> $displayName,
+                'firstName'=> $firstName,
+                'lastName'=> $lastName,
                 'birthdate'=> $birthdate,
                 'age'=> $age,
                 'sex'=> $sex,

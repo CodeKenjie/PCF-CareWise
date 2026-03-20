@@ -9,6 +9,6 @@ $migration = new Migration();
 $router = new Router();
 $router->get('/login', 'App\Controllers\LoginController@index');
 $router->get('/register', 'App\Controllers\RegisterController@index');
-$router->post('/register/store', 'App\Controllers\RegisterController@index');
+$router->post('/register/store', 'App\Controllers\RegisterController@store');
 $router->direct($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
 

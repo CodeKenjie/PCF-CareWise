@@ -11,7 +11,8 @@ class User extends Database {
 
     private $_id;
     private $displayName;
-    private $name;
+    private $firstName;
+    private $lastName;
     private $birthdate;
     private $age;
     private $sex;
@@ -26,38 +27,43 @@ class User extends Database {
         $this->db = $db->conn();
         $this->logger = new Logger();
         $this->displayName = strtoupper($data['displayName'] ?? '');
-        $this->name = ucwords($data['name'] ?? ''); 
+        $this->firstName = ucwords($data['firstName'] ?? ''); 
+        $this->lastName = ucwords($data['lastName'] ?? ''); 
         $this->birthdate = $data['birthdate'] ?? null;
         $this->age = $data['age'] ?? '';
         $this->sex = strtoupper($data['sex'] ?? '');
         $this->address = ucwords($data['address'] ?? '');
+        $this->role = $data['role'] ?? '';
         $this->email = strtolower($data['email'] ?? '');
         $this->password = $data['password'] ?? '';
-        $this->role = $data['role'] ?? '';
     }
 
     public function save(){
         $response = [];
         try {
-            $query = 'INSERT INTO users (display_name, name, birthdate, age, sex, address, role) VALUES (:display_name, :name, :birthdate, :age, :sex, :address, :role);';
+            $query = 'INSERT INTO users (display_name, first_name, last_name, birthdate, age, sex, address, role, email, password) VALUES (:display_name, :first_name, :last_name, :birthdate, :age, :sex, :address, :role, :email, :password);';
             $stmt = $this->db->prepare($query);
             $stmt->execute([
                 ':display_name' => $this->displayName,
-                ':name' => $this->name,
+                ':first_name' => $this->firstName,
+                ':last_name' => $this->lastName,
                 ':birthdate' => $this->birthdate,
                 ':age' => $this->age,
                 ':sex' => $this->sex,
                 ':address' => $this->address,
+                ':role' => $this->role,
                 ':email' => $this->email,
                 ':password' => $this->password,
-                ':role' => $this->role,
             ]);
 
             $response = [ 'ok'=>true, 'code'=>201, 'message'=>'Registration success please check your email to verify your account!' ];
-            return json_encode($response);
+            echo json_encode($response);
+            exit;
         } catch (PDOException $err) {
             $response = [ 'ok'=>false, 'code'=>500, 'error'=>'Server Error!' ];
             $this->logger->error($err->getMessage());
+            echo json_encode($response);
+            exit;
             return;
         }
     }
@@ -71,11 +77,13 @@ class User extends Database {
             $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
             $response = [ 'ok' => true, 'code' => 200, 'collection'=> $users ];
-            return;
+            echo json_encode($response);
+            exit;
         } catch (PDOException $err) {
             $response = [ 'ok' => false, 'code' => 500, 'error' => 'Sever Failed'];
             $this->logger->error($err->getMessage());
-            return;
+            echo json_encode($response);
+            exit;
         }
 
     }

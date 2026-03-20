@@ -5,24 +5,23 @@ function view(id, type){
     const img = document.getElementById(id);
     const input = document.getElementById(type);
     
-    if (img.src.match(`/images/hide.svg`)) {
+    if (img.src.match(`assets/images/hide.svg`)) {
         input.type = "text"; 
-        img.src = "/images/view.svg";
+        input.style.paddingRight = "4em"; 
+        img.src = "assets/images/view.svg";
     } else {
         input.type = "password";
-        img.src = "/images/hide.svg";
+        img.src = "assets/images/hide.svg";
     }
 }
 
 function responseMessage(res, message){
     const response = document.getElementById(`responseContainer`);
     const div = document.createElement(`div`);
-    div.className = "responseMessage";
     div.style.background = res.ok === true ? 'var(--good)' : 'var(--critical)';
     div.id = Date.now();
     const p = document.createElement(`p`);
     p.textContent = message;
-    p.id="eMessage";
     const span = document.createElement(`span`);
     span.setAttribute("role", "button");
     span.tabIndex = "0";
@@ -31,15 +30,7 @@ function responseMessage(res, message){
     div.append(p, span);
     response.appendChild(div);
 
-    setTimeout(() => { div.remove() }, 5000);
-}
-
-function navigate(id) {
-    window.location = `index.php?page=${id}`;
-}
-
-function updateInput(input, value){
-    document.getElementById(input).value = value;
+    setTimeout(() => { div.remove() }, 10000);
 }
 
 function closePopup(){
@@ -264,64 +255,57 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         });
     }
 
-    const register = document.getElementById(`registerAccount`);
+    const register = document.getElementById(`register`);
     if (register) {
-        const login = document.getElementById(`loginButton`);
-        login.addEventListener("click", () => { window.location = "/login" });
-
         const strength = document.getElementById(`strength`);
         strength.classList.add(`hidden`);
         
-        const username = document.getElementById(`username`);
-        const userErr = document.getElementById(`ul`);
-        username.addEventListener("input", () => {
-            if(username.value.length >= 6 || username.value === "") {
-                username.style.borderColor = "var(--border-color)";
-                userErr.style.color = "var(--sub-font-color)";
+        const displayName = document.getElementById(`displayName`);
+        displayName.addEventListener("input", () => {
+            if(displayName.value.length >= 6 || displayName.value === "") {
+                displayName.style.borderColor = "var(--border-color)";
             }
         });
 
         const email = document.getElementById(`email`);
-        const emailErr = document.getElementById(`el`);
         email.addEventListener("input", () => {
             if(/^(?=.*[@])/.test(email.value)) {
                 email.style.borderColor = "var(--border-color)";
-                emailErr.style.color = "var(--sub-font-color)";
             }
         });
 
         const pass = document.getElementById(`password`);
-        const confPass = document.getElementById(`confPassword`);
-        const passErr = document.getElementById('pl');
-        const confPassErr = document.getElementById('cpl');
+        const confPass = document.getElementById(`confPass`);
         pass.addEventListener('input', function(e) {
             const value = pass.value;
-            
-            if (value === "") {
+            const hasUpper = /[A-Z]/.test(value);
+            const hasDigit = /\d/.test(value);
+            const hasSpecial = /[!@#$%^&*]/.test(value);
+            const longEnough = value.length >= 6;
+
+            if (value === "" || value.length === 0) {
+                strength.classList.add(`hidden`);
                 pass.style.borderColor = "var(--border-color)";
                 confPass.style.borderColor = "var(--border-color)";
-                confPassErr.style.color = "var(--sub-font-color)";
-                passErr.style.color = "var(--sub-font-color)";
+                return;
             }
 
-            if (value.length >= 6) {
-                strength.textContent = "weak";
-                strength.style.color = "red";
+            if (longEnough && hasUpper && hasDigit && hasSpecial) {
                 strength.classList.remove('hidden');
-            } else {
-                strength.classList.add('hidden');
-            } 
-
-            if (/^(?=.*\d)/.test(value) && value.length >=6){
-                strength.textContent = "Medium";
-                strength.style.color = "orange";
+                strength.textContent = "STRONG (please take note of your password to avoid forgetting)";
+                strength.style.color = "var(--good)";
+                pass.style.borderColor = "var(--good)";
+            } else if (longEnough && (hasDigit || hasUpper || hasSpecial)){
+                strength.classList.remove('hidden');
+                strength.textContent = "Medium (to further enhance protection must have number, uppercase, and special character)";
+                strength.style.color = "var(--moderate)";
+                pass.style.borderColor = "var(--moderate)";
+            } else if(value.length > 0) {
+                strength.classList.remove('hidden');
+                strength.textContent = "weak (should have number, uppercase letter, or special character)";
+                strength.style.color = "var(--critical)";
+                pass.style.borderColor = "var(--critical)";
             }
-
-            if(/^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])/.test(value)) {
-                strength.textContent = "STRONG";
-                strength.style.color = "green";
-            }
-
         });
 
         const form = document.getElementById(`register`);
@@ -336,6 +320,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 });
 
                 const data = await res.json();
+                console.log(data);
 
                 if (!data.ok) {
                     responseMessage(data, data.error);
@@ -343,21 +328,13 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                     responseMessage(data, data.message);
                 }
 
-                if (username.value.length < 6) {
-                    username.style.borderColor = "red";
-                    userErr.style.color = "red";
+                if (displayName.value.length < 6) {
+                    displayName.style.borderColor = "var(--critical)";
                 } 
 
-                if (!/^(?=.*[@])/.test(email.value) || data.trim() === `Email already exist`) {
-                    email.style.borderColor = "red";
-                    emailErr.style.color = "red";
-                }
-
                 if(confPass.value !== pass.value) {
-                    passErr.style.color = "red";
-                    confPassErr.style.color = "red";
-                    confPass.style.borderColor = "red";
-                    pass.style.borderColor = "red";
+                    confPass.style.borderColor = "var(--critical)";
+                    pass.style.borderColor = "var(--crtical)";
                 }
             } catch(err){
                 console.error(err);    

@@ -1,8 +1,9 @@
 :root {
+    --bgurl: url(/assets/images/site.jpg);
     --bigger-header: clamp(2.2rem, 3vw + 1.6rem, 3.8rem);
     --headers: clamp(1.8rem, 2.2vw + 1.3rem, 2.8rem);
     --smaller-header: clamp(1.4rem, 1.4vw + 1.1rem, 2rem);
-    --bigger: clamp(1.1rem, 0.5vw + 1rem, 1.25rem);
+    --bigger: clamp(1.2rem, 0.5vw + 1rem, 1.3rem);
     --normal: clamp(1rem, 0.3vw + 0.95rem, 1.125rem);
     --small: clamp(0.85rem, 0.2vw + 0.8rem, 0.95rem);
     --super-small: clamp(0.7rem, 0.2vw + 0.65rem, 0.8rem);
@@ -18,10 +19,10 @@
     --sub-font-color: rgb(116, 116, 116);
     --sub-bg: rgb(241, 241, 241);
     --transparent-bg: rgba(0, 0, 0, 0.5);
-    --hover-color: rgb(230, 230, 230);
+    --hover-color: rgb(65, 228, 160);
     --shadow: 0px 1px 5px rgba(0, 0, 0, .5);
-    --button-color: rgb(76, 214, 99);
-    --button-hover: rgb(127, 255, 101);
+    --button-color: rgb(26, 92, 83);
+    --button-hover:  rgb(40, 143, 129);
     --active-button: rgb(139, 138, 138);
     --border-color: rgb(170, 170, 170);
     --border: solid 1px var(--border-color);
@@ -74,16 +75,19 @@ a, a:link, a:visited, a:active {
     height: fit-content;
 }
 
+.hidden {
+    display: none;
+}
+
 .redirect {
-    position: absolute;
-    top: 0;
-    left: 0;
-    color: var(--font-color);
+    position: fixed;
+    color: var(--alt-font-color);
     font-size: var(--bigger);
     font-weight: var(--bold);
-    margin: 1em;
+    margin: 2em;
     background: var(--button-color);
-    border-radius: var(--radius);
+    border-radius: 1.5em 0 1.5em 0;
+    z-index: 3;
 }
 
 .redirect:hover {
@@ -98,16 +102,27 @@ h1, h2, h3, p {
     padding: 0;
 }
 
-input[type="text"], input[type="password"], input[type="date"]{
+input {
+    color: transparent;
+    background: transparent;
     font: var(--normal);
     padding: 1em;
     border: var(--border);
     border-radius: var(--radius);
+}
+
+input:focus, input:valid {
+    outline: none;
+    color: var(--font-color)
+}
+
+input[type="text"], input[type="password"], input[type="date"]{
     width: 100%;
+    z-index: 2;
 }
 
 input[type="password"] {
-    padding-right: 3em;
+    padding-right: 4em;
 }
 
 input[type="submit"] {
@@ -135,9 +150,58 @@ input[type="submit"] {
 }
 
 .password button {
-    margin-left: -4em;
+    margin-left: -5em;
     border: none;
     background: transparent;
+    display: none;
+}
+
+.password:focus-within button,
+.password:has(input:valid) button {
+    display: block;
+    z-index: 2;
+}
+
+#responseContainer {
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+#responseContainer div {
+    position: absolute;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 3em;
+    top: 0;
+    margin: 1em;
+    background: var(--critical);
+    padding: 1em;
+    border-radius: var(--radius);
+    color: var(--alt-font-color);
+    font-weight: var(--bold);
+}
+
+#responseContainer span {
+    position: relative;
+}
+
+#responseContainer span::before, #responseContainer span::after{
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 0;
+    background: var(--alt-font-color);
+    min-width: var(--normal);
+    min-height: 3px;
+}
+
+#responseContainer span::before {
+    rotate: 45deg;
+}
+
+#responseContainer span::after {
+    rotate: -45deg;
 }
 
 .header {
@@ -148,7 +212,15 @@ input[type="submit"] {
     gap: 1em;
 }
 
+#register {
+    background: var(--bgurl) center / cover no-repeat;
+    display: flex;
+    min-width: 100%;
+    min-height: 100vh;
+}
+
 #register input[type="submit"] {
+    color: var(--alt-font-color);
     min-width: 100%;
 }
 
@@ -159,25 +231,25 @@ input[type="submit"] {
     box-shadow: var(--shadow);
 }
 
-#register {
-    display: flex;
-    justify-content: end;
-    min-width: 100%;
-    min-height: 100vh;
+.site {
+    background: var(--bgurl) center / cover no-repeat;
+    flex: 1 1 0;
+    border: 1.5em solid var(--bg);
+    border-radius: 4em 0 0 4em;
 }
 
 #register section{
+    background: var(--bg);
     flex: 1 1 0;
     display: flex;
     flex-direction: column;
 }
 
 #register form {
-    flex: 1 1 0;
-    max-width: auto;
-    min-height: fit-content;
     background: var(--bg);
     padding:0 5em;
+    display: flex;
+    flex-direction: column;
 }
 
 #register h1 {
@@ -187,28 +259,32 @@ input[type="submit"] {
 #register span {
     display: flex;
     flex-direction: column;
-    padding: 0.5em;
 }
 
-#register .site {
-    flex: 1 1 0;
-    height: 100vh;
-}
-
-#register .selections {
+#register .part {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1em;
-    padding: 0.5em;
 }
 
 #register span label {
     background:var(--bg);
-    font-size: var(--small);
+    font-size: var(--normal);
     font-weight: var(--bold);
-    transform: translate(1rem, 0.5rem);
+    transform: translate(1rem, -1.2rem);
     max-width: fit-content;
+    margin-top: -1.25em;
+    opacity: 75%;
+    z-index: 1;
+}
+
+#register span:focus-within label,
+#register span:has(input:valid) label {
+    transform: translate(0, -3rem) scale(0.8);
+    transition: transform 300ms ease-in;
     padding: 0 0.5em;
+    opacity: 100%;
+    z-index: 2;
 }
 
 #register select{
