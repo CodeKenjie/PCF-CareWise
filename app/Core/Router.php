@@ -5,17 +5,19 @@ class Router {
     protected $routes = [];
 
     public function get($url, $controllerAction) {
-        $this->routes['GET'][$url] = $controllerAction;
+        $this->routes['GET'][rtrim($url, '/')] = $controllerAction;
     }
     
     public function post($url, $controllerAction){
-        $this->routes['POST'][$url] = $controllerAction;
+        $this->routes['POST'][rtrim($url, '/')] = $controllerAction;
     }
 
     public function direct($uri, $method) {
         $method = strtoupper($method);
+        $uri = rtrim(parse_url($uri, PHP_URL_PATH), '/') ?: '/';
+
         if(!isset($this->routes[$method])) {
-            echo 'No Request recieved';
+            $this->abort(405);
             return;
         }
 
@@ -26,7 +28,12 @@ class Router {
             }
         }
 
-        echo "404 not found";
+        $this->abort(404);
     }
-    
+ 
+    protected function abort($code) {
+        http_response_code($code);
+        require __DIR__ . "/../Views/error.php";
+        exit;
+    }
 }

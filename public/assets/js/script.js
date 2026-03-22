@@ -308,13 +308,12 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             }
         });
 
-        const form = document.getElementById(`register`);
-        form.addEventListener('submit', async (e) => {
+        register.addEventListener('submit', async (e) => {
             e.preventDefault();
 
             try {
                 const formdata = new FormData(e.target);
-                const res = await fetch(`/register/store`, {
+                const res = await fetch(`/register`, {
                     method: "POST",
                     body: formdata
                 });
@@ -324,8 +323,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
 
                 if (!data.ok) {
                     responseMessage(data, data.error);
-                } else {
-                    responseMessage(data, data.message);
+                    return;
                 }
 
                 if (displayName.value.length < 6) {
@@ -336,17 +334,17 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                     confPass.style.borderColor = "var(--critical)";
                     pass.style.borderColor = "var(--crtical)";
                 }
+
+                responseMessage(data, data.message);
+                window.location = "/login";
             } catch(err){
                 console.error(err);    
             }
         });
     } 
 
-    const login = document.getElementById(`loginAccount`);
+    const login = document.getElementById(`login`);
     if (login) {
-        const registerBtn = document.getElementById(`registerButton`);
-        registerBtn.addEventListener("click", () => { window.location = "/register" });
-
         const email = document.getElementById(`email`);
         email.addEventListener("input", () => {
             if(email.value === "") {
@@ -361,13 +359,12 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             }
         });
         
-        const form = document.getElementById(`login`);
-        form.addEventListener("submit", async (e) => {
+        login.addEventListener("submit", async (e) => {
             e.preventDefault();
 
             try {
                 const formdata = new FormData(e.target);
-                const res = await fetch("api/login_users.php", {
+                const res = await fetch("/login", {
                     method: "POST",
                     body: formdata
                 });
@@ -376,25 +373,21 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 
                 if(!data.ok){
                     responseMessage(data, data.error);
-                } else {
-                    responseMessage(data, data.message);
                 }
 
-                if(!data.email){
-                    email.style.borderColor = "red";
-                } else {
+                if(!data.email) {
+                    email.style.borderColor = "var(--critical)";
+                    return;
+                }
+
+                if(!data.password && data.email){
                     email.style.borderColor = "";
+                    password.style.borderColor = "var(--critical)";
+                    return;
                 }
 
-                if(!data.password){
-                    password.style.borderColor = "red";
-                } else {
-                    password.style.borderColor = "";
-                }
-
-                if (data.ok) {
-                    window.location = "index.php";
-                }
+                responseMessage(data, data.message);
+                window.location = "/dashboard";
             } catch(err) {
                 console.error(err);
             }

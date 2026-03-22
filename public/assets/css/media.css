@@ -1,4 +1,8 @@
 @media ( max-width: 600px ) and (orientation: portrait){
+    .redirect {
+        position: absolute;
+    }
+
     .site {
         display: none;
     }
@@ -9,26 +13,37 @@
         padding: 1em;
     }
 
+    .header img{
+        min-width: 10em;
+        min-height: 10em;
+    }
+
     .password button {
         margin-left: -3.5em;
     }
 
-    #register form {
+    #register form, #login form{
         padding: 1em;
     }
 
-    #register section{
+    #register section, #login section{
         justify-content: center;
     }
 
     #register span:focus-within label,
-    #register span:has(input:valid) label {
+    #register span:has(input:valid) label, 
+    #login span:focus-within label,
+    #login span:has(input:valid) label {
         transform: translate(0, -3rem) scale(0.8);
         transition: transform 300ms ease;
     }
 }
 
 @media (max-width: 1000px) and (orientation: landscape) {
+    .redirect {
+        position: absolute;
+    }
+
     .site {
         display: none;
     }
@@ -43,12 +58,17 @@
         justify-content: center;
     }
 
-    #register section {
+    .header img{
+        min-width: 10em;
+        min-height: 10em;
+    }
+
+    #register section, #login section{
         flex-direction: row;
         justify-content: center;
     }
 
-    #register form {
+    #register form, #login section{
         padding: 2em;
     }
 

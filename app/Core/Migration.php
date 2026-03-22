@@ -1,9 +1,11 @@
 <?php
 namespace App\Core;
 use PDO;
+use PDOException;
 
 class Migration extends Database {
     private $files = __DIR__ . "/../../database/migrations";
+    private $response = [];
 
     public function createMigrationTable(){
         $query = 'CREATE TABLE IF NOT EXISTS 
@@ -45,20 +47,25 @@ class Migration extends Database {
     }
 
     public function rollback() {
-        $query = 'SELECT * FROM migrations ORDER BY id DESC LIMIT 1';
-        $lastMigration = $this->conn()->query($query)->fetch(PDO::FETCH_ASSOC);
+        try {
+            $query = 'SELECT * FROM migrations ORDER BY id DESC LIMIT 1';
+            $lastMigration = $this->conn()->query($query)->fetch(PDO::FETCH_ASSOC);
 
-        if (!$lastMigration){
-            return;
+            if (!$lastMigration){
+                return;
+            }
+
+            $file = $lastMigration['name'];
+            require $this->files . '/' . $file;
+            $class = str_replace('.php', '', $file);
+            $deleteLastMigration = new $class;
+            $deleteLastMigration->down();
+
+            $rollback = 'DELETE FROM migrations WHERE id = ?';
+            $this->conn()->prepare($rollback)->execute([$lastMigration['id']]);
+        } catch (PDOException $err) {
+            $this->response = [ 'ok' => false, 'code' => 500, 'error' => 'Server Error: ' . $err->getMessage() ];
+            echo json_encode($this->response);
         }
-
-        $file = $lastMigration['name'];
-        require __DIR__ . '/' . $file;
-        $class = str_replace('.php', '', $file);
-        $deleteLastMigration = new $class;
-        $deleteLastMigration->down();
-
-        $rollback = 'DELETE FROM migrations WHERE id = ?';
-        $this->conn()->prepare($rollback)->execute($lastMigration['id']);
     }
 }

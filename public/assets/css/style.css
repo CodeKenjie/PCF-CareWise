@@ -1,5 +1,5 @@
 :root {
-    --bgurl: url(/assets/images/site.jpg);
+    --super-header: clamp(3rem, 4.2vw + 2rem, 4.8rem);
     --bigger-header: clamp(2.2rem, 3vw + 1.6rem, 3.8rem);
     --headers: clamp(1.8rem, 2.2vw + 1.3rem, 2.8rem);
     --smaller-header: clamp(1.4rem, 1.4vw + 1.1rem, 2rem);
@@ -43,6 +43,19 @@
     padding: 2em;
 }
 
+.sh {
+    font-size: var(--super-header);
+}
+
+.mh {
+    font-size: var(--bigger-header) ;   
+}
+.sbh {
+    font-size: var(--bigger);
+    font-weight: var(--bold);
+    opacity: 75%;
+}
+
 .ctr-text {
     text-align: center;
 }
@@ -73,28 +86,6 @@ a, a:link, a:visited, a:active {
     text-decoration: none;
     width: fit-content;
     height: fit-content;
-}
-
-.hidden {
-    display: none;
-}
-
-.redirect {
-    position: fixed;
-    color: var(--alt-font-color);
-    font-size: var(--bigger);
-    font-weight: var(--bold);
-    margin: 2em;
-    background: var(--button-color);
-    border-radius: 1.5em 0 1.5em 0;
-    z-index: 3;
-}
-
-.redirect:hover {
-    background: var(--button-hover);
-    transform: scale(1.1);
-    transition: transform 300ms ease;
-    box-shadow: var(--shadow);
 }
 
 h1, h2, h3, p {
@@ -134,6 +125,38 @@ input[type="submit"] {
     padding: 1em;
 }
 
+.hidden {
+    display: none;
+}
+
+.redirect {
+    position: fixed;
+    color: var(--alt-font-color);
+    font-size: var(--bigger);
+    font-weight: var(--bold);
+    margin: 2em;
+    background: var(--button-color);
+    border-radius: 1.5em 0 1.5em 0;
+    z-index: 3;
+}
+
+.redirect:hover {
+    background: var(--button-hover);
+    transform: scale(1.1);
+    transition: transform 300ms ease;
+    box-shadow: var(--shadow);
+}
+
+#login .redirect {
+    right: 0;
+    border-radius: 0 1.5em 0 1.5em;
+}
+
+.forgotten {
+    padding: 0 0.5em 1em;
+    align-self: end;
+}
+
 .logo{
     max-width: 5rem;
     max-height: 5rem;
@@ -163,23 +186,28 @@ input[type="submit"] {
 }
 
 #responseContainer {
-    position: relative;
+    position: absolute;
+    top: 0;
+    min-width: 100%;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    z-index: 10;
+    margin: 0;
+    padding: 0.5em;
+    gap: 0.5em;
 }
 
 #responseContainer div {
-    position: absolute;
     display: grid;
     grid-template-columns: 1fr auto;
-    gap: 3em;
-    top: 0;
-    margin: 1em;
     background: var(--critical);
     padding: 1em;
+    gap: 3em;
     border-radius: var(--radius);
     color: var(--alt-font-color);
     font-weight: var(--bold);
+    width: fit-content;
 }
 
 #responseContainer span {
@@ -194,6 +222,7 @@ input[type="submit"] {
     background: var(--alt-font-color);
     min-width: var(--normal);
     min-height: 3px;
+    cursor: pointer;
 }
 
 #responseContainer span::before {
@@ -212,19 +241,25 @@ input[type="submit"] {
     gap: 1em;
 }
 
-#register {
-    background: var(--bgurl) center / cover no-repeat;
+#register, #login {
     display: flex;
     min-width: 100%;
     min-height: 100vh;
 }
 
-#register input[type="submit"] {
+#register form, #login form {
+    background: var(--bg);
+    padding:0 5em;
+    display: flex;
+    flex-direction: column;
+}
+
+#register input[type="submit"], #login input[type="submit"] {
     color: var(--alt-font-color);
     min-width: 100%;
 }
 
-#register input[type="submit"]:hover {
+#register input[type="submit"]:hover, #login input[type="submit"]:hover {
     background: var(--button-hover);
     transform: scale(1.05);
     transition: tranform 300sm ease;
@@ -232,31 +267,31 @@ input[type="submit"] {
 }
 
 .site {
-    background: var(--bgurl) center / cover no-repeat;
     flex: 1 1 0;
     border: 1.5em solid var(--bg);
-    border-radius: 4em 0 0 4em;
+    object-fit: cover;
 }
 
-#register section{
+.site img {
+    width: 100%;
+    height: 100%;
+    border-radius: 2em 0 0 2em;
+    clip-path: polygon(0 0, 100% 0, 95% 100%, 0% 100%);
+}
+
+#login .site img {
+    border-radius: 0 2em 2em 0;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 5% 100%);
+}
+
+#register section, #login section{
     background: var(--bg);
     flex: 1 1 0;
     display: flex;
     flex-direction: column;
 }
 
-#register form {
-    background: var(--bg);
-    padding:0 5em;
-    display: flex;
-    flex-direction: column;
-}
-
-#register h1 {
-    font-size: var(--bigger-header);
-}
-
-#register span {
+#register span, #login span {
     display: flex;
     flex-direction: column;
 }
@@ -267,7 +302,8 @@ input[type="submit"] {
     gap: 1em;
 }
 
-#register span label {
+#register span label,
+#login span label {
     background:var(--bg);
     font-size: var(--normal);
     font-weight: var(--bold);
@@ -279,7 +315,9 @@ input[type="submit"] {
 }
 
 #register span:focus-within label,
-#register span:has(input:valid) label {
+#register span:has(input:valid) label,
+#login span:focus-within label,
+#login span:has(input:valid) label {
     transform: translate(0, -3rem) scale(0.8);
     transition: transform 300ms ease-in;
     padding: 0 0.5em;

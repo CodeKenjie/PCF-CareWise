@@ -22,7 +22,7 @@ class CreatePatientsTable extends Migration {
     }
 
     public function down() {
-        $query = "DROP TABLE IF EXIST patients";
+        $query = "DROP TABLE IF EXISTS patients";
         $this->conn()->exec($query);
     }
 }
