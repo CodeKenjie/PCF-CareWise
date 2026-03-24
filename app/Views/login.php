@@ -8,8 +8,8 @@
         </div>
         <form action="/login" method="post">
             <span class="p-sm">
-                <h1 class="ctr-text sh">Hi Nurse</h1>
-                <h2 class="ctr-text sbh">Welcome to CareWise</h2>
+                <h1 class="ctr-text spr-h">Hi Nurse</h1>
+                <h2 class="ctr-text sb-h">Welcome to CareWise</h2>
             </span>
             <span class="p-sm">
                 <input id="email" name="email" type="email" maxlength="150" required>

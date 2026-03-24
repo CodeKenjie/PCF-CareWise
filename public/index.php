@@ -13,5 +13,6 @@ $router->get('/login', 'App\Controllers\LoginController@index');
 $router->post('/login', 'App\Controllers\UserController@login');
 $router->get('/register', 'App\Controllers\RegisterController@index');
 $router->post('/register', 'App\Controllers\UserController@register');
-$router->direct($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
 
+$router->get('/dashboard', 'App\Controllers\DashboardController@index');
+$router->direct($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);

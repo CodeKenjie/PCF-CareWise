@@ -1,13 +1,14 @@
 :root {
+    --font-fam: Arial, Helvetica, sans-serif;
     --super-header: clamp(3rem, 4.2vw + 2rem, 4.8rem);
-    --bigger-header: clamp(2.2rem, 3vw + 1.6rem, 3.8rem);
-    --headers: clamp(1.8rem, 2.2vw + 1.3rem, 2.8rem);
-    --smaller-header: clamp(1.4rem, 1.4vw + 1.1rem, 2rem);
+    --big-header: clamp(2.2rem, 3vw + 1.6rem, 3.8rem);
+    --header: clamp(1.8rem, 2.2vw + 1.3rem, 2.8rem);
+    --small-header: clamp(1.4rem, 1.4vw + 1.1rem, 2rem);
     --bigger: clamp(1.2rem, 0.5vw + 1rem, 1.3rem);
     --normal: clamp(1rem, 0.3vw + 0.95rem, 1.125rem);
     --small: clamp(0.85rem, 0.2vw + 0.8rem, 0.95rem);
     --super-small: clamp(0.7rem, 0.2vw + 0.65rem, 0.8rem);
-    --bold: 800;
+    --bold: 700;
     --semi-bold: 600;
     --thin: 300;
     --bg: rgb(255, 255, 255);
@@ -16,14 +17,14 @@
     --radius: 0.5rem;
     --double-radius: 1rem;
     --alt-font-color: rgb(255, 255, 255);
-    --sub-font-color: rgb(116, 116, 116);
+    --button-highlight: rgb(240, 240, 240);
     --sub-bg: rgb(241, 241, 241);
     --transparent-bg: rgba(0, 0, 0, 0.5);
     --hover-color: rgb(65, 228, 160);
     --shadow: 0px 1px 5px rgba(0, 0, 0, .5);
     --button-color: rgb(26, 92, 83);
     --button-hover:  rgb(40, 143, 129);
-    --active-button: rgb(139, 138, 138);
+    --button-active: rgb(139, 138, 138);
     --border-color: rgb(170, 170, 170);
     --border: solid 1px var(--border-color);
     --critical: rgb(212, 66, 66);
@@ -43,21 +44,45 @@
     padding: 2em;
 }
 
-.sh {
+.spr-h {
     font-size: var(--super-header);
 }
 
-.mh {
-    font-size: var(--bigger-header) ;   
+.m-h {
+    font-size: var(--big-header) ;   
 }
-.sbh {
+
+.sm-h {
     font-size: var(--bigger);
+    font-weight: var(--bold);
+}
+.sb-h {
+    font-size: var(--normal);
     font-weight: var(--bold);
     opacity: 75%;
 }
 
 .ctr-text {
     text-align: center;
+}
+
+.critical {
+    border-color: var(--critical);
+}
+
+.moderate {
+    border-color: var(--moderate);
+}
+
+.good {
+    border-color: var(--good);
+}
+
+
+.svg{
+    fill: currentColor;
+    width: 1em;
+    height: 1em;
 }
 
 html {
@@ -69,7 +94,7 @@ html {
 body {
     color: var(--font-color);
     font-size: var(--normal);
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    font-family: var(--font-fam);
     min-height: 100vh;
     min-height: 100dvh;
     width: 100%;
@@ -91,6 +116,12 @@ a, a:link, a:visited, a:active {
 h1, h2, h3, p {
     margin: 0;
     padding: 0;
+}
+
+main {
+    display: flex;
+    width: 100%;
+    height: 100dvh;
 }
 
 input {
@@ -129,6 +160,39 @@ input[type="submit"] {
     display: none;
 }
 
+#ham-menu {
+    position: relative;
+    width: 3em;
+    height: 3rem;
+    border-radius: 50%;
+    margin: 0.5em;
+    cursor: pointer;
+}
+
+#ham-menu:hover {
+    background: var(--button-highlight);
+}
+
+#ham-menu span{
+    content: "";
+    position: absolute;
+    top: 32%;
+    left: 49%;
+    background: black;
+    border-radius: 1em;
+    width: 1.5em;
+    height: 0.3em;
+    transform: translate(-50%, -50%);
+}
+
+#ham-menu span:nth-child(2){
+    top: 50%;
+}
+
+#ham-menu span:nth-child(3){
+    top: 70%;
+}
+
 .redirect {
     position: fixed;
     color: var(--alt-font-color);
@@ -162,9 +226,14 @@ input[type="submit"] {
     max-height: 5rem;
 }
 
+.sm-icon {
+    width: var(--bigger);
+    height: var(--bigger);
+}
+
 .icon {
-    width: var(--headers);
-    height: var(--headers);
+    width: var(--header);
+    height: var(--header);
 }
 
 .password {
@@ -234,11 +303,18 @@ input[type="submit"] {
 }
 
 .header {
+    width: var(--header);
+    height: var(--header);
     font-size: var(--bigger);
     display: flex;
     align-items: center;
     padding: 2em;
     gap: 1em;
+}
+
+.header img {
+    width: var(--header);
+    height: var(--header);
 }
 
 #register, #login {
@@ -300,12 +376,6 @@ input[type="submit"] {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1em;
-}
-
-#register span label,
-#login span label {
-    background:var(--bg);
-    font-size: var(--normal);
     font-weight: var(--bold);
     transform: translate(1rem, -1.2rem);
     max-width: fit-content;
@@ -327,8 +397,126 @@ input[type="submit"] {
 
 #register select{
     background: transparent;
-    font: var(--normal);
+    font-size: var(--normal);
+    font-weight: var(--bold);
     border: var(--border);
     border-radius: var(--radius);
     padding: 1em;
+    opacity: 75%;
+}
+
+#sidebar {
+    background: var(--bg);
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 20rem;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#sidebar.close {
+    width: 4.5rem;
+    overflow: hidden;
+    transition: width 300ms ease;
+}
+
+#sidebar.close .sm-icon {
+    width: 1.5em;
+    height: 1.5em;
+    transition: width 300ms ease;
+}
+
+#sidebar.close section, 
+#sidebar.close li a {
+    align-items: center;
+    justify-content: center;
+}
+
+#sidebar.close li:has(a) span,
+#sidebar.close section:has(div) h4,
+#sidebar.close section div{
+    width: 0;
+    overflow: hidden;
+    margin-left: -0.5em;
+    transition: width 300ms ease;
+} 
+
+#sidebar section {
+    display: flex;
+    gap: 0.5em;
+    padding: 0.5em;
+    margin: 3em 0;
+    cursor: pointer;
+}
+
+#sidebar section:hover {
+    background: var(--button-highlight);
+}
+
+#sidebar section span {
+    width: var(--header);
+    height: var(--header);
+    box-shadow: var(--shadow);
+    border: 0.1rem solid var(--bg);
+    border-radius: 50%;
+    overflow: hidden;
+    object-fit: cover;
+}
+
+#sidebar section span img {
+    width: 100%;
+    height: 100%;
+}
+
+#sidebar section div {
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+#sidebar ul{
+    display: flex;
+    flex-direction: column;
+    font-size: var(--bigger);
+    font-weight: var(--bold);
+    list-style-type: none;
+}
+
+#sidebar ul a {
+    position: relative;
+    flex: 1 1 0;
+    display: flex;
+    align-items: center;
+    color: var(--font-color);
+    padding: 0.5em;
+    margin: 0 0.5em;
+    border-radius: var(--radius);
+    gap: 0.5em;
+}
+
+#sidebar ul li {
+    display: flex;
+}
+
+#sidebar ul a:hover{
+    color: var(--alt-font-color);
+}
+
+#sidebar ul a::before {
+    position: absolute;
+    content: "";
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 100%;
+    background: var(--button-hover);
+    border-radius: var(--radius);
+    opacity: 75%;
+    z-index: -1;
+}
+
+#sidebar ul a:hover::before {
+    width: 100%;
+    transition: width 200ms ease-in;
 }

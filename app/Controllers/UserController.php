@@ -26,37 +26,25 @@ class UserController extends Controller {
             $age = $bdateFormat -> diff($today) -> y;
 
             if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
-                $response = ['ok' => false, 'error' => "Email is not Valid"];
+                $response = ['ok' => false, 'code' => 400,  'error' => "Email is not Valid"];
                 echo json_encode($response);
                 exit;
             }
 
             if(strlen($displayName) < 6) { 
-                $response = ['ok' => false, 'error' => "Username must be 6 character or longer"];
+                $response = ['ok' => false, 'code' => 401, 'error' => "Username must be 6 character or longer"];
                 echo json_encode($response);
                 exit;
             }
 
             if($password !== $confPass) { 
-                $response = ['ok' => false, 'error' => "Password did not match"];
-                echo json_encode($response);
-                exit;
-            }
-
-            if (!$email) { 
-                $response = ['ok' => false, 'error' => "Wrong email format"];
-                echo json_encode($response);
-                exit;
-            }
-
-            if(!$accept) { 
-                $response = ['ok' => false, 'error' => "Please make sure to read and accept security privacy, terms and condition"];
+                $response = ['ok' => false, 'code' => 409,'error' => "Password did not match"];
                 echo json_encode($response);
                 exit;
             }
             
-            $userData = [
-                'display_name'=> $displayName,
+            $data = [
+                'displayName'=> $displayName,
                 'firstName'=> $firstName,
                 'lastName'=> $lastName,
                 'birthdate'=> $birthdate,
@@ -68,8 +56,16 @@ class UserController extends Controller {
                 'role'=> $role,
             ];
             $user = new User();
-            $result = $user->save($userData); 
-            echo json_encode($result);
+
+            if($user->findByEmail($data['email'])){
+                $response = [ 'ok' => false, 'code' => 409, 'error' => 'Email is already registered' ];
+                echo json_encode($response);
+                exit;
+            }
+
+            $user->create($data); 
+            $response = [ 'ok' => true, 'code' => 200, 'message' => 'Account successfully created!'];
+            echo json_encode($response);
             exit;
         }
     }
@@ -81,20 +77,31 @@ class UserController extends Controller {
             $password = $_POST['password'] ?? '';
 
             if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
-                $response = ['ok' => false, 'error' => "Email format not valid" ];
+                $response = ['ok' => false, 'code' => 400, 'error' => "Email format not valid" ];
                 echo json_encode($response);
                 exit;
             }
 
-            $data = [
-                'email' => strtolower($email),
-                'password' => $password
-            ];
-
             $user = new User();
-            $result = $user->logUserIn($data);
-            echo json_encode($result);
-            exit;
+            $userExists = $user->findByEmail($email);
+
+            if(!$userExists) {
+                $response = ['ok' => false, 'code' => 404, 'error' => 'Email is not yet registered' ];
+                echo json_encode($response);
+                exit;
+            }
+
+            if (!password_verify($password, $userExists['password'])) {
+                $response = ['ok' => false, 'code' => 401, 'error' => 'Incorrect Password' ];
+                echo json_encode($response);
+                exit;
+            }
+
+            session_regenerate_id(true);
+            $_SESSION['id'] = $userExists['id'];
+
+            $response = ['ok' => true, 'code' => 200, 'message' => 'Logged in success!' ];
+            echo json_encode($response);
         }
     }
 }

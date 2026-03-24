@@ -226,34 +226,10 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
     })
 
     const sidebar = document.querySelector(`#sidebar`);
-    if (sidebar) {
-        const params = new URLSearchParams(window.location.search);
-        const currentpage = params.get(`page`);
-        const activeButton = document.getElementById(`${currentpage}Button`);
-        if (currentpage) {
-            activeButton.classList.add(`activePage`);
-        }
-
-        const sidebarState = localStorage.getItem('sidebarState');
-        document.querySelector(`#hamburgerMenu`).classList.add(`active`);
-
-        if (sidebarState === "minimized") {
-            sidebar.classList.add("minimized");
-            document.querySelector(`#hamburgerMenu`).classList.remove(`active`);
-        }
-
-        document.getElementById(`hamburgerMenu`).addEventListener("click", (e) => {
-            sidebar.classList.toggle(`minimized`);
-
-            if (sidebar.classList.contains(`minimized`)) {
-                localStorage.setItem('sidebarState', "minimized");
-                document.querySelector(`#hamburgerMenu`).classList.remove(`active`);
-            } else {
-                localStorage.setItem('sidebarState', "expanded");
-                document.querySelector(`#hamburgerMenu`).classList.add(`active`);
-            }
-        });
-    }
+    const hamMenu = document.getElementById(`ham-menu`);
+    hamMenu.addEventListener(`click`, () => {
+        sidebar.classList.toggle(`close`);
+    });
 
     const register = document.getElementById(`register`);
     if (register) {
@@ -326,13 +302,17 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                     return;
                 }
 
-                if (displayName.value.length < 6) {
-                    displayName.style.borderColor = "var(--critical)";
+                if (data.code === 401) {
+                    displayName.classList.add(`critical`);
                 } 
 
                 if(confPass.value !== pass.value) {
-                    confPass.style.borderColor = "var(--critical)";
-                    pass.style.borderColor = "var(--crtical)";
+                    confPass.classList.add(`critical`);
+                    pass.classList.add(`critical`);
+                }
+
+                if (data.code === 409) {
+                    email.classList.add(`critical`);
                 }
 
                 responseMessage(data, data.message);
@@ -375,19 +355,19 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                     responseMessage(data, data.error);
                 }
 
-                if(!data.email) {
+                if(data.code === 400 || data.code === 404 ) {
                     email.style.borderColor = "var(--critical)";
                     return;
                 }
 
-                if(!data.password && data.email){
+                if(data.code === 401){
                     email.style.borderColor = "";
                     password.style.borderColor = "var(--critical)";
                     return;
                 }
 
                 responseMessage(data, data.message);
-                window.location = "/dashboard";
+                window.location = '/dashboard';
             } catch(err) {
                 console.error(err);
             }

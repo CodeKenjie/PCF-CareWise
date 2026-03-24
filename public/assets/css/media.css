@@ -1,6 +1,13 @@
 @media ( max-width: 600px ) and (orientation: portrait){
+    main {
+        flex-direction: column;
+    }
     .redirect {
         position: absolute;
+    }
+
+    #ham-menu span:nth-child(2) {
+        top: 52%;
     }
 
     .site {
@@ -37,6 +44,55 @@
         transform: translate(0, -3rem) scale(0.8);
         transition: transform 300ms ease;
     }
+
+    #sidebar {
+        position: fixed;
+        top: unset;
+        bottom: 0;
+        flex-direction: row;
+        width: 100%;
+        height: fit-content;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #sidebar div,
+    #sidebar header{
+        display: none;
+    }
+
+    #sidebar .sm-icon {
+        width: var(--header);
+        height: var(--header);
+    }
+
+    #sidebar section span {
+        width: 3rem;
+        height: 3rem;
+    }
+    #sidebar section{
+        height: fit-content;
+        margin: 0;
+        justify-content: center;
+    }
+
+    #sidebar ul {
+        flex: 1 1 0;
+        flex-direction: row;
+        width: 100%;
+        height: fit-content;
+        justify-content: center;
+    }
+
+    #sidebar li a {
+        flex: 1 1 0;
+        flex-direction: column;
+        margin: 0;
+    }
+
+    #sidebar li:has(a) span {
+        font-size: var(--super-small);
+    } 
 }
 
 @media (max-width: 1000px) and (orientation: landscape) {
