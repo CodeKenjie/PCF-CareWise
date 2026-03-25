@@ -2,10 +2,10 @@
 <main id="login">
     <a class="redirect p-md" href="/register">Register</a>
     <section>
-        <div class="header">
+        <header>
             <img class="logo" src="/assets/images/logo.png" alt="">
             <h2>PCF:CareWise</h2>
-        </div>
+        </header>
         <form action="/login" method="post">
             <span class="p-sm">
                 <h1 class="ctr-text spr-h">Hi Nurse</h1>

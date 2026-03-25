@@ -1,4 +1,10 @@
-@media ( max-width: 600px ) and (orientation: portrait){
+@media ( max-height: 640px ) and ( orientation: portrait ) {
+    #register header {
+        display: none;
+    }
+}
+
+@media ( max-width: 600px ) and ( orientation: portrait ){
     main {
         flex-direction: column;
     }
@@ -14,15 +20,14 @@
         display: none;
     }
 
-    .header {
+    #register header {
         flex-direction: column;
-        justify-content: center;
-        padding: 1em;
+        margin: 0;
     }
 
-    .header img{
-        min-width: 10em;
-        min-height: 10em;
+    #register header img {
+        width: var(--super-header);
+        height: var(--super-header);
     }
 
     .password button {
@@ -35,14 +40,6 @@
 
     #register section, #login section{
         justify-content: center;
-    }
-
-    #register span:focus-within label,
-    #register span:has(input:valid) label, 
-    #login span:focus-within label,
-    #login span:has(input:valid) label {
-        transform: translate(0, -3rem) scale(0.8);
-        transition: transform 300ms ease;
     }
 
     #sidebar {
@@ -77,15 +74,18 @@
     }
 
     #sidebar ul {
-        flex: 1 1 0;
         flex-direction: row;
         width: 100%;
         height: fit-content;
         justify-content: center;
+        margin: 0;
+    }
+
+    #sidebar li {
+        flex: 1 1 0;
     }
 
     #sidebar li a {
-        flex: 1 1 0;
         flex-direction: column;
         margin: 0;
     }
@@ -93,6 +93,14 @@
     #sidebar li:has(a) span {
         font-size: var(--super-small);
     } 
+
+    #sidebar .popup{
+        top: unset;
+        left: unset;
+        bottom: 100%;
+        right: 1%;
+        border-radius: var(--radius) 0 0 var(--radius);
+    }
 }
 
 @media (max-width: 1000px) and (orientation: landscape) {

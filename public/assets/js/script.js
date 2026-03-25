@@ -226,10 +226,18 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
     })
 
     const sidebar = document.querySelector(`#sidebar`);
-    const hamMenu = document.getElementById(`ham-menu`);
-    hamMenu.addEventListener(`click`, () => {
-        sidebar.classList.toggle(`close`);
-    });
+    if(sidebar){
+        const hamMenu = document.getElementById(`ham-menu`);
+        hamMenu.addEventListener(`click`, () => {
+            sidebar.classList.toggle(`close`);
+        });
+
+        const profilePop = document.querySelector(`.popup`);
+        const profile = document.getElementById(`profile`);
+        profile.addEventListener(`click`, () => {
+            profilePop.classList.toggle(`open`);
+        });
+    }
 
     const register = document.getElementById(`register`);
     if (register) {

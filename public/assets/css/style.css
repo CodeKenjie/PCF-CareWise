@@ -4,6 +4,7 @@
     --big-header: clamp(2.2rem, 3vw + 1.6rem, 3.8rem);
     --header: clamp(1.8rem, 2.2vw + 1.3rem, 2.8rem);
     --small-header: clamp(1.4rem, 1.4vw + 1.1rem, 2rem);
+    --super-small-header: clamp(1.3rem, 1vw + 1.05rem, 1.5rem);
     --bigger: clamp(1.2rem, 0.5vw + 1rem, 1.3rem);
     --normal: clamp(1rem, 0.3vw + 0.95rem, 1.125rem);
     --small: clamp(0.85rem, 0.2vw + 0.8rem, 0.95rem);
@@ -302,25 +303,24 @@ input[type="submit"] {
     rotate: -45deg;
 }
 
-.header {
-    width: var(--header);
-    height: var(--header);
-    font-size: var(--bigger);
-    display: flex;
-    align-items: center;
-    padding: 2em;
-    gap: 1em;
-}
-
-.header img {
-    width: var(--header);
-    height: var(--header);
-}
-
 #register, #login {
     display: flex;
     min-width: 100%;
     min-height: 100vh;
+}
+
+#login header,
+#register header {
+    display: flex;
+    align-items: center;
+    margin: 2rem;
+    gap: 1em;
+}
+
+#login header img,
+#register header img {
+    width: 3em;
+    height: 3em;
 }
 
 #register form, #login form {
@@ -377,6 +377,14 @@ input[type="submit"] {
     grid-template-columns: 1fr 1fr;
     gap: 1em;
     font-weight: var(--bold);
+    z-index: 1;
+}
+
+#register span label,
+#login span label {
+    background:var(--bg);
+    font-size: var(--normal);
+    font-weight: var(--bold);
     transform: translate(1rem, -1.2rem);
     max-width: fit-content;
     margin-top: -1.25em;
@@ -388,7 +396,7 @@ input[type="submit"] {
 #register span:has(input:valid) label,
 #login span:focus-within label,
 #login span:has(input:valid) label {
-    transform: translate(0, -3rem) scale(0.8);
+    transform: translate(0.5em, -2.6em) scale(0.88);
     transition: transform 300ms ease-in;
     padding: 0 0.5em;
     opacity: 100%;
@@ -406,6 +414,7 @@ input[type="submit"] {
 }
 
 #sidebar {
+    position: relative;
     background: var(--bg);
     position: sticky;
     top: 0;
@@ -418,7 +427,6 @@ input[type="submit"] {
 
 #sidebar.close {
     width: 4.5rem;
-    overflow: hidden;
     transition: width 300ms ease;
 }
 
@@ -434,6 +442,10 @@ input[type="submit"] {
     justify-content: center;
 }
 
+#sidebar.close ul {
+    align-items: center;
+}
+
 #sidebar.close li:has(a) span,
 #sidebar.close section:has(div) h4,
 #sidebar.close section div{
@@ -443,11 +455,23 @@ input[type="submit"] {
     transition: width 300ms ease;
 } 
 
+#sidebar.close header section{
+    display: none;
+}
+
+#sidebar header {
+    display: flex;
+}
+
+#sidebar header section {
+    display: flex;
+    align-items: center;
+}
+
 #sidebar section {
     display: flex;
     gap: 0.5em;
-    padding: 0.5em;
-    margin: 3em 0;
+    padding: 1em 0.5em;
     cursor: pointer;
 }
 
@@ -478,9 +502,10 @@ input[type="submit"] {
 #sidebar ul{
     display: flex;
     flex-direction: column;
-    font-size: var(--bigger);
+    font-size: var(--super-small-header);
     font-weight: var(--bold);
     list-style-type: none;
+    margin: 1em 0;
 }
 
 #sidebar ul a {
@@ -519,4 +544,54 @@ input[type="submit"] {
 #sidebar ul a:hover::before {
     width: 100%;
     transition: width 200ms ease-in;
+}
+
+#sidebar .popup {
+    position: absolute;
+    top: 30%;
+    left: 100%;
+    display: grid;
+    background: var(--bg);
+    width: 0;
+    height: 0;
+    font-size: var(--bigger);
+    border-radius: 0 var(--radius) var(--radius) var(--radius);
+    overflow: hidden;
+    z-index: 1000;
+}
+
+#sidebar .popup button,
+#sidebar .popup a {
+    display: flex;
+    align-items: center;
+    color: var(--font-color);
+    background: var(--bg);
+    text-align: start;
+    font-size: var(--bigger);
+    font-weight: var(--bold);
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    padding: 0.5em;
+    gap: 0.5em;
+    border-radius: 0 var(--radius) var(--radius) var(--radius);
+    transition: width 300ms ease;
+}
+
+#sidebar .popup a:hover,
+#sidebar .popup button:hover{
+    background: var(--button-highlight);
+}
+
+#sidebar .popup.open {
+    border: var(--border);
+    width: 15rem;
+    height: fit-content;
+    padding: 0.4em;
+    transition: width 300ms ease;
+}
+
+#sidebar.close .popup {
+    top: 32%;
+    left: 110%;
 }

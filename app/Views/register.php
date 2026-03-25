@@ -5,14 +5,14 @@
         <img src="assets/images/site.jpg" alt="">
     </div>
     <section>
-        <div class="header">
+        <header>
             <img class="logo" src="/assets/images/logo.png" alt="">
             <h2>PCF:CareWise</h2>
-        </div>
+        </header>
         <form action="/register" method="post">
             <span class="p-sm">
-                <h1 class="ctr-text mh">Join our team</h1>
-                <h2 class="ctr-text sbh">help our community</h2>
+                <h1 class="ctr-text spr-h">Join our team</h1>
+                <h2 class="ctr-text sb-h">help our community</h2>
             </span>
             <span class="p-sm">
                 <input id="displayName" name="displayName" type="text" maxlength="50" required>
