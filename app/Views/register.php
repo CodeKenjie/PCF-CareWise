@@ -48,7 +48,6 @@
                 <span>
                     <select name="role" required>
                         <option value="" hidden></option>
-                        <option value="super user" hidden>Super User</option>
                         <option value="admin">Admin</option>
                         <option value="staff">Staff</option>
                     </select>

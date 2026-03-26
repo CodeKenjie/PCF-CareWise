@@ -404,142 +404,10 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             registerPatient.classList.remove('active');
         });
 
-        const registerPatient = document.getElementById(`registerPatient`);
-        if (registerPatient) {
-            const pFirstName = document.getElementById(`pFirstName`);
-            const pLastName = document.getElementById(`pLastName`);
-            const pAddress = document.getElementById(`pAddress`);
-            const pBirth = document.getElementById(`pBirth`);
-            const pSex = document.getElementById(`pSex`);
-            const pContact = document.getElementById(`pContact`);
-            const pReferredBy = document.getElementById(`pReferredBy`);
-
-            const closeRegisterForm = document.getElementById(`closeRegisterForm`);
-            closeRegisterForm.addEventListener(`click`, () => {
-                pFirstName.value = "";
-                pLastName.value = "";
-                pAddress.value = "";
-                pBirth.value = "";
-                pSex.value = "";
-                pContact.value = "";
-                pReferredBy.value = "";
-                registerPatient.classList.remove(`active`);
-            });
-            
-            const registrationForm = document.getElementById(`registrationForm`);
-            registrationForm.addEventListener("submit", async (e) => {
-                e.preventDefault();
-
-                pBirth.addEventListener("input", () => {
-                    if(pBirth.value !== ""){
-                        pBirth.style.borderColor = "var(--border-color)";
-                    }
-                });
-
-                try{
-                    const formdata = new FormData(e.target);
-                    const res = await fetch("api/add_patient.php", {
-                        method: "POST",
-                        body: formdata
-                    });
-
-                    const data = await res.json();
-
-                    if(!data.ok){
-                        responseMessage(data, data.error);
-                    } else {
-                        pFirstName.value = "";
-                        pLastName.value = "";
-                        pAddress.value = "";
-                        pBirth.value = "";
-                        pSex.value = "";
-                        pContact.value = "";
-                        pReferredBy.value = "";
-                        responseMessage(data, data.message);
-                        registerPatient.classList.remove(`active`);
-                        loadPatientsData();
-                    }
-
-                    if(!data.birthdate){
-                        pBirth.style.borderColor = "red";
-                    } else {
-                        pBirth.style.borderColor = "var(--border-color)";
-                    }
-                } catch(err){
-                    console.error(err);
-                }
-            });
-        }
-
-        const editPatientPanel = document.getElementById(`editPatientPanel`);
-        if (editPatientPanel) {
-            const updateFirstName = document.getElementById(`updateFirstName`);
-            const updateLastName = document.getElementById(`updateLastName`);
-            const updateAddress = document.getElementById(`updateAddress`);
-            const updateBirth = document.getElementById(`updateBirth`);
-            const updateSex = document.getElementById(`updateSex`);
-            const updateContact = document.getElementById(`updateContact`);
-
-            const editPatientForm = document.getElementById(`editPatientForm`);
-            editPatientForm.addEventListener("submit", async (e) => {
-                e.preventDefault();
-
-                updateBirth.addEventListener("input", () => {
-                    if(updateBirth.value !== ""){
-                        updateBirth.style.borderColor = "var(--border-color)";
-                    }
-                });
-
-                try{
-                    const res = await fetch("api/edit_patient.php", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({ first_name: updateFirstName.value, last_name: updateLastName.value, address: updateAddress.value, birthdate: updateBirth.value, sex: updateSex.value, contact: updateContact.value, id: selectedPatientId })
-                    });
-
-                    const data = await res.json();
-
-                    if(!data.ok){
-                        responseMessage(data, data.error);
-                    } else {
-                        updateFirstName.value = "";
-                        updateLastName.value = "";
-                        updateAddress.value = "";
-                        updateBirth.value = "";
-                        updateSex.value = "";
-                        updateContact.value = "";
-                        responseMessage(data, data.message);
-                        editPatientPanel.classList.remove(`active`);
-                        loadPatientsData();
-                    }
-
-                    if(!data.birthdate){
-                        updateBirth.style.borderColor = "red";
-                    }
-                } catch(err){
-                    console.error(err);
-                }
-            });
-
-            const closeEditForm = document.getElementById(`closeEditForm`);
-            closeEditForm.addEventListener("click", () => {
-                updateFirstName.value = "";
-                updateLastName.value = "";
-                updateAddress.value = "";
-                updateBirth.value = "";
-                updateSex.value = "";
-                updateContact.value = "";
-                editPatientPanel.classList.remove(`active`);
-            });
-
-        }
-        
-        const sortDirection = document.getElementById(`sortDirection`);
-        const sortByName = document.getElementById(`sortByName`);
-        const sortByAge = document.getElementById(`sortByAge`);
-        const sortById = document.getElementById(`sortById`);
+        const sortDirection = document.getElementById(`direction`);
+        const sortByName = document.getElementById(`byName`);
+        const sortByAge = document.getElementById(`byAge`);
+        const sortById = document.getElementById(`byId`);
         let currentSort = `id`;
         let currentDirection = `ASC`;
 
@@ -561,25 +429,26 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         sortByName.addEventListener(`click`, (e) => {
             e.preventDefault();
             currentSort = 'last_name';
-            sortByName.classList.add(`generalSort`);
-            sortById.classList.remove(`generalSort`);
-            sortByAge.classList.remove(`generalSort`);
+            sortByName.classList.add(`activeSort`);
+            sortById.classList.remove(`activeSort`);
+            sortByAge.classList.remove(`activeSort`);
             sortPatient(currentSort, currentDirection);
         });
+
         sortByAge.addEventListener(`click`, (e) => {
             e.preventDefault();
             currentSort = 'age';
-            sortByName.classList.remove(`generalSort`);
-            sortById.classList.remove(`generalSort`);
-            sortByAge.classList.add(`generalSort`);
+            sortByName.classList.remove(`activeSort`);
+            sortById.classList.remove(`activeSort`);
+            sortByAge.classList.add(`activeSort`);
             sortPatient(currentSort, currentDirection);
         });
         sortById.addEventListener(`click`, (e) => {
             e.preventDefault();
             currentSort = 'id';
-            sortByName.classList.remove(`generalSort`);
-            sortById.classList.add(`generalSort`);
-            sortByAge.classList.remove(`generalSort`);
+            sortByName.classList.remove(`activeSort`);
+            sortById.classList.add(`activeSort`);
+            sortByAge.classList.remove(`activeSort`);
             sortPatient(currentSort, currentDirection);
         });
 

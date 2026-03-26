@@ -121,6 +121,9 @@
         justify-content: center;
     }
 
+    #sidebar section {
+        padding: 1em;
+    }
     #patients #collection li {
         grid-template-columns: 1fr;
         align-items: center;
@@ -132,6 +135,11 @@
 
     #patients #collection tr {
         flex-direction: column;
+    }
+
+    #registerPatientBtn {
+        flex-direction: column;
+        font-size: var(--small);
     }
 }
 
