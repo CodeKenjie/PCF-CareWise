@@ -1,5 +1,6 @@
 :root {
     --font-fam: Arial, Helvetica, sans-serif;
+    --profile: clamp(10rem, 6.2vw + 3rem, 20rem);
     --super-header: clamp(3rem, 4.2vw + 2rem, 4.8rem);
     --big-header: clamp(2.2rem, 3vw + 1.6rem, 3.8rem);
     --header: clamp(1.8rem, 2.2vw + 1.3rem, 2.8rem);
@@ -13,7 +14,7 @@
     --semi-bold: 600;
     --thin: 300;
     --bg: rgb(255, 255, 255);
-    --navbg: rgb(241, 241, 241);
+    --disable-bg: rgba(0, 0, 0, 0.1);
     --font-color: rgb(19, 19, 19);
     --radius: 0.5rem;
     --double-radius: 1rem;
@@ -22,15 +23,17 @@
     --sub-bg: rgb(241, 241, 241);
     --transparent-bg: rgba(0, 0, 0, 0.5);
     --hover-color: rgb(65, 228, 160);
-    --shadow: 0px 1px 5px rgba(0, 0, 0, .5);
-    --button-color: rgb(26, 92, 83);
-    --button-hover:  rgb(40, 143, 129);
+    --shadow: 0px 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    --button-color: rgba(26, 77, 92, 0.8);
+    --button-hover:  rgb(26, 77, 92);
     --button-active: rgb(139, 138, 138);
     --border-color: rgb(170, 170, 170);
     --border: solid 1px var(--border-color);
     --critical: rgb(212, 66, 66);
     --moderate: rgb(219, 169, 75);
     --good: rgb(61, 161, 61);
+    --bg-gradient: linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.25));
+    --bg-gradient-shine: linear-gradient(120deg, rgba(255, 255, 255, 0.6) 10%, rgba(255, 255, 255, 0.15) 30%, rbga(255, 255, 255, 0) 100%);
 }
 
 .p-sm {
@@ -51,6 +54,10 @@
 
 .m-h {
     font-size: var(--big-header) ;   
+}
+
+.lrg-h {
+    font-size: var(--header) ;   
 }
 
 .sm-h {
@@ -120,6 +127,8 @@ h1, h2, h3, p {
 }
 
 main {
+    background: var(--bg);
+    position: relative;
     display: flex;
     width: 100%;
     height: 100dvh;
@@ -128,7 +137,7 @@ main {
 input {
     color: transparent;
     background: transparent;
-    font: var(--normal);
+    font-size: var(--normal);
     padding: 1em;
     border: var(--border);
     border-radius: var(--radius);
@@ -154,6 +163,16 @@ input[type="submit"] {
     font-weight: var(--bold);
     border: none;
     border-radius: 20rem;
+    padding: 1em;
+}
+
+select{
+    color: var(--font-color);
+    background: transparent;
+    font-size: var(--normal);
+    font-weight: var(--bold);
+    border: var(--border);
+    border-radius: var(--radius);
     padding: 1em;
 }
 
@@ -280,10 +299,14 @@ input[type="submit"] {
     width: fit-content;
 }
 
+#tags span,
 #responseContainer span {
     position: relative;
+    width: var(--normal);
+    height: var(--normal);
 }
 
+#tags span::before, #tags span::after,
 #responseContainer span::before, #responseContainer span::after{
     content: "";
     position: absolute;
@@ -295,10 +318,12 @@ input[type="submit"] {
     cursor: pointer;
 }
 
+#tags span::before,
 #responseContainer span::before {
     rotate: 45deg;
 }
 
+#tags span::after,
 #responseContainer span::after {
     rotate: -45deg;
 }
@@ -324,6 +349,7 @@ input[type="submit"] {
 }
 
 #register form, #login form {
+    flex: 1 1 0;
     background: var(--bg);
     padding:0 5em;
     display: flex;
@@ -345,7 +371,6 @@ input[type="submit"] {
 .site {
     flex: 1 1 0;
     border: 1.5em solid var(--bg);
-    object-fit: cover;
 }
 
 .site img {
@@ -353,6 +378,7 @@ input[type="submit"] {
     height: 100%;
     border-radius: 2em 0 0 2em;
     clip-path: polygon(0 0, 100% 0, 95% 100%, 0% 100%);
+    object-fit: cover;
 }
 
 #login .site img {
@@ -367,12 +393,14 @@ input[type="submit"] {
     flex-direction: column;
 }
 
-#register span, #login span {
+#registerPatient span,
+#register span, 
+#login span {
     display: flex;
     flex-direction: column;
 }
 
-#register .part {
+.part {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1em;
@@ -380,9 +408,10 @@ input[type="submit"] {
     z-index: 1;
 }
 
+#registerPatient span label,
 #register span label,
 #login span label {
-    background:var(--bg);
+    background: transparent;
     font-size: var(--normal);
     font-weight: var(--bold);
     transform: translate(1rem, -1.2rem);
@@ -392,25 +421,20 @@ input[type="submit"] {
     z-index: 1;
 }
 
+#registerPatient span:has(select:valid) label,
+#registerPatient span:focus-within label,
+#registerPatient span:has(input:valid) label,
+#register span:has(select:valid) label,
 #register span:focus-within label,
 #register span:has(input:valid) label,
 #login span:focus-within label,
 #login span:has(input:valid) label {
+    background: var(--bg);
     transform: translate(0.5em, -2.6em) scale(0.88);
     transition: transform 300ms ease-in;
     padding: 0 0.5em;
     opacity: 100%;
     z-index: 2;
-}
-
-#register select{
-    background: transparent;
-    font-size: var(--normal);
-    font-weight: var(--bold);
-    border: var(--border);
-    border-radius: var(--radius);
-    padding: 1em;
-    opacity: 75%;
 }
 
 #sidebar {
@@ -423,6 +447,7 @@ input[type="submit"] {
     height: 100vh;
     display: flex;
     flex-direction: column;
+    z-index: 10;
 }
 
 #sidebar.close {
@@ -441,6 +466,7 @@ input[type="submit"] {
     align-items: center;
     justify-content: center;
 }
+
 
 #sidebar.close ul {
     align-items: center;
@@ -469,9 +495,10 @@ input[type="submit"] {
 }
 
 #sidebar section {
+    position: relative;
     display: flex;
     gap: 0.5em;
-    padding: 1em 0.5em;
+    padding: 1em;
     cursor: pointer;
 }
 
@@ -528,6 +555,12 @@ input[type="submit"] {
     color: var(--alt-font-color);
 }
 
+#sidebar.close li a.currentPage,
+#sidebar li a.currentPage {
+    color: var(--alt-font-color);
+    background: var(--button-color);
+}
+
 #sidebar ul a::before {
     position: absolute;
     content: "";
@@ -551,13 +584,15 @@ input[type="submit"] {
     top: 30%;
     left: 100%;
     display: grid;
-    background: var(--bg);
+    background: var(--bg-gradient);
+    backdrop-filter: blur(28px);
+    box-shadow: var(--shadow);
     width: 0;
     height: 0;
     font-size: var(--bigger);
     border-radius: 0 var(--radius) var(--radius) var(--radius);
     overflow: hidden;
-    z-index: 1000;
+    z-index: 5;
 }
 
 #sidebar .popup button,
@@ -565,7 +600,7 @@ input[type="submit"] {
     display: flex;
     align-items: center;
     color: var(--font-color);
-    background: var(--bg);
+    background: transparent;
     text-align: start;
     font-size: var(--bigger);
     font-weight: var(--bold);
@@ -583,7 +618,7 @@ input[type="submit"] {
     background: var(--button-highlight);
 }
 
-#sidebar .popup.open {
+#sidebar .popup.active {
     border: var(--border);
     width: 15rem;
     height: fit-content;
@@ -594,4 +629,268 @@ input[type="submit"] {
 #sidebar.close .popup {
     top: 32%;
     left: 110%;
+}
+
+#patients {
+    flex-direction: column;
+    padding: 1em;
+    gap: 1em;
+    width: inherit;
+    height: inherit;
+    scroll-snap-type: x mandatory;
+    scroll-padding: 0.5em;
+}
+
+#patients section {
+    position: relative;
+    border-radius: var(--radius);
+    padding: 1em;
+    background: var(--bg-gradient);
+    backdrop-filter: blur(20px);
+    box-shadow: var(--shadow);
+    scroll-snap-align: start;
+    height: min(70rem, 78%);
+}
+
+#patients section:nth-of-type(1){
+    height: fit-content;
+}
+#patients section::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--bg-gradient-shine);
+    pointer-events: none;
+}
+
+#patients #collection {
+    background: var(--sub-bg);
+    height: 100%;
+    padding: 0.5em;
+    border-radius: var(--radius);
+    scroll-snap-type: x mandatory;
+    scroll-padding: 0.5em;
+}
+
+#patients #collection li {
+    display: grid;
+    grid-template-columns: auto 1fr auto; 
+    background: var(--bg);
+    border-radius: var(--radius);
+    scroll-snap-align: start;
+    list-style-type: none;
+    padding: 1em;
+    gap: 1em;
+    width: 100%;
+    height: fit-content;
+    overflow: hidden;
+}
+
+
+#patients #collection span {
+    justify-self: center;
+    width: var(--profile);
+    height: var(--profile);
+    overflow: hidden;
+    border-radius: 50%;
+    box-shadow: var(--shadow);
+}
+
+#patients #collection img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+
+#patients #collection div {
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
+#patients #collection table {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1em;
+}
+
+#patients #collection tbody {
+    display: grid;
+    grid-template-columns: auto;
+    align-items: center;
+    gap: 1em;
+    width: inherit;
+}
+
+#patients #collection tr {
+    display: flex;
+    gap: 0.5em;
+}
+
+#patients #collection td {
+    font-size: var(--bigger);
+    vertical-align: middle;
+}
+
+#patients #collection td:nth-child(1) {
+    font-size: var(--normal);
+    opacity: 75%;
+    width: 8rem;
+}
+
+#patients #collection td:nth-child(2){
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow-y: hidden;
+}
+
+#patients #collection button{
+    flex:  1 1 0;
+    width: fit-content;
+    height: fit-content;
+    background: var(--bg);
+    border: none;
+    border-radius: var(--radius);
+    padding: 1em;
+}
+
+#patients #collection li div button:nth-of-type(3):hover {
+    background: var(--critical);
+    color: var(--alt-font-color);
+    scale: 1.05;
+    transition: scale 300ms ease;
+}
+
+
+#registerPatient {
+    display: none;
+    background: var(--disable-bg);
+    position: absolute;
+    justify-content: center;
+    align-items: center;
+    width: inherit;
+    height: inherit;
+    z-index: 11;
+}
+
+#registerPatient.active {
+    display: flex;
+}
+
+#registerPatient form {
+    width: fit-content;
+    height: fit-content;
+    background: var(--bg);
+    padding: 1em;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+#registerPatient button {
+    font-size: var(--bigger);
+    font-weight: var(--bold);
+    padding: 1em;
+    border: var(--border);
+    border-radius: 2em;
+    background-color: transparent;
+}
+
+#registerPatient button:nth-of-type(1):hover {
+    color: var(--alt-font-color);
+    background: var(--button-color);
+    scale: 1.05;
+    transition: scale 300ms ease;
+}
+
+#removeTag:hover,
+#patients #collection li div button:nth-of-type(1):hover,
+#patients #collection li div button:nth-of-type(2):hover,
+#registerPatient button:nth-of-type(2):hover {
+    background: var(--button-highlight);
+    scale: 1.05;
+    transition: scale 300ms ease;
+}
+
+#registerPatientBtn:hover{
+    background: var(--button-hover);
+    scale: 1.05;
+    transition: scale 300ms ease;
+}
+
+#registerPatient button:nth-of-type(1):active,
+#registerPatient button:nth-of-type(2):active,
+#registerPatientBtn:active{
+    background: var(--button-active);
+}
+
+.actions {
+    display: flex;
+    gap: 1em;
+}
+
+#registerPatientBtn{
+    font-size: var(--bigger);
+    font-weight: var(--bold);
+    background: var(--button-color);
+    color: var(--alt-font-color);
+    border: none;
+    border-radius: var(--radius);
+    padding: 1em;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+}
+
+.actions form {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#tags {
+    position: absolute;
+    display: flex;
+    list-style-type: none;
+    margin-left: 1em;
+}
+
+#tags li {
+    position: relative;
+    font-size: var(--normal);
+    font-weight: var(--bold);
+    background: var(--sub-bg);
+    padding: 0.5em;
+    z-index: 3;
+    border-radius: var(--radius);
+    display: flex;
+    gap: 1em;
+}
+
+#tags span::before, #tags span::after {
+    top: 40%;
+    background: var(--font-color);
+}
+
+.actions span {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.actions form button {
+    background: transparent;
+    margin-left: -5em;
+    padding:1em;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 2;
+}
+.actions form button:active {
+    color: var(--button-highlight);
 }

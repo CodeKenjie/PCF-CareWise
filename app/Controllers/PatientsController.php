@@ -2,16 +2,16 @@
 namespace App\Controllers;
 use App\Core\Controller;
 
-class DashboardController extends Controller  {
+class PatientsController extends Controller {
     public function index() {
         $user = $this->getLoggedUser();
 
         $data = [
-            'title' => 'PCF:CareWise - Dashboard',
+            'title' => 'PCF:CareWise - Patients',
             'userDisplayName' => $user['display_name'],
-            'userRole' => $user['role']
+            'userRole' => $user['role'],
         ];
 
-        $this->view('pages/dashboard', $data);
+        $this->view('/pages/patients', $data);
     }
 }

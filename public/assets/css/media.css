@@ -2,43 +2,19 @@
     #register header {
         display: none;
     }
+
+    #login header {
+        flex-direction: row;
+    }
 }
 
-@media ( max-width: 600px ) and ( orientation: portrait ){
-    main {
-        flex-direction: column;
-    }
-    .redirect {
-        position: absolute;
-    }
-
-    #ham-menu span:nth-child(2) {
-        top: 52%;
-    }
-
+@media ( max-width: 900px) and ( orientation: portrait) {
     .site {
         display: none;
     }
 
-    #register header {
-        flex-direction: column;
-        margin: 0;
-    }
-
-    #register header img {
-        width: var(--super-header);
-        height: var(--super-header);
-    }
-
-    .password button {
-        margin-left: -3.5em;
-    }
-
-    #register form, #login form{
-        padding: 1em;
-    }
-
-    #register section, #login section{
+    #login form {
+        flex: 1 1 0;
         justify-content: center;
     }
 
@@ -101,6 +77,62 @@
         right: 1%;
         border-radius: var(--radius) 0 0 var(--radius);
     }
+
+    #patients #collection tr {
+        flex-direction: column;
+    }
+}
+
+@media ( max-width: 600px ) and ( orientation: portrait ){
+    main {
+        flex-direction: column;
+    }
+
+    .redirect {
+        position: absolute;
+    }
+
+    #ham-menu span:nth-child(2) {
+        top: 52%;
+    }
+
+    .site {
+        display: none;
+    }
+
+    #register header {
+        flex-direction: column;
+    }
+
+    #register header img {
+        width: var(--super-header);
+        height: var(--super-header);
+    }
+
+    .password button {
+        margin-left: -3.5em;
+    }
+
+    #register form, #login form{
+        padding: 1em;
+    }
+
+    #register section, #login section{
+        justify-content: center;
+    }
+
+    #patients #collection li {
+        grid-template-columns: 1fr;
+        align-items: center;
+    }
+
+    #patients #collection div {
+        flex-direction: row;
+    }
+
+    #patients #collection tr {
+        flex-direction: column;
+    }
 }
 
 @media (max-width: 1000px) and (orientation: landscape) {
@@ -112,19 +144,21 @@
         display: none;
     }
 
-    .logo {
-        max-width: 10rem;
-        max-height: 10rem;
+    #register .logo {
+        width: 10rem;
+        height: 10rem;
     }
 
-    .header {
+    header {
         flex-direction: column;
         justify-content: center;
+        height: 100%;
+        margin: 0;
     }
 
-    .header img{
-        min-width: 10em;
-        min-height: 10em;
+    header img{
+        min-width: 10rem;
+        min-height: 10rem;
     }
 
     #register section, #login section{

@@ -1,5 +1,6 @@
 <?php
 namespace App\Core;
+use App\Models\User;
 
 class Controller {
     protected function view($file, array $data){
@@ -10,5 +11,15 @@ class Controller {
     protected function redirect($url){
         header('Location: ' . $url);
         return;
+    }
+
+    protected function getLoggedUser(){
+        if(!isset($_SESSION['id'])){
+            $this->redirect('/login');
+            exit;
+        }
+
+        $user = new User();
+        return $user->findById($_SESSION['id']);
     }
 }

@@ -235,7 +235,14 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         const profilePop = document.querySelector(`.popup`);
         const profile = document.getElementById(`profile`);
         profile.addEventListener(`click`, () => {
-            profilePop.classList.toggle(`open`);
+            profilePop.classList.toggle(`active`);
+        });
+
+        const currentPage = document.querySelectorAll(`#sidebar ul a`);
+        currentPage.forEach(page => {
+            if(page.href === window.location.href) {
+                page.classList.add(`currentPage`);
+            }
         });
     }
 
@@ -382,14 +389,20 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         });
     }
 
-    const patientsInfo = document.getElementById(`patientsInfo`);
-    if(patientsInfo){
+    const patients = document.getElementById(`patients`);
+    if(patients){
         loadPatientsData();
 
-        const addPatient = document.getElementById(`addPatient`);
-        addPatient.addEventListener(`click`, () => {
-            registerPatient.classList.add(`active`);
+        const registerPatientBtn = document.getElementById(`registerPatientBtn`);
+        registerPatientBtn.addEventListener(`click`, () => {
+            const registerPatient = document.querySelector(`#registerPatient`);
+            registerPatient.classList.add('active');
         });      
+
+        const cancelPatientRegistration = document.getElementById(`cancelPatientRegistration`);
+        cancelPatientRegistration.addEventListener(`click`, () => {
+            registerPatient.classList.remove('active');
+        });
 
         const registerPatient = document.getElementById(`registerPatient`);
         if (registerPatient) {

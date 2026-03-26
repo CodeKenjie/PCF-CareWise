@@ -37,14 +37,23 @@
                 <label for="address">Address</label>
             </span>
             <div class="part p-sm">
-                <select name="sex">
-                    <option value="Male" selected>Male</option>
-                    <option value="Female">Female</option>
-                </select>
-                <select name="role">
-                    <option value="admin">Admin</option>
-                    <option value="staff" selected>Staff</option>
-                </select>
+                <span>
+                    <select name="sex" required>
+                        <option value="" hidden></option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                    </select>
+                    <label for="sex">Sex</label>
+                </span>
+                <span>
+                    <select name="role" required>
+                        <option value="" hidden></option>
+                        <option value="super user" hidden>Super User</option>
+                        <option value="admin">Admin</option>
+                        <option value="staff">Staff</option>
+                    </select>
+                    <label for="role">Role</label>
+                </span>
             </div>
             <span class="p-sm">
                 <input id="email" name="email" type="email" maxlength="150" required>

@@ -10,6 +10,8 @@ services:
       - .env
     volumes:
       - D:/Kenjie/Projects/PCF-CareWise:/var/www/html
+      - ./php/custom.ini:/usr/local/etc/php/conf.d/custom.ini
+      - ./php/www-custom.conf:/usr/local/etc/php-fpm.d/www-custom.conf
     networks:
       - private
 

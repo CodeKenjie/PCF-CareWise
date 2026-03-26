@@ -56,7 +56,7 @@
             </form>
         </div>
         <span>
-            <img src="assets/images/site.jpg" alt="">
+            <img src="assets/images/profile.png" alt="">
         </span>
         <div>
             <h4 class="sm-h"><?= htmlspecialchars($userDisplayName) ?></h4>
