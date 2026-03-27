@@ -1,5 +1,5 @@
-let selectedPatientId = null;
-let selectedItemId = null;
+let url = null;
+
 
 function view(id, type){
     const img = document.getElementById(id);
@@ -30,57 +30,65 @@ function responseMessage(res, message){
     div.append(p, span);
     response.appendChild(div);
 
-    setTimeout(() => { div.remove() }, 10000);
+    setTimeout(() => { div.remove() }, 5000);
 }
 
 function closePopup(){
-    const activePopup = document.querySelector(`.popup.active`);
+    const activePopup = document.querySelector(`.active`);
     if(activePopup){ 
         activePopup.classList.remove(`active`) 
     }
 }
 
 function renderPatientsData(data){
-    const container = document.getElementById(`patientsCollection`);
-    const template = document.getElementById(`patientsTemplate`);
-    const confirmPatient = document.getElementById(`confirmPopUp`);
-    const editPatientPanel = document.getElementById(`editPatientPanel`);
+    const previewForm = document.getElementById(`previewForm`);
+    const previewPanel = document.getElementById(`patientPreview`);
+    const container = document.getElementById(`collection`);
+    const template = document.getElementById(`patientsCard`);
 
     container.innerHTML = "";
 
     data.collection.forEach( patient => {
         const clone = template.content.cloneNode(true);
 
-        clone.querySelector(`.pId`).textContent = patient.id;
-        clone.querySelector(`.pName`).textContent = patient.last_name + ", " + patient.first_name;
-        clone.querySelector(`.pAddress`).textContent = patient.address;
-        clone.querySelector(`.pBirthdate`).textContent = patient.birthdate;
-        clone.querySelector(`.pAge`).textContent = patient.age ?? '';
-        clone.querySelector(`.pSex`).textContent = patient.sex;
-        clone.querySelector(`.pContact`).textContent = patient.contact;
-        clone.querySelector(`.pReferredBy`).textContent = patient.referred_by;
-
-        const deletePatient = clone.querySelector(`.deletePatient`);
-        deletePatient.addEventListener("click", ()=> {
-            selectedPatientId = patient.id;
-            confirmPatient.classList.add(`active`);
+        clone.querySelector(`.id`).textContent = patient.id;
+        clone.querySelector(`.name`).textContent = patient.last_name + ", " + patient.first_name;
+        clone.querySelector(`.address`).textContent = patient.address;
+        clone.querySelector(`.birthdate`).textContent = patient.birthdate;
+        clone.querySelector(`.age`).textContent = patient.age;
+        clone.querySelector(`.sex`).textContent = patient.sex;
+        clone.querySelector(`.contact`).textContent = patient.contacts;
+        clone.querySelector(`.referredBy`).textContent = patient.referred_by;
+        clone.querySelector(`.patientPreviewBtn`).addEventListener(`click`, () => {
+            previewForm.action = `/patients/patient/view?id=${patient.id}`;
+            patientPreview(patient.id);
+            previewPanel.classList.add(`active`);
         });
-
-        const editPatient = clone.querySelector(`.editPatient`);
-        editPatient.addEventListener("click", () => {
-            document.getElementById(`editTitle`).textContent = "Update " + patient.last_name +"'s " + " Details";
-            document.getElementById(`updateFirstName`).value = patient.first_name;
-            document.getElementById(`updateLastName`).value = patient.last_name;
-            document.getElementById(`updateAddress`).value = patient.address;
-            document.getElementById(`updateBirth`).value = patient.birthdate;
-            document.getElementById(`updateSex`).value = patient.sex;
-            document.getElementById(`updateContact`).value = patient.contact;
-            selectedPatientId = patient.id;
-            editPatientPanel.classList.add(`active`);
-        });
-        
         container.appendChild(clone);
     });
+}
+
+async function patientPreview(id){
+    const previewPanel = document.getElementById(`patientPreview`);
+    try{
+        const res = await fetch(`/patients/patient/view?id=${id}`, {
+            method: "GET"
+        });
+        const data = await res.json();
+
+        if(previewPanel){
+            document.getElementById(`pId`).textContent = data.information.id;
+            document.getElementById(`pName`).textContent = `${data.information.last_name}, ${data.information.first_name}`;
+            document.getElementById(`pAge`).textContent = data.information.age;
+            document.getElementById(`pSex`).textContent = data.information.sex;
+            document.getElementById(`pBirthdate`).textContent = data.information.birthdate;
+            document.getElementById(`pAddress`).textContent = data.information.address;
+            document.getElementById(`pContacts`).textContent = data.information.contacts;
+            document.getElementById(`pReferredBy`).textContent = data.information.referred_by;
+        }
+    } catch(err) {
+        console.error(err);
+    }
 }
 
 function renderPatientsForCare(data){
@@ -109,56 +117,11 @@ function renderPatientsForCare(data){
 
 }
 
-function renderInventoryItem(data){
-    const container = document.getElementById(`itemCollection`);
-    const donationContainer = document.getElementById(`donatedCollection`);
-    const template = document.getElementById(`itemTemplate`);
-
-    container.innerHTML = "";
-
-    data.collection.forEach(item => {
-        const clone = template.content.cloneNode(true);
-
-        const li = clone.querySelector(`li`);
-        li.addEventListener("click", () => {
-            selectedItemId = item.id;    
-        });
-        clone.querySelector(`.itemName`).textContent = item.item_name;
-        clone.querySelector(`.category`).textContent = item.category;
-        clone.querySelector(`.quantity`).textContent = item.quantity;
-        clone.querySelector(`.minQuant`).textContent = item.minimum_quantity;
-        const itemStatus = clone.querySelector(`.itemStatus`);
-        itemStatus.textContent = item.quantity_status;
-
-        if (item.quantity_status === "Critical") {
-            itemStatus.classList.add(`statusCritical`);
-        } else if (item.quantity_status === "Moderate") {
-            itemStatus.classList.add(`statusModerate`);
-        } else {
-            itemStatus.classList.add(`statusGood`);
-        }
-
-        clone.querySelector(`.expirationDate`).textContent = item.expiration_date;
-        const expirationStatus = clone.querySelector(`.expirationStatus`);
-        expirationStatus.textContent = item.expiration_status;
-
-        if(item.expiration_status === "Expired") {
-            expirationStatus.classList.add(`statusCritical`);
-        } else if (item.expiration_status === "Expiring Soon") {
-            expirationStatus.classList.add(`statusModerate`);
-        } else {
-            expirationStatus.classList.add(`statusGood`);
-        }
-        
-        container.appendChild(clone)
-    });
-}
-
-async function loadPatientsData() {
-    const patients = document.getElementById(`patientsInfo`);
-    const care = document.getElementById(`patientsCare`);
+async function loadPatientsList() {
     try {
-        const res = await fetch(`api/get_patients.php`);
+        const res = await fetch(`/patients/all`, {
+            method: "GET"
+        });
 
         const data = await res.json();
         if (!data.ok) {
@@ -166,54 +129,10 @@ async function loadPatientsData() {
             return;
         }
         
-        if(patients){
-            renderPatientsData(data);
-        }
-
-        if (care) {
-            renderPatientsForCare(data);
-        }
+        renderPatientsData(data);
     } catch (err) {
         console.error(err);
     } 
-}
-
-async function sortPatient(sort = `id`, direction = 'ASC') {
-    try {
-        const res = await fetch(`api/get_patients.php`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ sort: sort, direction: direction })
-        });
-        
-        const data = await res.json();
-        if (!data.ok){
-            responseMessage(data, data.error);
-            return;
-        }
-
-        renderPatientsData(data);
-    } catch (err) {
-        console.log(err);
-    }
-    
-}
-
-async function loadInventoryItem() {
-    try {
-        const res = await fetch(`api/get_items.php`);
-        const data = await res.json();
-        if (!data.ok) {
-            responseMessage(data, data.error);
-            return;
-        }
-    
-        renderInventoryItem(data);
-    } catch (err) {
-        console.error(err);
-    }
 }
 
 document.addEventListener(`DOMContentLoaded`, function(e) {
@@ -326,7 +245,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                     pass.classList.add(`critical`);
                 }
 
-                if (data.code === 409) {
+                if (data.code === 400) {
                     email.classList.add(`critical`);
                 }
 
@@ -391,17 +310,56 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
 
     const patients = document.getElementById(`patients`);
     if(patients){
-        loadPatientsData();
+        loadPatientsList();
+        const firstName = document.getElementById(`firstName`);
+        const lastName = document.getElementById(`lastName`);
+        const birthdate = document.getElementById(`birthdate`);
+        const address = document.getElementById(`address`);
+        const sex = document.getElementById(`sex`);
+        const contact = document.getElementById(`contact`);
+        const exContact = document.getElementById(`exContact`);
+        const referredBy = document.getElementById(`referredBy`);
 
         const registerPatientBtn = document.getElementById(`registerPatientBtn`);
         registerPatientBtn.addEventListener(`click`, () => {
             const registerPatient = document.querySelector(`#registerPatient`);
             registerPatient.classList.add('active');
-        });      
+        }); 
 
         const cancelPatientRegistration = document.getElementById(`cancelPatientRegistration`);
         cancelPatientRegistration.addEventListener(`click`, () => {
             registerPatient.classList.remove('active');
+        });
+
+        const registerPatientForm = document.getElementById(`registerPatientForm`);
+        registerPatientForm.addEventListener(`submit`, async (e) => {
+            e.preventDefault();
+            const formdata = new FormData(e.target);
+            try {
+                const res = await fetch('/patients/patient/register', {
+                    method:'POST',
+                    body: formdata
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    responseMessage(data, data.error);
+                }
+
+                responseMessage(data, data.message);
+                registerPatient.classList.remove('active');
+                firstName.value = '';
+                lastName.value = '';
+                birthdate.value = '';
+                sex.value = '';
+                address.value = '';
+                contact.value = '';
+                exContact.value = '';
+                referredBy.value = '';
+                loadPatientsList();
+            } catch (err) {
+                console.error(err);
+            }
         });
 
         const sortDirection = document.getElementById(`direction`);
@@ -452,83 +410,14 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             sortPatient(currentSort, currentDirection);
         });
 
-        const confirmPatient = document.getElementById(`confirmPopUp`);
-        const cancel = document.getElementById(`cancel`);
-        cancel.addEventListener("click", () => {
-            confirmPatient.classList.remove(`active`);
+        const patientPreview = document.getElementById(`patientPreview`);
+        const closePreview = document.getElementById(`closePreview`);
+        closePreview.addEventListener(`click`, () => {
+            patientPreview.classList.remove(`active`);
         });
 
-        const confirm = document.getElementById(`confirm`);
-        confirm.addEventListener("click", async (e) => {
-            e.preventDefault();
-            try {
-                const res = await fetch(`api/delete_patient.php`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({ patient: selectedPatientId })
-                });
-
-                const data = await res.json();
-
-                if (!data.ok){
-                    responseMessage(data, data.error);
-                    return;
-                }
-
-                responseMessage(data, data.message);
-                confirmPatient.classList.remove(`active`);
-                loadPatientsData();
-            } catch (err) {
-                console.error(err);
-            }
-        });
 
     }
 
-    const care = document.getElementById(`patientsCare`);
-    if (care) {
-        loadPatientsData();
-    }
-
-    const inventory = document.getElementById(`inventory`);
-    if (inventory) {
-        loadInventoryItem();
-        const addItem = document.getElementById(`addItem`);
-        addItem.addEventListener("click", () => {
-            document.querySelector(`.popup`).classList.add(`active`);
-        });
-
-        const cancel = document.getElementById(`cancel`);
-        cancel.addEventListener("click", () => {
-            document.querySelector(`.popup`).classList.remove(`active`);
-        });
-        
-        const addItemForm = document.getElementById(`addItemForm`);
-        addItemForm.addEventListener("submit", async (e) => {
-            e.preventDefault();
-
-            try{
-                const formdata = new FormData(e.target);
-                const res = await fetch(`api/add_item.php`, {
-                    method: "POST",
-                    body: formdata
-                })
-
-                const data = await res.json();
-                if(!data.ok) {
-                    responseMessage(data, data.error);
-                    return;
-                }
-
-                responseMessage(data, data.message);
-                document.querySelector(`.popup`).classList.remove(`active`);
-                loadInventoryItem();
-            } catch (err) {
-                console.error(err);
-            }
-            loadInventoryItem();
-        });
-    }
+    
 })

@@ -42,6 +42,12 @@ class UserController extends Controller {
                 echo json_encode($response);
                 exit;
             }
+
+            if(!$accept){
+                $response = [ 'ok' => false, 'code' => 403, 'error' => 'Please make sure to read and accept the terms and condition'];
+                echo json_encode($response);
+                exit;
+            }
             
             $data = [
                 'displayName'=> $displayName,

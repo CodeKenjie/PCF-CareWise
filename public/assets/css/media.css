@@ -8,9 +8,18 @@
     }
 }
 
-@media ( max-width: 900px) and ( orientation: portrait) {
+@media ( max-width: 1000px) and ( orientation: portrait) {
     .site {
         display: none;
+    }
+
+    #register header {
+        flex-direction: column;
+    }
+
+    #register header img {
+        width: var(--super-header);
+        height: var(--super-header);
     }
 
     #login form {
@@ -78,8 +87,25 @@
         border-radius: var(--radius) 0 0 var(--radius);
     }
 
+    #patients #collection li {
+        grid-template-columns: 1fr;
+        align-items: center;
+    }
+
+    #patients #collection div {
+        flex-direction: row;
+    }
+
     #patients #collection tr {
         flex-direction: column;
+    }
+
+    #patients #collection tr {
+        flex-direction: column;
+    }
+
+    #patients #collection td:nth-child(2){
+        max-width: 20rem;
     }
 }
 
@@ -124,22 +150,14 @@
     #sidebar section {
         padding: 1em;
     }
-    #patients #collection li {
-        grid-template-columns: 1fr;
-        align-items: center;
-    }
-
-    #patients #collection div {
-        flex-direction: row;
-    }
-
-    #patients #collection tr {
-        flex-direction: column;
-    }
 
     #registerPatientBtn {
         flex-direction: column;
         font-size: var(--small);
+    }
+
+    #patients #collection td:nth-child(2){
+        max-width: 10rem;
     }
 }
 
@@ -178,4 +196,84 @@
         padding: 2em;
     }
 
+    #sidebar {
+        position: fixed;
+        top: unset;
+        bottom: 0;
+        flex-direction: row;
+        width: 100%;
+        height: fit-content;
+        justify-content: center;
+        align-items: center;
+    }
+
+    #sidebar div,
+    #sidebar header{
+        display: none;
+    }
+
+    #sidebar .sm-icon {
+        width: var(--header);
+        height: var(--header);
+    }
+
+    #sidebar section span {
+        width: 3rem;
+        height: 3rem;
+    }
+    #sidebar section{
+        height: fit-content;
+        margin: 0;
+        justify-content: center;
+    }
+
+    #sidebar ul {
+        flex-direction: row;
+        width: 100%;
+        height: fit-content;
+        justify-content: center;
+        margin: 0;
+    }
+
+    #sidebar li {
+        flex: 1 1 0;
+    }
+
+    #sidebar li a {
+        flex-direction: column;
+        margin: 0;
+    }
+
+    #sidebar li:has(a) span {
+        font-size: var(--super-small);
+    } 
+
+    #sidebar .popup{
+        top: unset;
+        left: unset;
+        bottom: 100%;
+        right: 1%;
+        border-radius: var(--radius) 0 0 var(--radius);
+    }
+
+    #patients #collection li {
+        grid-template-columns: 1fr;
+        align-items: center;
+    }
+
+    #patients #collection div {
+        flex-direction: row;
+    }
+
+    #patients #collection tr {
+        flex-direction: column;
+    }
+
+    #patients #collection tr {
+        flex-direction: column;
+    }
+
+    #patients #collection td:nth-child(2){
+        max-width: 20rem;
+    }
 }

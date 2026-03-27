@@ -646,7 +646,7 @@ select{
     backdrop-filter: blur(20px);
     box-shadow: var(--shadow);
     scroll-snap-align: start;
-    height: min(70rem, 78%);
+    height: clamp(39rem, 80vh - 10rem, 90vh);
     overflow: hidden;
 }
 
@@ -666,10 +666,15 @@ select{
 }
 
 #patients #collection {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
     height: 100%;
     border-radius: var(--radius);
-    scroll-snap-type: x mandatory;
+    scroll-snap-type: y mandatory;
     scroll-padding: 0.5em;
+    overflow: auto;
+    scrollbar-width: none;
 }
 
 #patients #collection li {
@@ -678,13 +683,13 @@ select{
     background: var(--bg-gradient);
     box-shadow: var(--shadow);
     border-radius: var(--radius);
+    border: var(--border);
     scroll-snap-align: start;
     list-style-type: none;
     padding: 1em;
     gap: 1em;
     width: 100%;
     height: fit-content;
-    overflow: hidden;
 }
 
 .profile {
@@ -693,6 +698,7 @@ select{
     height: var(--profile);
     overflow: hidden;
     border-radius: 50%;
+    box-shadow: var(--shadow);
 }
 
 .profile img {
@@ -723,7 +729,8 @@ select{
 }
 
 #patients #collection tr {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto 1fr;
     gap: 0.5em;
 }
 
@@ -737,15 +744,17 @@ select{
 #patients #collection td:nth-child(1) {
     font-size: var(--small);
     opacity: 75%;
-    width: 8rem;
 }
 
 #patients #collection td:nth-child(2){
     display: -webkit-box;
-    -webkit-line-clamp: 1;
+    -webkit-line-clamp: 2;
     line-clamp: 1;
     -webkit-box-orient: vertical;
     overflow-y: hidden;
+    scrollbar-width: none;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 #patients #collection button{
@@ -766,7 +775,7 @@ select{
 }
 
 
-#viewPatient,
+#patientPreview,
 #registerPatient {
     display: none;
     background: var(--disable-bg);
@@ -778,12 +787,33 @@ select{
     z-index: 11;
 }
 
-#viewPatient.active,
+#patientPreview span {
+    font-size: var(--normal);
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    padding: 1em;
+}
+
+#patientPreview span:nth-of-type(1) {
+    justify-content: center;
+}
+
+#patientPreview span label {
+    opacity: 75%;
+}
+
+#patientPreview span h3 {
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+#patientPreview.active,
 #registerPatient.active {
     display: flex;
 }
 
-#viewPatient form,
+#patientPreview form,
 #registerPatient form {
     width: fit-content;
     height: fit-content;
@@ -794,7 +824,6 @@ select{
     box-shadow: var(--shadow);
 }
 
-#viewPatient div:nth-of-type(1),
 #registerPatient div:nth-of-type(1) {
     position: relative;
     display: flex;
@@ -820,6 +849,7 @@ select{
     transition: scale 300ms ease;
 }
 
+#patientPreview button,
 #registerPatient button {
     font-size: var(--bigger);
     font-weight: var(--bold);
@@ -838,6 +868,7 @@ select{
     border: none;
 }
 
+#patientPreview button:hover,
 #registerPatient div:nth-of-type(1) button:hover,
 #patients #collection li div button:nth-of-type(1):hover,
 #patients #collection li div button:nth-of-type(2):hover,

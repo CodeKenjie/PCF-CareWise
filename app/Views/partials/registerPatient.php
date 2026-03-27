@@ -1,5 +1,5 @@
 <section id="registerPatient" class="popup">
-    <form action="/register/patient" method="post">
+    <form id="registerPatientForm" action="/patients/patient/register" method="post">
         <div>
             <span class="profile">
                 <img src="assets/images/profile.png" alt="">
@@ -10,20 +10,20 @@
             </label>
         </div>
         <span class="p-sm">
-            <input name="firstName" type="text" required>
+            <input id="firstName" name="firstName" type="text" required>
             <label for="firstName">First Name</label>
         </span>
         <span class="p-sm">
-            <input name="lastName" type="text" required>
+            <input id="lastName" name="lastName" type="text" required>
             <label for="lastName">Last Name</label>
         </span>
         <div class="part p-sm">
             <span>
-                <input name="birthdate" type="date" required>
+                <input id="birthdate" name="birthdate" type="date" required>
                 <label for="birthdate">Birthdate</label>
             </span>
             <span>
-                <select name="sex" id="sex" required>
+                <select id="sex" name="sex" id="sex" required>
                     <option value="" hidden></option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
@@ -32,21 +32,21 @@
             </span>
         </div>
         <span class="p-sm">
-            <input name="address" type="text" required>
+            <input id="address" name="address" type="text" required>
             <label for="address">Address</label>
         </span>
         <div class="part p-sm">
             <span>
-                <input name="contact" type="text" required>
+                <input id="contact" name="contact" type="text" required>
                 <label for="contact">Contact</label>
             </span>
             <span>
-                <input name="exContact" type="text" placeholder="N/A" required>
-                <label for="exContact">Contact#2(optional)</label>
+                <input id="exContact" name="exContact" type="text" placeholder="N/A" required>
+                <label for="exContact">Contact#2(N/A)</label>
             </span>
         </div>
         <span class="p-sm">
-            <input name="referredBy" type="text" placeholder="N/A" required>
+            <input id="referredBy" name="referredBy" type="text" placeholder="N/A" required>
             <label for="referredBy">Referred by</label>
         </span>
         <div class="part p-sm">
