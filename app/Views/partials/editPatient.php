@@ -1,5 +1,5 @@
-<section id="registerPatient" class="popup">
-    <form id="registerPatientForm" action="/patients/register" method="post">
+<section id="editPatient">
+    <form id="editPatientForm" action="/patients/edit" method="post">
         <div>
             <span class="profile">
                 <img src="assets/images/profile.png" alt="">
@@ -10,20 +10,20 @@
             </label>
         </div>
         <span class="p-sm">
-            <input id="firstName" name="firstName" type="text" required>
-            <label for="firstName">First Name</label>
+            <input id="updateFirstName" name="firstName" type="text" required>
+            <label for="upadateFirstName">First Name</label>
         </span>
         <span class="p-sm">
-            <input id="lastName" name="lastName" type="text" required>
-            <label for="lastName">Last Name</label>
+            <input id="updateLastName" name="lastName" type="text" required>
+            <label for="updateLastName">Last Name</label>
         </span>
         <div class="part p-sm">
             <span>
-                <input id="birthdate" name="birthdate" type="date" required>
-                <label for="birthdate">Birthdate</label>
+                <input id="updateBirthdate" name="birthdate" type="date" required>
+                <label for="updateBirthdate">Birthdate</label>
             </span>
             <span>
-                <select id="sex" name="sex" id="sex" required>
+                <select id="updateSex" name="sex" required>
                     <option value="" hidden></option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
@@ -32,26 +32,26 @@
             </span>
         </div>
         <span class="p-sm">
-            <input id="address" name="address" type="text" required>
-            <label for="address">Address</label>
+            <input id="updateAddress" name="address" type="text" required>
+            <label for="upadateAddress">Address</label>
         </span>
         <div class="part p-sm">
             <span>
-                <input id="contact" name="contact" type="text" required>
-                <label for="contact">Contact</label>
+                <input id="updateContact" name="contact" type="text" required>
+                <label for="updateContact">Contact</label>
             </span>
             <span>
-                <input id="exContact" name="exContact" type="text" placeholder="N/A" required>
-                <label for="exContact">Contact#2(N/A)</label>
+                <input id="updateExContact" name="exContact" type="text" placeholder="N/A" required>
+                <label for="updateExContact">Contact#2(N/A)</label>
             </span>
         </div>
         <span class="p-sm">
-            <input id="referredBy" name="referredBy" type="text" placeholder="N/A" required>
-            <label for="referredBy">Referred by</label>
+            <input id="updateReferredBy" name="referredBy" type="text" placeholder="N/A" required>
+            <label for="updateReferredBy">Referred by</label>
         </span>
         <div class="part p-sm">
             <button type="submit">Submit</button>
-            <button id="cancelPatientRegistration" type="reset">Cancel</button>
+            <button id="cancelPatientEdit" type="reset">Cancel</button>
         </div>
     </form>
 </section>

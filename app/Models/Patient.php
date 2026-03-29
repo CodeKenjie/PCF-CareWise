@@ -19,14 +19,14 @@ class Patient extends Database {
             $query = 'INSERT INTO patients (first_name, last_name, age, sex, birthdate, address, contacts, referred_by) VALUES(:first_name, :last_name, :age, :sex, :birthdate, :address, :contacts, :referred_by)';
             $stmt = $this->db->prepare($query);
             $stmt->execute([
-                ':first_name' => ucwords($data['firstName'] ?? ''),
-                ':last_name' => ucwords($data['lastName'] ?? ''),
+                ':first_name' => $data['firstName'] ?? '',
+                ':last_name' => $data['lastName'] ?? '',
                 ':age' => $data['age'] ?? '',
-                ':sex' => strtoupper($data['sex'] ?? ''),
+                ':sex' => $data['sex'] ?? '',
                 ':birthdate' => $data['birthdate'] ?? '',
-                ':address' => ucwords($data['address'] ?? ''),
-                ':contacts' => $data['contact'] ?? '' . $data['exContact'] ?? '',
-                ':referred_by' => ucwords($data['referredBy'] ?? '')
+                ':address' => $data['address'] ?? '',
+                ':contacts' => $data['contact'] ?? '',
+                ':referred_by' => $data['referredBy'] ?? ''
             ]);
         }catch(PDOException $err){
             $this->logger->error($err->getMessage());
@@ -41,6 +41,26 @@ class Patient extends Database {
 
             return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $err) {
+            $this->logger->error($err->getMessage());
+        }
+    }
+
+    public function updatePatient(array $data){
+        try {
+            $query = 'UPDATE patients SET first_name = :first_name, last_name = :last_name, age = :age, sex = :sex, birthdate = :birthdate, address = :address, contacts = :contacts, referred_by = :referred_by WHERE id = :id';
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([
+                ':id' => $data['id'],
+                ':first_name' => $data['firstName'],
+                ':last_name' => $data['lastName'],
+                ':age' => $data['age'],
+                ':sex' => $data['sex'],
+                ':birthdate' => $data['birthdate'],
+                ':address' => $data['address'],
+                ':contacts' => $data['contacts'],
+                ':referred_by' => $data['referredBy']
+            ]);
+        } catch(PDOException $err){
             $this->logger->error($err->getMessage());
         }
     }

@@ -21,10 +21,13 @@ class Router {
             return;
         }
 
-        foreach($this->routes[$method] as $route => $controllerAction){
-            if ($uri === $route) {
+        foreach($this->routes[$method] as $route => $controllerAction) {
+            $pattern = preg_replace('#\{[^/]+\}#', '([^/]+)', $route);
+            $pattern = '#^' . $pattern . '$#';
+            if (preg_match($pattern, $uri, $matches)) {
+                array_shift($matches);
                 [ $controller, $action ] = explode('@', $controllerAction);
-                return (new $controller)->$action();
+                return (new $controller)->$action(...$matches);
             }
         }
 

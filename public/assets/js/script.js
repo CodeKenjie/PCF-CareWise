@@ -1,5 +1,4 @@
-let url = null;
-
+let selectedPatientId = null;
 
 function view(id, type){
     const img = document.getElementById(id);
@@ -42,6 +41,8 @@ function closePopup(){
 
 function renderPatientsData(data){
     const previewForm = document.getElementById(`previewForm`);
+    const editForm = document.getElementById(`editPatientForm`);
+    const editPanel = document.getElementById(`editPatient`);
     const previewPanel = document.getElementById(`patientPreview`);
     const container = document.getElementById(`collection`);
     const template = document.getElementById(`patientsCard`);
@@ -60,10 +61,28 @@ function renderPatientsData(data){
         clone.querySelector(`.contact`).textContent = patient.contacts;
         clone.querySelector(`.referredBy`).textContent = patient.referred_by;
         clone.querySelector(`.patientPreviewBtn`).addEventListener(`click`, () => {
-            previewForm.action = `/patients/patient/view?id=${patient.id}`;
+            previewForm.action = `/patients/view/${patient.id}`;
             patientPreview(patient.id);
             previewPanel.classList.add(`active`);
         });
+        
+        clone.querySelector(`.editPatientBtn`).addEventListener(`click`, () => {
+            const contact = patient.contacts.split(`,`).map(item => item.trim());
+            const sex = patient.sex;
+            editForm.action = `/patients/edit/${patient.id}`;
+            editPanel.classList.add(`active`);
+            selectedPatientId = patient.id;
+
+            document.getElementById(`updateFirstName`).value = patient.first_name;
+            document.getElementById(`updateLastName`).value = patient.last_name;
+            document.querySelector(`#updateSex`).value = sex;
+            document.getElementById(`updateBirthdate`).value = patient.birthdate;
+            document.getElementById(`updateAddress`).value = patient.address;
+            document.getElementById(`updateContact`).value = contact[0];
+            document.getElementById(`updateExContact`).value = contact[1];
+            document.getElementById(`updateReferredBy`).value = patient.referred_by;
+        });
+
         container.appendChild(clone);
     });
 }
@@ -71,7 +90,7 @@ function renderPatientsData(data){
 async function patientPreview(id){
     const previewPanel = document.getElementById(`patientPreview`);
     try{
-        const res = await fetch(`/patients/patient/view?id=${id}`, {
+        const res = await fetch(`/patients/view/${id}`, {
             method: "GET"
         });
         const data = await res.json();
@@ -331,12 +350,41 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             registerPatient.classList.remove('active');
         });
 
+        const editPanel = document.getElementById(`editPatient`);
+        const cancelPatientEdit = document.getElementById(`cancelPatientEdit`);
+        cancelPatientEdit.addEventListener(`click`, () => {
+            editPanel.classList.remove('active');
+        });
+
+        const editPatientForm = document.getElementById(`editPatientForm`);
+        editPatientForm.addEventListener(`submit`, async (e) => {
+            e.preventDefault();
+            const formdata = new FormData(e.target);
+            try {
+                const res = await fetch(`/patients/edit/${selectedPatientId}`, {
+                    method:'POST',
+                    body: formdata
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    responseMessage(data, data.error);
+                }
+
+                responseMessage(data, data.message);
+                editPanel.classList.remove('active');
+                loadPatientsList();
+            } catch (err) {
+                console.error(err);
+            }
+        });
+
         const registerPatientForm = document.getElementById(`registerPatientForm`);
         registerPatientForm.addEventListener(`submit`, async (e) => {
             e.preventDefault();
             const formdata = new FormData(e.target);
             try {
-                const res = await fetch('/patients/patient/register', {
+                const res = await fetch('/patients/register', {
                     method:'POST',
                     body: formdata
                 });

@@ -1,8 +1,9 @@
 <section id="patientPreview">
-    <form id="previewForm" action="/patients/patient/view">
+    <form id="previewForm" action="/patients/view">
+        <span id="closePreview"></span>
         <span>
             <header class="profile">
-                <img src="assets/images/site.jpg" alt="">
+                <img src="assets/images/profile.png" alt="">
             </header>
         </span>
         <span>
@@ -36,9 +37,6 @@
         <span>
             <label for="pReferredBy"><strong>Referred By:</strong></label>
             <h3 id="pReferredBy"></h3>
-        </span>
-        <span>
-            <button id="closePreview" type="button">Close</button>
         </span>
     </form>
 </section>

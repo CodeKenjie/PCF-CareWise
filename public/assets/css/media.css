@@ -8,6 +8,12 @@
     }
 }
 
+@media ( max-height: 1200px ) and ( orientation: portrait ){
+    #patients section {
+        height: clamp(30rem, 60vh + 5rem, 80rem);
+    }
+}
+
 @media ( max-width: 1000px) and ( orientation: portrait) {
     .site {
         display: none;

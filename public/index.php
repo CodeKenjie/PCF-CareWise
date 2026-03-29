@@ -17,7 +17,8 @@ $router->post('/register', 'App\Controllers\UserController@register');
 $router->get('/dashboard', 'App\Controllers\DashboardController@index');
 $router->get('/patients', 'App\Controllers\PatientsController@index');
 $router->get('/patients/all', 'App\Controllers\PatientsController@getAll');
-$router->get('/patients/patient/view', 'App\Controllers\PatientsController@get');
-$router->post('/patients/patient/register', 'App\Controllers\PatientsController@register');
+$router->post('/patients/register', 'App\Controllers\PatientsController@register');
+$router->get('/patients/view/{id}', 'App\Controllers\PatientsController@get');
+$router->post('/patients/edit/{id}', 'App\Controllers\PatientsController@edit');
 
 $router->direct($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
