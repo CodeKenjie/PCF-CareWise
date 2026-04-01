@@ -1,4 +1,6 @@
 let selectedPatientId = null;
+let order = 'id';
+let direction = 'ASC';
 
 function view(id, type){
     const img = document.getElementById(id);
@@ -40,10 +42,6 @@ function closePopup(){
 }
 
 function renderPatientsData(data){
-    const previewForm = document.getElementById(`previewForm`);
-    const editForm = document.getElementById(`editPatientForm`);
-    const editPanel = document.getElementById(`editPatient`);
-    const previewPanel = document.getElementById(`patientPreview`);
     const container = document.getElementById(`collection`);
     const template = document.getElementById(`patientsCard`);
 
@@ -61,26 +59,32 @@ function renderPatientsData(data){
         clone.querySelector(`.contact`).textContent = patient.contacts;
         clone.querySelector(`.referredBy`).textContent = patient.referred_by;
         clone.querySelector(`.patientPreviewBtn`).addEventListener(`click`, () => {
-            previewForm.action = `/patients/view/${patient.id}`;
+            document.getElementById(`previewForm`).action = `/patients/view/${patient.id}`;
             patientPreview(patient.id);
-            previewPanel.classList.add(`active`);
+            document.getElementById(`patientPreview`).classList.add(`active`);
         });
         
         clone.querySelector(`.editPatientBtn`).addEventListener(`click`, () => {
+            document.getElementById(`editPatientForm`).action = `/patients/edit/${patient.id}`;
+            document.getElementById(`editPatient`).classList.add(`active`);
             const contact = patient.contacts.split(`,`).map(item => item.trim());
             const sex = patient.sex;
-            editForm.action = `/patients/edit/${patient.id}`;
-            editPanel.classList.add(`active`);
             selectedPatientId = patient.id;
 
             document.getElementById(`updateFirstName`).value = patient.first_name;
             document.getElementById(`updateLastName`).value = patient.last_name;
-            document.querySelector(`#updateSex`).value = sex;
+            document.querySelector(`.updateSex`).value = sex;
             document.getElementById(`updateBirthdate`).value = patient.birthdate;
             document.getElementById(`updateAddress`).value = patient.address;
             document.getElementById(`updateContact`).value = contact[0];
             document.getElementById(`updateExContact`).value = contact[1];
             document.getElementById(`updateReferredBy`).value = patient.referred_by;
+        });
+
+        clone.querySelector(`.deletePatientBtn`).addEventListener(`click`, () => {
+            document.getElementById(`deletePatientForm`).action = `/patients/delete/${patient.id}`;
+            document.getElementById(`deletePatient`).classList.add(`active`);
+            selectedPatientId = patient.id;
         });
 
         container.appendChild(clone);
@@ -110,32 +114,6 @@ async function patientPreview(id){
     }
 }
 
-function renderPatientsForCare(data){
-    const container = document.getElementById(`patientsCollection`); 
-    const template = document.getElementById(`patientsTemplate`);
-    const preview = document.querySelector(`.popup`);
-
-    container.innerHTML = "";
-
-    data.collection.forEach(patient => {
-        const clone = template.content.cloneNode(true);
-        clone.querySelector(`.patientName`).textContent = patient.last_name + ", " + patient.first_name;
-        clone.querySelector(`.patientAge`).textContent = patient.age;
-        const selectedPatient = clone.querySelector(`.selectedPatient`);
-        selectedPatient.addEventListener("click", () => {
-            selectedPatientId = patient.id;
-            preview.classList.add(`active`);
-            document.getElementById(`pvwPatientId`).textContent = patient.id;
-            document.getElementById(`pvwPatientName`).textContent = patient.last_name + ", " + patient.first_name;
-            document.getElementById(`pvwPatientAge`).textContent = patient.age;
-            document.getElementById(`pvwPatientBirthdate`).textContent = patient.birthdate;
-        });
-
-        container.appendChild(clone);
-    });
-
-}
-
 async function loadPatientsList() {
     try {
         const res = await fetch(`/patients/all`, {
@@ -148,6 +126,25 @@ async function loadPatientsList() {
             return;
         }
         
+        renderPatientsData(data);
+    } catch (err) {
+        console.error(err);
+    } 
+}
+
+async function sortPatients() {
+    try {
+        const res = await fetch(`/patients/sort?order=${order}&direction=${direction}`, {
+            method: "GET"
+        });
+
+        const data = await res.json();
+        if (!data.ok) {
+            responseMessage(data, data.error);
+            return;
+        }
+        
+        responseMessage(data, data.message);
         renderPatientsData(data);
     } catch (err) {
         console.error(err);
@@ -414,57 +411,70 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         const sortByName = document.getElementById(`byName`);
         const sortByAge = document.getElementById(`byAge`);
         const sortById = document.getElementById(`byId`);
-        let currentSort = `id`;
-        let currentDirection = `ASC`;
 
         sortDirection.addEventListener(`click`, (e) => {
             e.preventDefault();
-            if (sortDirection.value === `DESC`){
-                sortDirection.innerText = `ASC`;
-                sortDirection.value = `ASC`;
-                currentDirection = 'ASC';
-                sortPatient(currentSort, currentDirection);
-            } else {
-                sortDirection.innerText = `DESC`;
-                sortDirection.value = `DESC`;
-                currentDirection = 'DESC';
-                sortPatient(currentSort, currentDirection);
-            }
+            direction = direction === 'DESC' ? 'ASC' : 'DESC';
+            sortDirection.textContent = direction;
+            sortPatients();
         });
         
         sortByName.addEventListener(`click`, (e) => {
             e.preventDefault();
-            currentSort = 'last_name';
+            order = 'last_name';
             sortByName.classList.add(`activeSort`);
             sortById.classList.remove(`activeSort`);
             sortByAge.classList.remove(`activeSort`);
-            sortPatient(currentSort, currentDirection);
+            sortPatients();
         });
 
         sortByAge.addEventListener(`click`, (e) => {
             e.preventDefault();
-            currentSort = 'age';
+            order = 'age';
             sortByName.classList.remove(`activeSort`);
             sortById.classList.remove(`activeSort`);
             sortByAge.classList.add(`activeSort`);
-            sortPatient(currentSort, currentDirection);
+            sortPatients();
         });
         sortById.addEventListener(`click`, (e) => {
             e.preventDefault();
-            currentSort = 'id';
+            order = 'id';
             sortByName.classList.remove(`activeSort`);
             sortById.classList.add(`activeSort`);
             sortByAge.classList.remove(`activeSort`);
-            sortPatient(currentSort, currentDirection);
+            sortPatients();
         });
 
-        const patientPreview = document.getElementById(`patientPreview`);
         const closePreview = document.getElementById(`closePreview`);
         closePreview.addEventListener(`click`, () => {
-            patientPreview.classList.remove(`active`);
+            document.getElementById(`patientPreview`).classList.remove(`active`);
         });
 
+        const closeDelete = document.getElementById(`closeDelete`);
+        closeDelete.addEventListener(`click`, () => {
+            document.getElementById(`deletePatient`).classList.remove(`active`);
+        });
 
+        document.getElementById(`deletePatientForm`).addEventListener(`submit`, async (e) => {
+            e.preventDefault();
+            try {
+                const res = await fetch(`/patients/delete/${selectedPatientId}`, {
+                    method: 'POST'
+                });
+
+                const data = await res.json();
+
+                if(!data.ok){
+                    responseMessage(data, data.error);
+                }
+
+                responseMessage(data, data.message);
+                document.getElementById(`deletePatient`).classList.remove(`active`);
+                loadPatientsList();
+            } catch (err) {
+                console.error(err)
+            }
+        });
     }
 
     

@@ -34,7 +34,7 @@
     }
 
     #sidebar {
-        position: fixed;
+        position: absolute;
         top: unset;
         bottom: 0;
         flex-direction: row;
@@ -113,6 +113,10 @@
     #patients #collection td:nth-child(2){
         max-width: 20rem;
     }
+
+    .actions div {
+        flex-direction: column;
+    }
 }
 
 @media ( max-width: 600px ) and ( orientation: portrait ){
@@ -165,6 +169,7 @@
     #patients #collection td:nth-child(2){
         max-width: 10rem;
     }
+
 }
 
 @media (max-width: 1000px) and (orientation: landscape) {

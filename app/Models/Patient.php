@@ -45,6 +45,16 @@ class Patient extends Database {
         }
     }
 
+    public function deletePatient($id){
+        try {
+            $query = 'DELETE FROM patients WHERE id = ? ';
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([$id]);
+        } catch(PDOException $err) {
+            $this->logger->error($err->getMessage());
+        }
+    }
+
     public function updatePatient(array $data){
         try {
             $query = 'UPDATE patients SET first_name = :first_name, last_name = :last_name, age = :age, sex = :sex, birthdate = :birthdate, address = :address, contacts = :contacts, referred_by = :referred_by WHERE id = :id';
@@ -65,9 +75,20 @@ class Patient extends Database {
         }
     }
 
+    public function sortPatients($order, $direction){
+        try{
+            $query = "SELECT * FROM patients ORDER BY $order $direction";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $err) {
+            $this->logger->error($err->getMessage());
+        }
+    }
+
     public function getAllPatients(){
         try {
-            $query = 'SELECT * FROM patients ORDER BY id ASC';
+            $query = 'SELECT * FROM patients';
             $stmt = $this->db->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);

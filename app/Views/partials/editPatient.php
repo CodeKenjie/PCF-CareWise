@@ -23,7 +23,7 @@
                 <label for="updateBirthdate">Birthdate</label>
             </span>
             <span>
-                <select id="updateSex" name="sex" required>
+                <select class="updateSex" name="sex" required>
                     <option value="" hidden></option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>

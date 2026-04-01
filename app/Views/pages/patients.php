@@ -7,24 +7,28 @@
                 <svg class="svg icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M2,21h8a1,1,0,0,0,0-2H3.071A7.011,7.011,0,0,1,10,13a5.044,5.044,0,1,0-3.377-1.337A9.01,9.01,0,0,0,1,20,1,1,0,0,0,2,21ZM10,5A3,3,0,1,1,7,8,3,3,0,0,1,10,5ZM23,16a1,1,0,0,1-1,1H19v3a1,1,0,0,1-2,0V17H14a1,1,0,0,1,0-2h3V12a1,1,0,0,1,2,0v3h3A1,1,0,0,1,23,16Z"></path></g></svg>
                 <span>Register Patient</span>
             </button>
-            <form action="/patients?search=" method="get">
-                <div id="sorts">
+            <div>
+                <form id="sorts" action="/patients/sort" method="get">
                     <span>
-                        <button id="byId" type="button" value="id">I.D</button>
-                        <button id="byName" type="button" value="name">Name</button>
-                        <button id="byAge" type="button" value="age">Age</button>
+                        <span>
+                            <button id="byId" type="button">I.D</button>
+                            <button id="byName" type="button">Name</button>
+                            <button id="byAge" type="button">Age</button>
+                        </span>
+                        <span>
+                            <button id="direction" type="button" value="ASC">ASC</button>
+                        </span>
                     </span>
+                </form>
+                <form action="">
                     <span>
-                        <button id="direction" type="button" value="ASC">ASC</button>
+                        <input name="search" style="padding-right: 4em;" type="text" placeholder="Search">
+                        <button id="searchBtn" type="submit">
+                            <svg viewBox="0 0 20 20" class="svg icon" xmlns="http://www.w3.org/2000/svg" fill="none"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill="currentColor" fill-rule="evenodd" d="M4 9a5 5 0 1110 0A5 5 0 014 9zm5-7a7 7 0 104.2 12.6.999.999 0 00.093.107l3 3a1 1 0 001.414-1.414l-3-3a.999.999 0 00-.107-.093A7 7 0 009 2z"></path> </g></svg>
+                        </button>
                     </span>
-                </div>
-                <span>
-                    <input name="search" style="padding-right: 4em;" type="text" placeholder="Search">
-                    <button id="searchBtn" type="submit">
-                        <svg viewBox="0 0 20 20" class="svg icon" xmlns="http://www.w3.org/2000/svg" fill="none"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill="currentColor" fill-rule="evenodd" d="M4 9a5 5 0 1110 0A5 5 0 014 9zm5-7a7 7 0 104.2 12.6.999.999 0 00.093.107l3 3a1 1 0 001.414-1.414l-3-3a.999.999 0 00-.107-.093A7 7 0 009 2z"></path> </g></svg>
-                    </button>
-                </span>
-            </form>
+                </form>
+            </div>
         </section>
         <section>
             <ul id="collection">
@@ -35,6 +39,7 @@
     <?php require __DIR__ . "/../partials/registerPatient.php"; ?>
     <?php require __DIR__ . "/../partials/patientPreview.php"; ?>
     <?php require __DIR__ . "/../partials/editPatient.php"; ?>
+    <?php require __DIR__ . "/../partials/deletePatient.php"; ?>
     <template id="patientsCard">
         <li>
             <span class="profile">
@@ -69,7 +74,7 @@
                         <td class="address"></td>
                     </tr>
                     <tr>
-                        <td><strong>Contact:</strong></td>
+                        <td><strong>Contacts:</strong></td>
                         <td class="contact"></td>
                     </tr>
                     <tr>
@@ -85,7 +90,7 @@
                 <button class="editPatientBtn">
                     <svg viewBox="0 0 24 24" class="svg sm-icon" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M2,21H8a1,1,0,0,0,0-2H3.071A7.011,7.011,0,0,1,10,13a5.044,5.044,0,1,0-3.377-1.337A9.01,9.01,0,0,0,1,20,1,1,0,0,0,2,21ZM10,5A3,3,0,1,1,7,8,3,3,0,0,1,10,5ZM20.207,9.293a1,1,0,0,0-1.414,0l-6.25,6.25a1.011,1.011,0,0,0-.241.391l-1.25,3.75A1,1,0,0,0,12,21a1.014,1.014,0,0,0,.316-.051l3.75-1.25a1,1,0,0,0,.391-.242l6.25-6.25a1,1,0,0,0,0-1.414Zm-5,8.583-1.629.543.543-1.629L19.5,11.414,20.586,12.5Z"></path></g></svg>
                 </button>
-                <button>
+                <button class="deletePatientBtn">
                     <svg viewBox="0 0 24 24" class="svg sm-icon" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M1,20a1,1,0,0,0,1,1h8a1,1,0,0,0,0-2H3.071A7.011,7.011,0,0,1,10,13a5.044,5.044,0,1,0-3.377-1.337A9.01,9.01,0,0,0,1,20ZM10,5A3,3,0,1,1,7,8,3,3,0,0,1,10,5Zm12.707,9.707L20.414,17l2.293,2.293a1,1,0,1,1-1.414,1.414L19,18.414l-2.293,2.293a1,1,0,0,1-1.414-1.414L17.586,17l-2.293-2.293a1,1,0,0,1,1.414-1.414L19,15.586l2.293-2.293a1,1,0,0,1,1.414,1.414Z"></path></g></svg>
                 </button>
             </div>

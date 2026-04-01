@@ -185,6 +185,16 @@ class PatientsController extends Controller {
         }
     }
 
+    public function delete($id) {
+        header('Content-Type: application/json');
+        $response = [];
+        $patient = new Patient();
+        $patient->deletePatient($id);
+
+        $response = [ 'ok' => true, 'code' => 200, 'message' => 'Patient successfully deleted' ];
+        echo json_encode($response);
+    }
+
     public function get($id){
         header('Content-Type: application/json');
         $response = [];
@@ -193,6 +203,25 @@ class PatientsController extends Controller {
         
         $response = [ 'ok' => true, 'code' => 200, 'information' => $patientInfo ];
         echo json_encode($response);
+    }
+
+    public function sort(){
+        header('Content-Type: application/json');
+        if($_SERVER['REQUEST_METHOD'] === 'GET'){
+            $response = [];
+            $order = $_GET['order'] ?? 'id';
+            $direction = $_GET['direction'] ?? 'ASC';
+            $allowedSort = ['id', 'last_name', 'age'];
+
+            if(!in_array($order, $allowedSort)) {
+                $order = 'id';
+            }
+
+            $patients = new Patient();
+            $sorted = $patients->sortPatients($order, $direction);
+            $response = [ 'ok' => true, 'code' => 200, 'message' => 'Patients sorted by: '. ucwords($order) . ' direction: ' . ucfirst($direction), 'collection' => $sorted ];
+            echo json_encode($response);
+        }
     }
 
     public function getAll(){
@@ -204,4 +233,5 @@ class PatientsController extends Controller {
         $response = ['ok' => true, 'code' => 200, 'collection' => $patientsList ];
         echo json_encode($response);
     }
+
 }

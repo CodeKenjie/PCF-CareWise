@@ -285,6 +285,7 @@ select{
     margin: 0;
     padding: 0.5em;
     gap: 0.5em;
+    pointer-events: none;
 }
 
 #responseContainer div {
@@ -303,6 +304,7 @@ select{
     position: relative;
     width: var(--normal);
     height: var(--normal);
+    pointer-events: all;
 }
 
 #responseContainer span::before, #responseContainer span::after{
@@ -541,6 +543,7 @@ select{
     position: relative;
     flex: 1 1 0;
     display: flex;
+    pointer-events: all;
     align-items: center;
     color: var(--font-color);
     padding: 0.5em;
@@ -615,6 +618,7 @@ select{
     transition: width 300ms ease;
 }
 
+#closePreview:hover,
 #sidebar .popup a:hover,
 #sidebar .popup button:hover{
     background: var(--button-highlight);
@@ -676,6 +680,7 @@ select{
     height: 100%;
     border-radius: var(--radius);
     scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
     scroll-padding: 0.5em;
     overflow: auto;
     scrollbar-width: none;
@@ -771,6 +776,7 @@ select{
     padding: 1em;
 }
 
+#deletePatient button:nth-of-type(1):hover,
 #patients #collection li div button:nth-of-type(3):hover {
     background: var(--critical);
     color: var(--alt-font-color);
@@ -779,6 +785,7 @@ select{
 }
 
 
+#deletePatient,
 #editPatient,
 #patientPreview,
 #registerPatient {
@@ -792,8 +799,34 @@ select{
     z-index: 11;
 }
 
+#deletePatient.active,
+#editPatient.active,
+#patientPreview.active,
+#registerPatient.active {
+    display: flex;
+}
+
 #closePreview {
+    width: fit-content;
     position: relative;
+    align-self: end;
+    border-radius: 50%;
+}
+
+#closePreview::before, #closePreview::after {
+    content: "";
+    position: absolute;
+    background: var(--font-color);
+    width: var(--normal);
+    height: 3px;
+}
+
+#closePreview::before {
+    rotate: 45deg;
+}
+
+#closePreview::after {
+    rotate: -45deg;
 }
 
 #patientPreview span {
@@ -802,6 +835,11 @@ select{
     align-items: center;
     gap: 1em;
     padding: 1em;
+}
+
+#deletePatient span,
+#patientPreview span:nth-of-type(2) {
+    align-self: center;
 }
 
 #patientPreview h3{
@@ -821,15 +859,21 @@ select{
     overflow-wrap: break-word;
 }
 
-#editPatient.active,
-#patientPreview.active,
-#registerPatient.active {
-    display: flex;
+#deletePatient header {
+    color: var(--critical);
+    font-size: var(--normal);
 }
 
+#deletePatient p {
+    padding: 1em 0;
+}
+
+#deletePatient form,
 #editPatient form,
 #patientPreview form,
 #registerPatient form {
+    display: flex;
+    flex-direction: column;
     width: fit-content;
     height: fit-content;
     background: var(--bg);
@@ -867,8 +911,8 @@ select{
     transition: scale 300ms ease;
 }
 
+#deletePatient button,
 #editPatient button,
-#patientPreview button,
 #registerPatient button {
     font-size: var(--bigger);
     font-weight: var(--bold);
@@ -888,6 +932,7 @@ select{
     border: none;
 }
 
+#deletePatient button:nth-of-type(2):hover,
 #patientPreview button:hover,
 #patients #collection li div button:nth-of-type(1):hover,
 #patients #collection li div button:nth-of-type(2):hover,
@@ -927,14 +972,6 @@ select{
     gap: 0.5em;
 }
 
-.actions form {
-    flex: 1 1 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 1em;
-}
-
 .actions span {
     position: relative;
     display: flex;
@@ -951,7 +988,15 @@ select{
     z-index: 2;
 }
 
+.actions div {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+}
+
 .actions #sorts {
+    flex: 1 1 0;
     display: flex;
     gap: 1em;
 }
