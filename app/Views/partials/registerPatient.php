@@ -1,6 +1,6 @@
 <section id="registerPatient" class="popup">
-    <form id="registerPatientForm" action="/patients/register" method="post">
-        <div>
+    <form id="registerPatientForm" class="form-ui" action="/patients/register" method="post">
+        <div class="avatar">
             <span class="profile">
                 <img src="assets/images/profile.png" alt="">
             </span>
@@ -51,7 +51,7 @@
         </span>
         <div class="part p-sm">
             <button type="submit">Submit</button>
-            <button id="cancelPatientRegistration" type="reset">Cancel</button>
+            <button id="cancelPatientRegistration" class="btn-highlight" type="reset">Cancel</button>
         </div>
     </form>
 </section>

@@ -6,7 +6,7 @@
             <img class="logo" src="/assets/images/logo.png" alt="">
             <h2>PCF:CareWise</h2>
         </header>
-        <form action="/login" method="post">
+        <form class="form-ui" action="/login" method="post">
             <span class="p-sm">
                 <h1 class="ctr-text spr-h">Hi Nurse</h1>
                 <h2 class="ctr-text sb-h">Welcome to CareWise</h2>

@@ -56,7 +56,7 @@ function renderPatientsData(data){
         clone.querySelector(`.birthdate`).textContent = patient.birthdate;
         clone.querySelector(`.age`).textContent = patient.age;
         clone.querySelector(`.sex`).textContent = patient.sex;
-        clone.querySelector(`.contact`).textContent = patient.contact + patient.extra_contact;
+        clone.querySelector(`.contact`).textContent = patient.contact + " " + patient.extra_contact;
         clone.querySelector(`.referredBy`).textContent = patient.referred_by;
         clone.querySelector(`.patientPreviewBtn`).addEventListener(`click`, () => {
             document.getElementById(`previewForm`).action = `/patients/view/${patient.id}`;
@@ -333,7 +333,6 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         const contact = document.getElementById(`contact`);
         const exContact = document.getElementById(`exContact`);
         const referredBy = document.getElementById(`referredBy`);
-        document.getElementById(`byId`).classList.add(`activeSort`);
 
         const registerPatientBtn = document.getElementById(`registerPatientBtn`);
         registerPatientBtn.addEventListener(`click`, () => {

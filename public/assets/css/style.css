@@ -391,14 +391,6 @@ select{
     flex-direction: column;
 }
 
-#editPatient span,
-#registerPatient span,
-#register span, 
-#login span {
-    display: flex;
-    flex-direction: column;
-}
-
 .part {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -407,10 +399,24 @@ select{
     z-index: 1;
 }
 
-#editPatient span label,
-#registerPatient span label,
-#register span label,
-#login span label {
+.form-ui {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    height: fit-content;
+    background: var(--bg);
+    padding: 1em;
+    border: var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.form-ui span {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-ui span label {
     background: transparent;
     font-size: var(--normal);
     font-weight: var(--bold);
@@ -421,17 +427,9 @@ select{
     z-index: 1;
 }
 
-#editPatient span:has(select:valid) label,
-#editPatient span:focus-within label,
-#editPatient span:has(input:valid) label,
-#registerPatient span:has(select:valid) label,
-#registerPatient span:focus-within label,
-#registerPatient span:has(input:valid) label,
-#register span:has(select:valid) label,
-#register span:focus-within label,
-#register span:has(input:valid) label,
-#login span:focus-within label,
-#login span:has(input:valid) label {
+.form-ui span:has(select:valid) label,
+.form-ui span:focus-within label,
+.form-ui span:has(input:valid) label{
     background: var(--bg);
     transform: translate(0.5em, -2.6em) scale(0.88);
     transition: transform 300ms ease-in;
@@ -439,6 +437,31 @@ select{
     border-radius: var(--radius);
     opacity: 100%;
     z-index: 2;
+}
+
+.popup{
+    display: none;
+    background: var(--disable-bg);
+    position: absolute;
+    justify-content: center;
+    align-items: center;
+    width: inherit;
+    height: inherit;
+    z-index: 11;
+}
+
+.popup.active{
+    display: flex;
+}
+
+.btn-highlight:hover {
+    background: var(--button-highlight) !important;
+    scale: 1.05;
+    transition: scale 300ms ease;
+}
+
+.btn-highlight:active{
+    background: var(--button-active);
 }
 
 #sidebar {
@@ -780,28 +803,6 @@ select{
     transition: scale 300ms ease;
 }
 
-
-#deletePatient,
-#editPatient,
-#patientPreview,
-#registerPatient {
-    display: none;
-    background: var(--disable-bg);
-    position: absolute;
-    justify-content: center;
-    align-items: center;
-    width: inherit;
-    height: inherit;
-    z-index: 11;
-}
-
-#deletePatient.active,
-#editPatient.active,
-#patientPreview.active,
-#registerPatient.active {
-    display: flex;
-}
-
 #closePreview {
     width: fit-content;
     position: relative;
@@ -825,6 +826,15 @@ select{
     rotate: -45deg;
 }
 
+#patientPreview form {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    border: var(--border);
+    border-radius: var(--radius);
+    padding: 1em;
+}
+
 #patientPreview span {
     font-size: var(--normal);
     display: flex;
@@ -833,8 +843,7 @@ select{
     padding: 1em;
 }
 
-#deletePatient span,
-#patientPreview span:nth-of-type(2) {
+#deletePatient span {
     align-self: center;
 }
 
@@ -864,23 +873,14 @@ select{
     padding: 1em 0;
 }
 
-#deletePatient form,
-#editPatient form,
-#patientPreview form,
-#registerPatient form {
+#deletePatient div {
+    flex: 1 1 0;
     display: flex;
-    flex-direction: column;
-    width: fit-content;
-    height: fit-content;
-    background: var(--bg);
-    padding: 1em;
-    border: var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
+    justify-content: center;
+    gap: 1em;
 }
 
-#editPatient div:nth-of-type(1),
-#registerPatient div:nth-of-type(1) {
+.avatar {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -888,8 +888,7 @@ select{
     padding: 1em;
 }
 
-#editPatient div:nth-of-type(1) label,
-#registerPatient div:nth-of-type(1) label {
+.avatar label {
     position: absolute;
     bottom: 6%;
     right: 30%;
@@ -899,8 +898,7 @@ select{
     box-shadow: var(--shadow);
 }
 
-#editPatient div:nth-of-type(1) label:hover,
-#registerPatient div:nth-of-type(1) label:hover {
+.avatar label:hover {
     color: var(--font-color);
     background-color: var(--button-highlight);
     scale: 1.05;
@@ -915,7 +913,7 @@ select{
     padding: 1em;
     border: var(--border);
     border-radius: 2em;
-    background-color: transparent;
+    background: var(--bg);
 }
 
 #registerPatientBtn:hover,
@@ -926,28 +924,6 @@ select{
     scale: 1.05;
     transition: scale 300ms ease;
     border: none;
-}
-
-#deletePatient button:nth-of-type(2):hover,
-#patientPreview button:hover,
-#patients #collection li div button:nth-of-type(1):hover,
-#patients #collection li div button:nth-of-type(2):hover,
-#editPatient div:nth-of-type(1) button:hover,
-#editPatient button:nth-of-type(2):hover,
-#registerPatient div:nth-of-type(1) button:hover,
-#registerPatient button:nth-of-type(2):hover {
-    background: var(--button-highlight);
-    scale: 1.05;
-    transition: scale 300ms ease;
-}
-
-.actions #searchBtn:active,
-#editPatient button:nth-of-type(1):active,
-#editPatient button:nth-of-type(2):active,
-#registerPatient button:nth-of-type(1):active,
-#registerPatient button:nth-of-type(2):active,
-#registerPatientBtn:active{
-    background: var(--button-active);
 }
 
 .actions {

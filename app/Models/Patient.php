@@ -100,7 +100,15 @@ class Patient extends Database {
                         ) AS rank
                         FROM patients
                         WHERE (:kw IS NULL OR to_tsvector('english', first_name || ' ' || last_name || ' ' || sex || ' ' || address || ' ' || contact || ' ' || extra_contact || ' ' || referred_by)
-                            @@ plainto_tsquery('english', :kw))
+                            @@ plainto_tsquery('english', :kw)
+                            OR first_name ILIKE '%' || :kw || '%'
+                            OR last_name ILIKE '%' || :kw || '%'
+                            OR sex ILIKE '%' || :kw || '%'
+                            OR address ILIKE '%' || :kw || '%'
+                            OR contact ILIKE '%' || :kw || '%'
+                            OR extra_contact ILIKE '%' || :kw || '%'
+                            OR referred_by ILIKE '%' || :kw || '%'
+                            )
                             AND (age = :age OR :age IS NULL)
                             AND (birthdate = :birthdate OR :birthdate IS NULL)
                         ORDER BY rank DESC";

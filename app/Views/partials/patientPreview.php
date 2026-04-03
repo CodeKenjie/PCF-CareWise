@@ -1,11 +1,11 @@
-<section id="patientPreview">
+<section id="patientPreview" class="popup">
     <form id="previewForm" action="/patients/view">
-        <span id="closePreview"></span>
-        <span>
-            <header class="profile">
+        <span id="closePreview" class="btn-highlight"></span>
+        <div class="avatar">
+            <span class="profile">
                 <img src="assets/images/profile.png" alt="">
-            </header>
-        </span>
+            </span>
+        </div>
         <span>
             <label for="pId"><strong>I.D:</strong></label>
             <h3 id="pId"></h3>

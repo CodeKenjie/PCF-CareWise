@@ -9,7 +9,7 @@
             <img class="logo" src="/assets/images/logo.png" alt="">
             <h2>PCF:CareWise</h2>
         </header>
-        <form action="/register" method="post">
+        <form class="form-ui" action="/register" method="post">
             <span class="p-sm">
                 <h1 class="ctr-text spr-h">Join our team</h1>
                 <h2 class="ctr-text sb-h">help our community</h2>
