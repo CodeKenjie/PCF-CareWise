@@ -85,11 +85,11 @@
         font-size: var(--super-small);
     } 
 
-    #sidebar .popup{
+    #sidebar .additional{
         top: unset;
         left: unset;
         bottom: 100%;
-        right: 1%;
+        right: 10%;
         border-radius: var(--radius) 0 0 var(--radius);
     }
 

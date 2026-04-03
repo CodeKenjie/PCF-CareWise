@@ -399,18 +399,6 @@ select{
     z-index: 1;
 }
 
-.form-ui {
-    display: flex;
-    flex-direction: column;
-    width: fit-content;
-    height: fit-content;
-    background: var(--bg);
-    padding: 1em;
-    border: var(--border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-}
-
 .form-ui span {
     display: flex;
     flex-direction: column;
@@ -448,6 +436,18 @@ select{
     width: inherit;
     height: inherit;
     z-index: 11;
+}
+
+.popup form {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    height: fit-content;
+    background: var(--bg);
+    padding: 1em;
+    border: var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
 }
 
 .popup.active{
@@ -607,7 +607,7 @@ select{
     transition: width 200ms ease-in;
 }
 
-#sidebar .popup {
+#sidebar .additional {
     position: absolute;
     top: 30%;
     left: 100%;
@@ -623,8 +623,8 @@ select{
     z-index: 5;
 }
 
-#sidebar .popup button,
-#sidebar .popup a {
+#sidebar .additional button,
+#sidebar .additional a {
     display: flex;
     align-items: center;
     color: var(--font-color);
@@ -642,12 +642,12 @@ select{
 }
 
 #closePreview:hover,
-#sidebar .popup a:hover,
-#sidebar .popup button:hover{
+#sidebar .additional a:hover,
+#sidebar .additional button:hover{
     background: var(--button-highlight);
 }
 
-#sidebar .popup.active {
+#sidebar .additional.active {
     border: var(--border);
     width: 15rem;
     height: fit-content;
@@ -655,7 +655,7 @@ select{
     transition: width 300ms ease;
 }
 
-#sidebar.close .popup {
+#sidebar.close .additional {
     top: 32%;
     left: 110%;
 }

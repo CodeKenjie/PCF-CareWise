@@ -165,7 +165,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             sidebar.classList.toggle(`close`);
         });
 
-        const profilePop = document.querySelector(`.popup`);
+        const profilePop = document.querySelector(`.additional`);
         const profile = document.getElementById(`profile`);
         profile.addEventListener(`click`, () => {
             profilePop.classList.toggle(`active`);
