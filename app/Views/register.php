@@ -28,14 +28,6 @@
                     <label for="lastName">Last Name</label>
                 </span>
             </div>
-            <span class="p-sm">
-                <input name="birthdate" type="date" required>
-                <label for="birthdate">Birthdate</label>
-            </span>
-            <span class="p-sm">
-                <input name="address" type="text" maxlength="255" required>
-                <label for="address">Address</label>
-            </span>
             <div class="part p-sm">
                 <span>
                     <select name="sex" required>

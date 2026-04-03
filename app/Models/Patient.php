@@ -16,7 +16,7 @@ class Patient extends Database {
 
     public function create(array $data){
         try{
-            $query = 'INSERT INTO patients (first_name, last_name, age, sex, birthdate, address, contacts, referred_by) VALUES(:first_name, :last_name, :age, :sex, :birthdate, :address, :contacts, :referred_by)';
+            $query = 'INSERT INTO patients (first_name, last_name, age, sex, birthdate, address, contact, extra_contact, referred_by) VALUES(:first_name, :last_name, :age, :sex, :birthdate, :address, :contact, :extra_contact, :referred_by)';
             $stmt = $this->db->prepare($query);
             $stmt->execute([
                 ':first_name' => $data['firstName'] ?? '',
@@ -25,7 +25,8 @@ class Patient extends Database {
                 ':sex' => $data['sex'] ?? '',
                 ':birthdate' => $data['birthdate'] ?? '',
                 ':address' => $data['address'] ?? '',
-                ':contacts' => $data['contact'] ?? '',
+                ':contact' => $data['contact'] ?? '',
+                ':extra_contact' => $data['extraContact'] ?? '',
                 ':referred_by' => $data['referredBy'] ?? ''
             ]);
         }catch(PDOException $err){
@@ -57,7 +58,7 @@ class Patient extends Database {
 
     public function updatePatient(array $data){
         try {
-            $query = 'UPDATE patients SET first_name = :first_name, last_name = :last_name, age = :age, sex = :sex, birthdate = :birthdate, address = :address, contacts = :contacts, referred_by = :referred_by WHERE id = :id';
+            $query = 'UPDATE patients SET first_name = :first_name, last_name = :last_name, age = :age, sex = :sex, birthdate = :birthdate, address = :address, contact = :contact, extra_contact = :extra_contact, referred_by = :referred_by WHERE id = :id';
             $stmt = $this->db->prepare($query);
             $stmt->execute([
                 ':id' => $data['id'],
@@ -67,7 +68,8 @@ class Patient extends Database {
                 ':sex' => $data['sex'],
                 ':birthdate' => $data['birthdate'],
                 ':address' => $data['address'],
-                ':contacts' => $data['contacts'],
+                ':contact' => $data['contact'],
+                ':extra_contact' => $data['extraContact'],
                 ':referred_by' => $data['referredBy']
             ]);
         } catch(PDOException $err){
@@ -86,9 +88,37 @@ class Patient extends Database {
         }
     }
 
+    public function searchPatient($keyWord){
+        try {
+            $age = is_numeric($keyWord) ?  (int)$keyWord : null;
+            $birthdate = preg_match('/^\d{4}-\d{2}-\d{2}$/', $keyWord) ? $keyWord : null;
+            $keyword = ($age === null && $birthdate === null && $contact === null) ? $keyWord : null;
+            $query = "SELECT *, 
+                        ts_rank(
+                            to_tsvector('english', first_name || ' ' || last_name || ' ' || sex || ' ' || address || ' ' || contact || ' ' || extra_contact || ' ' || referred_by),
+                            plainto_tsquery('english', :kw)
+                        ) AS rank
+                        FROM patients
+                        WHERE (:kw IS NULL OR to_tsvector('english', first_name || ' ' || last_name || ' ' || sex || ' ' || address || ' ' || contact || ' ' || extra_contact || ' ' || referred_by)
+                            @@ plainto_tsquery('english', :kw))
+                            AND (age = :age OR :age IS NULL)
+                            AND (birthdate = :birthdate OR :birthdate IS NULL)
+                        ORDER BY rank DESC";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindValue(':kw', $keyword);
+            $stmt->bindValue(':age', $age);
+            $stmt->bindValue(':birthdate', $birthdate);
+
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $err) {
+            $this->logger->error($err->getMessage());
+        }
+    }
+
     public function getAllPatients(){
         try {
-            $query = 'SELECT * FROM patients';
+            $query = 'SELECT * FROM patients ORDER BY id ASC';
             $stmt = $this->db->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);

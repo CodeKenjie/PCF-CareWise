@@ -56,7 +56,7 @@ function renderPatientsData(data){
         clone.querySelector(`.birthdate`).textContent = patient.birthdate;
         clone.querySelector(`.age`).textContent = patient.age;
         clone.querySelector(`.sex`).textContent = patient.sex;
-        clone.querySelector(`.contact`).textContent = patient.contacts;
+        clone.querySelector(`.contact`).textContent = patient.contact + patient.extra_contact;
         clone.querySelector(`.referredBy`).textContent = patient.referred_by;
         clone.querySelector(`.patientPreviewBtn`).addEventListener(`click`, () => {
             document.getElementById(`previewForm`).action = `/patients/view/${patient.id}`;
@@ -67,17 +67,15 @@ function renderPatientsData(data){
         clone.querySelector(`.editPatientBtn`).addEventListener(`click`, () => {
             document.getElementById(`editPatientForm`).action = `/patients/edit/${patient.id}`;
             document.getElementById(`editPatient`).classList.add(`active`);
-            const contact = patient.contacts.split(`,`).map(item => item.trim());
-            const sex = patient.sex;
             selectedPatientId = patient.id;
 
             document.getElementById(`updateFirstName`).value = patient.first_name;
             document.getElementById(`updateLastName`).value = patient.last_name;
-            document.querySelector(`.updateSex`).value = sex;
+            document.querySelector(`.updateSex`).value = patient.sex;
             document.getElementById(`updateBirthdate`).value = patient.birthdate;
             document.getElementById(`updateAddress`).value = patient.address;
-            document.getElementById(`updateContact`).value = contact[0];
-            document.getElementById(`updateExContact`).value = contact[1];
+            document.getElementById(`updateContact`).value = patient.contact;
+            document.getElementById(`updateExContact`).value = patient.extra_contact;
             document.getElementById(`updateReferredBy`).value = patient.referred_by;
         });
 
@@ -106,7 +104,7 @@ async function patientPreview(id){
             document.getElementById(`pSex`).textContent = data.information.sex;
             document.getElementById(`pBirthdate`).textContent = data.information.birthdate;
             document.getElementById(`pAddress`).textContent = data.information.address;
-            document.getElementById(`pContacts`).textContent = data.information.contacts;
+            document.getElementById(`pContacts`).textContent = data.information.contact + data.information.extra_contact;
             document.getElementById(`pReferredBy`).textContent = data.information.referred_by;
         }
     } catch(err) {
@@ -335,6 +333,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         const contact = document.getElementById(`contact`);
         const exContact = document.getElementById(`exContact`);
         const referredBy = document.getElementById(`referredBy`);
+        document.getElementById(`byId`).classList.add(`activeSort`);
 
         const registerPatientBtn = document.getElementById(`registerPatientBtn`);
         registerPatientBtn.addEventListener(`click`, () => {
@@ -473,6 +472,29 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 loadPatientsList();
             } catch (err) {
                 console.error(err)
+            }
+        });
+
+        document.getElementById(`searchForm`).addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const keyword = document.getElementById(`search`).value;
+            try{
+                const res = await fetch(`/patients/find?search=${keyword}`, {
+                    method: "GET"
+                });
+
+                const data = await res.json();
+                renderPatientsData(data);
+            } catch(err) {
+                console.error(err);
+            }
+        })
+
+        document.getElementById(`search`).addEventListener(`input`, (e) => {
+            const search = document.getElementById(`search`).value;
+            e.preventDefault();
+            if(search === "") {
+                loadPatientsList();
             }
         });
     }

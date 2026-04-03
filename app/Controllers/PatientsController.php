@@ -88,7 +88,8 @@ class PatientsController extends Controller {
                 'sex' => ucwords($sex),
                 'birthdate' => $birthdate,
                 'address' => ucwords($address),
-                'contact' => $contact . $exContact,
+                'contact' => $contact,
+                'extraContact' =>$exContact,
                 'referredBy' => ucwords($referredBy),
             ];
 
@@ -174,7 +175,8 @@ class PatientsController extends Controller {
                 'sex' => ucwords($sex),
                 'birthdate' => $birthdate,
                 'address' => ucwords($address),
-                'contacts' => $contact . $exContact,
+                'contact' => $contact,
+                'extraContact' =>$exContact,
                 'referredBy' => ucwords($referredBy),
             ];
             $patient = new Patient();
@@ -222,6 +224,15 @@ class PatientsController extends Controller {
             $response = [ 'ok' => true, 'code' => 200, 'message' => 'Patients sorted by: '. ucwords($order) . ' direction: ' . ucfirst($direction), 'collection' => $sorted ];
             echo json_encode($response);
         }
+    }
+
+    public function search(){
+        $input = $_GET['search'] ?? '';
+        $response = [];
+
+        $results = (new Patient())->searchPatient($input);
+        $response = [ 'ok' => true, 'code' => 200, 'collection' => $results ];
+        echo json_encode($response);
     }
 
     public function getAll(){

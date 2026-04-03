@@ -37,7 +37,7 @@
         </span>
         <div class="part p-sm">
             <span>
-                <input id="contact" name="contact" type="text" required>
+                <input id="contact" name="contact" type="text" maxlength="11" required>
                 <label for="contact">Contact</label>
             </span>
             <span>

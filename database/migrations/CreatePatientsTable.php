@@ -14,7 +14,8 @@ class CreatePatientsTable extends Migration {
                         sex VARCHAR(6) NOT NULL,
                         birthdate DATE NOT NULL,
                         address TEXT NOT NULL,
-                        contacts TEXT NOT NULL,
+                        contact VARCHAR(20),
+                        extra_contact VARCHAR(100),
                         referred_by VARCHAR(100),
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )';

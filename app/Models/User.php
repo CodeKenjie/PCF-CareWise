@@ -16,16 +16,13 @@ class User extends Database {
 
     public function create(array $data){
         try {
-            $query = 'INSERT INTO users (display_name, first_name, last_name, birthdate, age, sex, address, role, email, password) VALUES (:display_name, :first_name, :last_name, :birthdate, :age, :sex, :address, :role, :email, :password);';
+            $query = 'INSERT INTO users (display_name, first_name, last_name, sex, role, email, password) VALUES (:display_name, :first_name, :last_name, :sex, :role, :email, :password);';
             $stmt = $this->db->prepare($query);
             $stmt->execute([
-                ':display_name' => ucwords($data['displayName'] ?? ''),
-                ':first_name' => ucwords($data['firstName'] ?? ''),
-                ':last_name' => ucwords($data['lastName'] ?? ''),
-                ':birthdate' => $data['birthdate'] ?? '',
-                ':age' => $data['age'] ?? '',
-                ':sex' => strtoupper($data['sex'] ?? ''),
-                ':address' => ucwords($data['address'] ?? ''),
+                ':display_name' => $data['displayName'] ?? '',
+                ':first_name' => $data['firstName'] ?? '',
+                ':last_name' => $data['lastName'] ?? '',
+                ':sex' => $data['sex'] ?? '',
                 ':role' => $data['role'] ?? '',
                 ':email' => $data['email'] ?? '',
                 ':password' => password_hash($data['password'] ?? '', PASSWORD_DEFAULT) ,

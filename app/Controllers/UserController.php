@@ -13,17 +13,12 @@ class UserController extends Controller {
             $displayName = $_POST['displayName'] ?? '';
             $firstName = $_POST['firstName'] ?? '';
             $lastName = $_POST['lastName'] ?? '';
-            $birthdate = $_POST['birthdate'] ?? '';
             $sex = $_POST['sex'] ?? '';
-            $address = $_POST['address'] ?? '';
             $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) ?? '';
             $password = $_POST['password'] ?? '';
             $role = $_POST['role'] ?? '';
             $confPass = $_POST['confPass'] ?? '';
             $accept = isset($_POST['accept']);
-            $bdateFormat = new DateTime($birthdate);
-            $today = new DateTime('today');
-            $age = $bdateFormat -> diff($today) -> y;
 
             if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
                 $response = ['ok' => false, 'code' => 400,  'error' => "Email is not Valid"];
@@ -51,12 +46,9 @@ class UserController extends Controller {
             
             $data = [
                 'displayName'=> $displayName,
-                'firstName'=> $firstName,
-                'lastName'=> $lastName,
-                'birthdate'=> $birthdate,
-                'age'=> $age,
-                'sex'=> $sex,
-                'address'=> $address,
+                'firstName'=> ucwords($firstName),
+                'lastName'=> ucwords($lastName),
+                'sex'=> ucwords($sex),
                 'email'=> strtolower($email),
                 'password'=>$password,
                 'role'=> $role,
