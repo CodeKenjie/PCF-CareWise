@@ -10,12 +10,10 @@
             <form id="sorts" action="/patients/sort" method="get">
                 <span>
                     <span>
-                        <button id="byId" class="activeSort" type="button">I.D</button>
-                        <button id="byName" type="button">Name</button>
-                        <button id="byAge" type="button">Age</button>
-                    </span>
-                    <span>
-                        <button id="direction" type="button" value="ASC">ASC</button>
+                        <button id="byId" class="btn-highlight activeSort" type="button">I.D</button>
+                        <button id="byName" class="btn-highlight" type="button">Name</button>
+                        <button id="byAge" class="btn-highlight" type="button">Age</button>
+                        <button id="direction" class="btn-highlight" type="button" value="ASC">ASC</button>
                     </span>
                 </span>
             </form>
@@ -94,9 +92,9 @@
     <form id="previewForm" action="/patients/view">
         <span id="closePreview" class="btn-highlight"></span>
         <div class="avatar">
-            <span class="profile">
+            <header class="profile">
                 <img src="assets/images/profile.png" alt="">
-            </span>
+            </header>
         </div>
         <span>
             <label for="pId"><strong>I.D:</strong></label>
@@ -201,7 +199,7 @@
     </form>
 </div>
 <template id="patientsCard">
-    <li class="acrylic-bg">
+    <li>
         <span class="profile">
             <img src="assets/images/profile.png" alt="">
         </span>

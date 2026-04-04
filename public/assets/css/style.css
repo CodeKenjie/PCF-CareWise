@@ -13,6 +13,7 @@
     --bold: 700;
     --semi-bold: 600;
     --thin: 300;
+    --bg-dim: rgb(245, 245, 245);
     --bg: rgb(255, 255, 255);
     --disable-bg: rgba(0, 0, 0, 0.1);
     --font-color: rgb(19, 19, 19);
@@ -32,7 +33,7 @@
     --critical: rgb(212, 66, 66);
     --moderate: rgb(219, 169, 75);
     --good: rgb(61, 161, 61);
-    --bg-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.65) 50%, rgba(255, 255, 255, 0.4) 100%);
+    --bg-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0.2) 100%);
     --bg-gradient-shine: linear-gradient(120deg, rgba(255, 255, 255, 0.6) 10%, rgba(255, 255, 255, 0.15) 30%, rbga(255, 255, 255, 0) 100%);
 }
 
@@ -100,7 +101,7 @@ html {
 }
 
 body {
-    background: var(--bg);
+    background: var(--bg-dim);
     position: relative;
     display: flex;
     flex-direction: row;
@@ -116,6 +117,7 @@ main {
     flex: 1 1 0;
     display: flex;
     flex-direction: column;
+    justify-content: center;
     padding: 1em;
     gap: 1em;
     width: inherit;
@@ -519,7 +521,6 @@ select{
     border-radius: var(--radius);
     background: var(--bg-gradient);
     backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
     box-shadow: var(--shadow);
     height: clamp(40rem, 80% + 5rem, 80rem);
 }
@@ -535,7 +536,6 @@ select{
 
 #sidebar {
     position: relative;
-    background: var(--bg);
     position: sticky;
     top: 0;
     left: 0;
@@ -544,6 +544,7 @@ select{
     display: flex;
     flex-direction: column;
     z-index: 10;
+    border-radius: 0;
 }
 
 #sidebar.close {
@@ -577,17 +578,15 @@ select{
     transition: width 300ms ease;
 } 
 
-#sidebar.close header section{
+#sidebar.close header img,
+#sidebar.close header h2 {
     display: none;
 }
 
 #sidebar header {
     display: flex;
-}
-
-#sidebar header section {
-    display: flex;
     align-items: center;
+    gap: 0.5em;
 }
 
 #sidebar section {
@@ -681,6 +680,7 @@ select{
     top: 30%;
     left: 100%;
     display: grid;
+    background: var(--bg);
     width: 0;
     height: 0;
     font-size: var(--bigger);
@@ -707,10 +707,9 @@ select{
 }
 
 #sidebar .additional.active {
-    border: var(--border);
     width: 15rem;
     height: fit-content;
-    padding: 0.4em;
+    padding: 0.5em;
     transition: width 300ms ease;
 }
 
@@ -730,14 +729,17 @@ select{
 }
 
 #patients #collection li {
+    background: var(--bg);
     display: grid;
     grid-template-columns: auto 1fr auto; 
     list-style-type: none;
     padding: 1em;
     gap: 1em;
     border: var(--border);
+    border-radius: var(--radius);
     width: 100%;
     height: fit-content;
+    box-shadow: var(--shadow);
 }
 
 .profile {
@@ -966,6 +968,7 @@ select{
 
 #patients #actions #sorts span {
     display: flex;
+    flex-wrap: wrap;
     gap: 0.5em;
 }
 
@@ -976,7 +979,6 @@ select{
     -webkit-box-orient: vertical;
     overflow-y: hidden;
     scrollbar-width: none;
-    background: var(--bg);
     font-size: var(--small);
     padding: 0.5em 1em;
     border: var(--border);
@@ -988,4 +990,8 @@ select{
     background: var(--button-color);
     scale: 1.1;
     border: none;
+}
+
+#patients #actions #sorts .activeSort:hover {
+    scale: 1.2;
 }
