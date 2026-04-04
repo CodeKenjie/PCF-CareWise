@@ -23,5 +23,6 @@ $router->post('/patients/register', 'App\Controllers\PatientsController@register
 $router->get('/patients/view/{id}', 'App\Controllers\PatientsController@get');
 $router->post('/patients/edit/{id}', 'App\Controllers\PatientsController@edit');
 $router->post('/patients/delete/{id}', 'App\Controllers\PatientsController@delete');
+$router->get('/inventory', 'App\Controllers\InventoryController@index');
 
 $router->direct($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);

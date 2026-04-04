@@ -23,7 +23,7 @@
     --sub-bg: rgb(241, 241, 241);
     --transparent-bg: rgba(0, 0, 0, 0.5);
     --hover-color: rgb(65, 228, 160);
-    --shadow: 0px 8px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    --shadow: 0px 4px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.6);
     --button-color: rgba(26, 77, 92, 0.8);
     --button-hover:  rgb(26, 77, 92);
     --button-active: rgb(139, 138, 138);
@@ -32,7 +32,7 @@
     --critical: rgb(212, 66, 66);
     --moderate: rgb(219, 169, 75);
     --good: rgb(61, 161, 61);
-    --bg-gradient: linear-gradient(135deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.25));
+    --bg-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.65) 50%, rgba(255, 255, 255, 0.4) 100%);
     --bg-gradient-shine: linear-gradient(120deg, rgba(255, 255, 255, 0.6) 10%, rgba(255, 255, 255, 0.15) 30%, rbga(255, 255, 255, 0) 100%);
 }
 
@@ -100,13 +100,34 @@ html {
 }
 
 body {
+    background: var(--bg);
+    position: relative;
+    display: flex;
+    flex-direction: row;
     color: var(--font-color);
     font-size: var(--normal);
     font-family: var(--font-fam);
-    min-height: 100vh;
     min-height: 100dvh;
     width: 100%;
     margin: 0;
+}
+
+main {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    padding: 1em;
+    gap: 1em;
+    width: inherit;
+    height: 100dvh;
+    overflow: hidden;
+}
+
+section {
+    display: flex;
+    height: fit-content;
+    padding: 1em;
+    gap: 1em;
 }
 
 *, *::before, *::after {
@@ -124,14 +145,6 @@ a, a:link, a:visited, a:active {
 h1, h2, h3, p {
     margin: 0;
     padding: 0;
-}
-
-main {
-    background: var(--bg);
-    position: relative;
-    display: flex;
-    width: 100%;
-    height: 100dvh;
 }
 
 input {
@@ -433,8 +446,8 @@ select{
     position: absolute;
     justify-content: center;
     align-items: center;
-    width: inherit;
-    height: inherit;
+    min-width: 100vw;
+    min-height: 100vh;
     z-index: 11;
 }
 
@@ -454,14 +467,70 @@ select{
     display: flex;
 }
 
+.btn-pill {
+    font-size: var(--bigger);
+    font-weight: var(--bold);
+    padding: 1em;
+    border-radius: 2em;
+    border: var(--border);
+}
+
+.btn-accent,
+.btn-highlight,
+.btn-critical {
+    background: transparent;
+}
+
+.btn-accent:hover {
+    color: var(--alt-font-color);
+    background: var(--button-color);
+    scale: 1.05;
+    transition: scale 300ms ease;
+    border: none;
+}
+
+.btn-critical:hover {
+    background: var(--critical);
+    color: var(--alt-font-color);
+    scale: 1.05;
+    transition: scale 300ms ease;
+    border: none;
+}
+
+.btn-critical:active {
+    color: var(--alt-font-color);
+    background: red;
+    border: none;
+}
+
 .btn-highlight:hover {
-    background: var(--button-highlight) !important;
+    background: var(--button-highlight);
     scale: 1.05;
     transition: scale 300ms ease;
 }
 
 .btn-highlight:active{
     background: var(--button-active);
+    border: none;
+}
+
+.acrylic-bg {
+    position: relative;
+    border-radius: var(--radius);
+    background: var(--bg-gradient);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    box-shadow: var(--shadow);
+    height: clamp(40rem, 80% + 5rem, 80rem);
+}
+
+.acrylic-bg::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--bg-gradient-shine);
+    pointer-events: none;
 }
 
 #sidebar {
@@ -612,15 +681,12 @@ select{
     top: 30%;
     left: 100%;
     display: grid;
-    background: var(--bg-gradient);
-    backdrop-filter: blur(28px);
-    box-shadow: var(--shadow);
     width: 0;
     height: 0;
     font-size: var(--bigger);
     border-radius: 0 var(--radius) var(--radius) var(--radius);
     overflow: hidden;
-    z-index: 5;
+    z-index: 10;
 }
 
 #sidebar .additional button,
@@ -628,7 +694,6 @@ select{
     display: flex;
     align-items: center;
     color: var(--font-color);
-    background: transparent;
     text-align: start;
     font-size: var(--bigger);
     font-weight: var(--bold);
@@ -639,12 +704,6 @@ select{
     gap: 0.5em;
     border-radius: 0 var(--radius) var(--radius) var(--radius);
     transition: width 300ms ease;
-}
-
-#closePreview:hover,
-#sidebar .additional a:hover,
-#sidebar .additional button:hover{
-    background: var(--button-highlight);
 }
 
 #sidebar .additional.active {
@@ -660,47 +719,11 @@ select{
     left: 110%;
 }
 
-#patients {
-    flex-direction: column;
-    padding: 1em;
-    gap: 1em;
-    width: inherit;
-    height: inherit;
-    scroll-snap-type: x mandatory;
-    scroll-padding: 0.5em;
-}
-
-#patients section {
-    position: relative;
-    border-radius: var(--radius);
-    padding: 1em;
-    background: var(--bg-gradient);
-    backdrop-filter: blur(20px);
-    box-shadow: var(--shadow);
-    scroll-snap-align: start;
-    height: clamp(40rem, 80% + 5rem, 80rem);
-    overflow: hidden;
-}
-
-#patients section:nth-of-type(1){
-    height: fit-content;
-}
-
-#patients #collection li::before,
-#patients section::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: var(--bg-gradient-shine);
-    pointer-events: none;
-}
-
 #patients #collection {
+    flex: 1 1 0;
     display: flex;
     flex-direction: column;
     gap: 0.5em;
-    height: 100%;
     border-radius: var(--radius);
     overflow: auto;
     scrollbar-width: none;
@@ -709,13 +732,10 @@ select{
 #patients #collection li {
     display: grid;
     grid-template-columns: auto 1fr auto; 
-    background: var(--bg-gradient);
-    box-shadow: var(--shadow);
-    border-radius: var(--radius);
-    border: var(--border);
     list-style-type: none;
     padding: 1em;
     gap: 1em;
+    border: var(--border);
     width: 100%;
     height: fit-content;
 }
@@ -789,18 +809,9 @@ select{
     flex:  1 1 0;
     width: fit-content;
     height: fit-content;
-    background: var(--bg);
     border: none;
     border-radius: var(--radius);
     padding: 1em;
-}
-
-#deletePatient button:nth-of-type(1):hover,
-#patients #collection li div button:nth-of-type(3):hover {
-    background: var(--critical);
-    color: var(--alt-font-color);
-    scale: 1.05;
-    transition: scale 300ms ease;
 }
 
 #closePreview {
@@ -905,32 +916,6 @@ select{
     transition: scale 300ms ease;
 }
 
-#deletePatient button,
-#editPatient button,
-#registerPatient button {
-    font-size: var(--bigger);
-    font-weight: var(--bold);
-    padding: 1em;
-    border: var(--border);
-    border-radius: 2em;
-    background: var(--bg);
-}
-
-#registerPatientBtn:hover,
-#editPatient button:nth-of-type(1):hover,
-#registerPatient button:nth-of-type(1):hover {
-    color: var(--alt-font-color);
-    background: var(--button-color);
-    scale: 1.05;
-    transition: scale 300ms ease;
-    border: none;
-}
-
-.actions {
-    display: flex;
-    gap: 1em;
-}
-
 #registerPatientBtn{
     font-size: var(--bigger);
     font-weight: var(--bold);
@@ -944,13 +929,19 @@ select{
     gap: 0.5em;
 }
 
-.actions span {
+#patients #actions {
+    display: flex;
+    height: fit-content;
+    align-items: center;
+}
+
+#patients #actions span {
     position: relative;
     display: flex;
     align-items: center;
 }
 
-.actions #searchBtn {
+#patients #actions #searchBtn {
     background: transparent;
     margin-left: -5em;
     padding:0.5em;
@@ -960,25 +951,25 @@ select{
     z-index: 2;
 }
 
-.actions div {
+#patients #actions div {
     flex: 1 1 0;
     display: flex;
     flex-direction: row;
     gap: 1em;
 }
 
-.actions #sorts {
+#patients #actions #sorts {
     flex: 1 1 0;
     display: flex;
     gap: 1em;
 }
 
-.actions #sorts span {
+#patients #actions #sorts span {
     display: flex;
     gap: 0.5em;
 }
 
-.actions #sorts button {
+#patients #actions #sorts button {
     display: -webkit-box;
     -webkit-line-clamp: 1;
     line-clamp: 1;
@@ -992,7 +983,7 @@ select{
     border-radius: var(--radius);
 }
 
-.actions #sorts .activeSort {
+#patients #actions #sorts .activeSort {
     color: var(--alt-font-color);
     background: var(--button-color);
     scale: 1.1;

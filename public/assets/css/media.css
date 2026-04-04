@@ -6,15 +6,27 @@
     #login header {
         flex-direction: row;
     }
+
+    #sidebar section {
+        padding: 1em;
+    }
 }
 
 @media ( max-height: 1200px ) and ( orientation: portrait ){
-    #patients section {
-        height: clamp(30rem, 60vh + 5rem, 80rem);
+    main {
+        padding-bottom: 10rem;
+    }
+
+    #sidebar section {
+        padding: 1em;
     }
 }
 
 @media ( max-width: 1000px) and ( orientation: portrait) {
+    body {
+        flex-direction: column;
+    }
+
     .site {
         display: none;
     }
@@ -34,7 +46,7 @@
     }
 
     #sidebar {
-        position: absolute;
+        position: fixed;
         top: unset;
         bottom: 0;
         flex-direction: row;
@@ -114,7 +126,8 @@
         max-width: 20rem;
     }
 
-    .actions div {
+    #patients #actions div {
+        flex: 1 1 0;
         flex-direction: column;
     }
 }
