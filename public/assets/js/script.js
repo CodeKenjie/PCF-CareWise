@@ -81,6 +81,8 @@ function renderPatientsData(data){
 
         clone.querySelector(`.deletePatientBtn`).addEventListener(`click`, () => {
             document.getElementById(`deletePatientForm`).action = `/patients/delete/${patient.id}`;
+            document.getElementById(`name`).textContent = patient.last_name + ", " + patient.first_name;
+            document.getElementById(`id`).textContent = patient.id;
             document.getElementById(`deletePatient`).classList.add(`active`);
             selectedPatientId = patient.id;
         });
@@ -405,44 +407,6 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             }
         });
 
-        const sortDirection = document.getElementById(`direction`);
-        const sortByName = document.getElementById(`byName`);
-        const sortByAge = document.getElementById(`byAge`);
-        const sortById = document.getElementById(`byId`);
-
-        sortDirection.addEventListener(`click`, (e) => {
-            e.preventDefault();
-            direction = direction === 'DESC' ? 'ASC' : 'DESC';
-            sortDirection.textContent = direction;
-            sortPatients();
-        });
-        
-        sortByName.addEventListener(`click`, (e) => {
-            e.preventDefault();
-            order = 'last_name';
-            sortByName.classList.add(`activeSort`);
-            sortById.classList.remove(`activeSort`);
-            sortByAge.classList.remove(`activeSort`);
-            sortPatients();
-        });
-
-        sortByAge.addEventListener(`click`, (e) => {
-            e.preventDefault();
-            order = 'age';
-            sortByName.classList.remove(`activeSort`);
-            sortById.classList.remove(`activeSort`);
-            sortByAge.classList.add(`activeSort`);
-            sortPatients();
-        });
-        sortById.addEventListener(`click`, (e) => {
-            e.preventDefault();
-            order = 'id';
-            sortByName.classList.remove(`activeSort`);
-            sortById.classList.add(`activeSort`);
-            sortByAge.classList.remove(`activeSort`);
-            sortPatients();
-        });
-
         const closePreview = document.getElementById(`closePreview`);
         closePreview.addEventListener(`click`, () => {
             document.getElementById(`patientPreview`).classList.remove(`active`);
@@ -478,7 +442,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             e.preventDefault();
             const keyword = document.getElementById(`search`).value;
             try{
-                const res = await fetch(`/patients/find?search=${keyword}`, {
+                const res = await fetch(`/patients/patient?search=${keyword}`, {
                     method: "GET"
                 });
 
@@ -498,5 +462,63 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         });
     }
 
+    const inventory = document.getElementById(`inventory`);
+    if (inventory){
+        document.getElementById(`addItemBtn`).addEventListener(`click`, () => {
+            document.getElementById(`addItem`).classList.add(`active`);
+        });
+
+        document.getElementById(`cancelAddItem`).addEventListener(`click`, () => {
+            document.getElementById(`addItem`).classList.remove(`active`);
+        });
+
+        document.getElementById(`cancelEditItem`).addEventListener(`click`, () => {
+            document.getElementById(`editItem`).classList.remove(`active`);
+        });
+    }
+
+    const sortDirection = document.getElementById(`direction`);
+    const sort1 = document.getElementById(`sort1`);
+    const sort2 = document.getElementById(`sort2`);
+    const sort3 = document.getElementById(`sort3`);
+
+    sortDirection.addEventListener(`click`, (e) => {
+        e.preventDefault();
+        direction = direction === 'DESC' ? 'ASC' : 'DESC';
+        sortDirection.textContent = direction;
+        (patients) ? sortPatients() : null;
+    });
     
+    sort1.addEventListener(`click`, (e) => {
+        e.preventDefault();
+        sort1.classList.add(`activeSort`);
+        sort2.classList.remove(`activeSort`);
+        sort3.classList.remove(`activeSort`);
+        if(patients){
+            order = 'id';
+            sortPatients();
+        }
+    });
+
+    sort2.addEventListener(`click`, (e) => {
+        e.preventDefault();
+        sort1.classList.remove(`activeSort`);
+        sort2.classList.add(`activeSort`);
+        sort3.classList.remove(`activeSort`);
+        if(patients){
+            order = 'last_name';
+            sortPatients();
+        }
+    });
+
+    sort3.addEventListener(`click`, (e) => {
+        e.preventDefault();
+        sort1.classList.remove(`activeSort`);
+        sort2.classList.remove(`activeSort`);
+        sort3.classList.add(`activeSort`);
+        if(patients){
+            order = 'age';
+            sortPatients();
+        }
+    });
 })

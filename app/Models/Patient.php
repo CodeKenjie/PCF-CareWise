@@ -90,9 +90,9 @@ class Patient extends Database {
 
     public function searchPatient($keyWord){
         try {
-            $age = is_numeric($keyWord) ?  (int)$keyWord : null;
+            $id = is_numeric($keyWord) ?  (int)$keyWord : null;
             $birthdate = preg_match('/^\d{4}-\d{2}-\d{2}$/', $keyWord) ? $keyWord : null;
-            $keyword = ($age === null && $birthdate === null) ? $keyWord : null;
+            $keyword = ($id === null && $birthdate === null) ? $keyWord : null;
             $query = "SELECT *, 
                         ts_rank(
                             to_tsvector('english', first_name || ' ' || last_name || ' ' || sex || ' ' || address || ' ' || contact || ' ' || extra_contact || ' ' || referred_by),
@@ -107,14 +107,13 @@ class Patient extends Database {
                             OR address ILIKE '%' || :kw || '%'
                             OR contact ILIKE '%' || :kw || '%'
                             OR extra_contact ILIKE '%' || :kw || '%'
-                            OR referred_by ILIKE '%' || :kw || '%'
-                            )
-                            AND (age = :age OR :age IS NULL)
-                            AND (birthdate = :birthdate OR :birthdate IS NULL)
+                            OR referred_by ILIKE '%' || :kw || '%')
+                            AND (id = :id OR age = :id OR :id IS NULL)
+                            AND (birthdate <= :birthdate OR :birthdate IS NULL)
                         ORDER BY rank DESC";
             $stmt = $this->db->prepare($query);
             $stmt->bindValue(':kw', $keyword);
-            $stmt->bindValue(':age', $age);
+            $stmt->bindValue(':id', $id);
             $stmt->bindValue(':birthdate', $birthdate);
 
             $stmt->execute();

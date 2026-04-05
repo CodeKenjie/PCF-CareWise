@@ -71,6 +71,7 @@
         width: 3rem;
         height: 3rem;
     }
+
     #sidebar section{
         height: fit-content;
         margin: 0;
@@ -126,11 +127,6 @@
     #patients #collection td:nth-child(2){
         max-width: 20rem;
     }
-
-    #patients #actions div {
-        flex: 1 1 0;
-        flex-direction: column;
-    }
 }
 
 @media ( max-width: 600px ) and ( orientation: portrait ){
@@ -176,13 +172,20 @@
         padding: 1em;
     }
 
-    #registerPatientBtn {
+    #inventory #addItemBtn,
+    #patients #registerPatientBtn {
         flex-direction: column;
         font-size: var(--small);
     }
 
     #patients #collection td:nth-child(2){
         max-width: 10rem;
+    }
+
+    #inventory #actions div,
+    #patients #actions div {
+        flex: 1 1 0;
+        flex-direction: column;
     }
 }
 
@@ -246,6 +249,7 @@
         width: 3rem;
         height: 3rem;
     }
+
     #sidebar section{
         height: fit-content;
         margin: 0;

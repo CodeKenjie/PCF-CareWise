@@ -4,6 +4,10 @@ use App\Core\Migration;
 
 class CreateSearchPatientsIndex extends Migration{
     public function up(){
+
+        $idIndex = "CREATE INDEX IF NOT EXISTS id_idx ON patients(id)";
+        $this->conn()->exec($idIndex);
+
         $textIndex = "CREATE INDEX IF NOT EXISTS patients_text_idx
                         ON patients 
                         USING GIN (
@@ -22,9 +26,6 @@ class CreateSearchPatientsIndex extends Migration{
         
         $birthdateIndex = "CREATE INDEX IF NOT EXISTS birthdate_idx ON patients(birthdate)";
         $this->conn()->exec($birthdateIndex);
-
-        $ageIndex = "CREATE INDEX IF NOT EXISTS age_idx ON patients(age)";
-        $this->conn()->exec($ageIndex);
     }
     
     public function down() {

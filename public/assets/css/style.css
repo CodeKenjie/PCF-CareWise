@@ -385,6 +385,18 @@ select{
     box-shadow: var(--shadow);
 }
 
+#login .site img {
+    border-radius: 0 2em 2em 0;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 5% 100%);
+}
+
+#register section, #login section{
+    background: var(--bg);
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+}
+
 .site {
     flex: 1 1 0;
     border: 1.5em solid var(--bg);
@@ -398,24 +410,97 @@ select{
     object-fit: cover;
 }
 
-#login .site img {
-    border-radius: 0 2em 2em 0;
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 5% 100%);
-}
-
-#register section, #login section{
-    background: var(--bg);
-    flex: 1 1 0;
-    display: flex;
-    flex-direction: column;
-}
-
 .part {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1em;
     font-weight: var(--bold);
     z-index: 1;
+}
+
+.sortsSpan {
+    flex: 1 1 0;
+    flex-wrap: wrap;
+    display: flex;
+    gap: 0.5em;
+}
+
+.sortsSpan button {
+    font-size: var(--small);
+    padding: 0.5em 1em;
+    border: var(--border);
+    border-radius: var(--radius);
+}
+
+.sortsSpan .activeSort {
+    color: var(--alt-font-color);
+    background: var(--button-color);
+    scale: 1.1;
+    border: none;
+}
+
+.sortsSpan .activeSort:hover {
+    background: var(--button-color);
+    scale: 1.2;
+}
+
+.searchSpan {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.searchSpan button {
+    background: transparent;
+    margin-left: -5em;
+    padding:0.5em;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    z-index: 2;
+}
+
+.delete form {
+    padding: 0;    
+}
+
+.delete header {
+    display: flex;
+    align-items: center;
+    color: var(--critical);
+    font-size: var(--normal);
+    gap: 0.5em;
+    padding: 0 1em;
+}
+
+.delete div {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+.avatar {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1em;
+}
+
+.avatar label {
+    position: absolute;
+    bottom: 6%;
+    right: 30%;
+    background: var(--bg);
+    padding: 0.5em;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.avatar label:hover {
+    color: var(--font-color);
+    background-color: var(--button-highlight);
+    scale: 1.05;
+    transition: scale 300ms ease;
 }
 
 .form-ui span {
@@ -479,6 +564,14 @@ select{
     padding: 1em;
     border-radius: 2em;
     border: var(--border);
+}
+
+.btn-square {
+    font-size: var(--normal);
+    font-weight: var(--bold);
+    border: none;
+    padding: 1em;
+    border-radius: var(--radius);
 }
 
 .btn-accent,
@@ -843,25 +936,12 @@ select{
     rotate: -45deg;
 }
 
-#patientPreview form {
-    display: flex;
-    flex-direction: column;
-    background: var(--bg);
-    border: var(--border);
-    border-radius: var(--radius);
-    padding: 1em;
-}
-
 #patientPreview span {
     font-size: var(--normal);
     display: flex;
     align-items: center;
     gap: 1em;
     padding: 1em;
-}
-
-#deletePatient span {
-    align-self: center;
 }
 
 #patientPreview h3{
@@ -879,47 +959,6 @@ select{
 #patientPreview span h3 {
     word-break: break-word;
     overflow-wrap: break-word;
-}
-
-#deletePatient header {
-    color: var(--critical);
-    font-size: var(--normal);
-}
-
-#deletePatient p {
-    padding: 1em 0;
-}
-
-#deletePatient div {
-    flex: 1 1 0;
-    display: flex;
-    justify-content: center;
-    gap: 1em;
-}
-
-.avatar {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 1em;
-}
-
-.avatar label {
-    position: absolute;
-    bottom: 6%;
-    right: 30%;
-    background: var(--bg);
-    padding: 0.5em;
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-}
-
-.avatar label:hover {
-    color: var(--font-color);
-    background-color: var(--button-highlight);
-    scale: 1.05;
-    transition: scale 300ms ease;
 }
 
 #registerPatientBtn{
@@ -941,70 +980,43 @@ select{
     align-items: center;
 }
 
-#patients #actions span {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-#patients #actions #searchBtn {
-    background: transparent;
-    margin-left: -5em;
-    padding:0.5em;
-    border: none;
-    border-radius: var(--radius);
-    cursor: pointer;
-    z-index: 2;
-}
-
+#inventory #actions div,
 #patients #actions div {
-    flex: 1 1 0;
     display: flex;
     flex-direction: row;
+    align-items: center;
     gap: 1em;
+    width: 100%;
 }
 
-#patients #actions #sorts {
+#inventory #actions div form,
+#patients #actions div form {
     flex: 1 1 0;
-    display: flex;
-    gap: 1em;
-}
-
-#patients #actions #sorts span {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5em;
-}
-
-#patients #actions #sorts button {
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    line-clamp: 1;
-    -webkit-box-orient: vertical;
-    overflow-y: hidden;
-    scrollbar-width: none;
-    font-size: var(--small);
-    padding: 0.5em 1em;
-    border: var(--border);
-    border-radius: var(--radius);
-}
-
-#patients #actions #sorts .activeSort {
-    color: var(--alt-font-color);
-    background: var(--button-color);
-    scale: 1.1;
-    border: none;
-}
-
-#patients #actions #sorts .activeSort:hover {
-    scale: 1.2;
 }
 
 #inventory section:nth-of-type(1) {
+    height: fit-content;
+}
+
+#inventory section:nth-of-type(2) {
     display: flex;
     flex-direction: column;
     gap: 0;
     overflow: hidden;
+}
+
+#inventory #addItemBtn {
+    background: var(--button-color);
+    color: var(--alt-font-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--normal);
+    font-weight: var(--bold);
+    padding:0.5em 1em;
+    border: none;
+    border-radius: var(--radius);
+    gap: 0.5em;
 }
 
 #inventory #collection {
@@ -1015,8 +1027,6 @@ select{
     list-style-type: none; 
     overflow: auto;
 }
-
-
 
 #inventory #collection li {
     display: grid;
@@ -1035,6 +1045,7 @@ select{
     flex: 1 1 0;
     flex-wrap: wrap;
     display: flex;
+    justify-content: center;
     align-items: center;
 }
 

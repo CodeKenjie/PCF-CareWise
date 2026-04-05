@@ -1,26 +1,24 @@
 <?php require __DIR__ . "/../partials/header.php"; ?>
 <?php require __DIR__ . "/../partials/sidebar.php"; ?>
 <main id="patients">
-    <section id="actions" class="acrylic-bg actions">
+    <section id="actions" class="acrylic-bg">
         <button id="registerPatientBtn" class="btn-accent">
             <svg class="svg icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M2,21h8a1,1,0,0,0,0-2H3.071A7.011,7.011,0,0,1,10,13a5.044,5.044,0,1,0-3.377-1.337A9.01,9.01,0,0,0,1,20,1,1,0,0,0,2,21ZM10,5A3,3,0,1,1,7,8,3,3,0,0,1,10,5ZM23,16a1,1,0,0,1-1,1H19v3a1,1,0,0,1-2,0V17H14a1,1,0,0,1,0-2h3V12a1,1,0,0,1,2,0v3h3A1,1,0,0,1,23,16Z"></path></g></svg>
             <span>Register Patient</span>
         </button>
         <div>
-            <form id="sorts" action="/patients/sort" method="get">
-                <span>
-                    <span>
-                        <button id="byId" class="btn-highlight activeSort" type="button">I.D</button>
-                        <button id="byName" class="btn-highlight" type="button">Name</button>
-                        <button id="byAge" class="btn-highlight" type="button">Age</button>
-                        <button id="direction" class="btn-highlight" type="button" value="ASC">ASC</button>
-                    </span>
+            <form action="/patients/sort" method="get">
+                <span class="sortsSpan">
+                    <button id="sort1" class="btn-highlight activeSort" type="button">I.D</button>
+                    <button id="sort2" class="btn-highlight" type="button">Name</button>
+                    <button id="sort3" class="btn-highlight" type="button">Age</button>
+                    <button id="direction" class="btn-highlight" type="button" value="ASC">ASC</button>
                 </span>
             </form>
-            <form id="searchForm" action="/patients/find" method="get">
-                <span>
+            <form id="searchForm" action="/patients/patient" method="get">
+                <span class="searchSpan">
                     <input id="search" name="search" style="padding-right: 4em;" type="text" placeholder="Search">
-                    <button id="searchBtn" type="submit">
+                    <button type="submit">
                         <svg viewBox="0 0 20 20" class="svg icon" xmlns="http://www.w3.org/2000/svg" fill="none"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill="currentColor" fill-rule="evenodd" d="M4 9a5 5 0 1110 0A5 5 0 014 9zm5-7a7 7 0 104.2 12.6.999.999 0 00.093.107l3 3a1 1 0 001.414-1.414l-3-3a.999.999 0 00-.107-.093A7 7 0 009 2z"></path> </g></svg>
                     </button>
                 </span>
@@ -187,14 +185,17 @@
         </div>
     </form>
 </div>
-<div id="deletePatient" class="popup">
+<div id="deletePatient" class="delete popup">
     <form id="deletePatientForm" class="form-ui" action="/patients/delete" method="post">
-        <header><h4>Delete Patient</h4></header>
-        <hr>
-        <p>Are you sure that you want to delete patient: </p>
+        <header>
+            <svg class="svg icon" viewBox="-5.5 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>warning</title> <path d="M10.16 25.92c-2.6 0-8.72-0.24-9.88-2.24-1.28-2.28 2.040-8.24 3.080-10.040 1.040-1.76 4.64-7.56 7.12-7.56 2.8 0 7.24 7.48 8.56 10.12 1.92 3.84 2.48 6.4 1.56 7.6-1.52 2.040-8.96 2.12-10.44 2.12zM10.48 7.72c-0.72 0-3.080 2.36-5.64 6.76-2.76 4.68-3.48 7.72-3.080 8.4 0.32 0.56 3.2 1.4 8.4 1.4 5.44 0 8.64-0.88 9.080-1.48 0.28-0.36 0.040-2.28-1.72-5.84-2.64-5.28-6.12-9.24-7.040-9.24zM10.52 19.2c-0.48 0-0.84-0.36-0.84-0.84v-6.36c0-0.48 0.36-0.84 0.84-0.84s0.84 0.36 0.84 0.84v6.32c0 0.48-0.4 0.88-0.84 0.88zM11.36 21.36c0 0.464-0.376 0.84-0.84 0.84s-0.84-0.376-0.84-0.84c0-0.464 0.376-0.84 0.84-0.84s0.84 0.376 0.84 0.84z"></path> </g></svg>
+            <h4>Delete Patient</h4>
+        </header>
+        <hr style="height: 1px; color: var(--border-color);">
+        <p class="p-md">Are you sure that you want to delete patient: <strong style="color:var(--critical)" id="name"></strong> id: <strong style="color: var(--critical);" id="id"></strong></p>
         <div>
-            <button class="btn-pill btn-critical" type="submit">Delete</button>
-            <button id="closeDelete" class="btn-pill btn-highlight" type="button">Cancel</button>
+            <button class="btn-square btn-critical" type="submit">Delete</button>
+            <button id="closeDelete" class="btn-square btn-highlight" type="button">Cancel</button>
         </div>
     </form>
 </div>
