@@ -27,6 +27,7 @@
         flex-direction: column;
     }
 
+    #inventory #listHeader,
     .site {
         display: none;
     }
@@ -145,6 +146,7 @@
         top: 52%;
     }
 
+    #inventory #listHeader,
     .site {
         display: none;
     }
@@ -182,7 +184,6 @@
     #patients #collection td:nth-child(2){
         max-width: 10rem;
     }
-
 }
 
 @media (max-width: 1000px) and (orientation: landscape) {
