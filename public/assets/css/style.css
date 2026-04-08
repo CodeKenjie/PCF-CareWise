@@ -296,7 +296,7 @@ select{
     display: flex;
     flex-direction: column;
     align-items: center;
-    z-index: 10;
+    z-index: 99;
     margin: 0;
     padding: 0.5em;
     gap: 0.5em;
@@ -331,6 +331,7 @@ select{
     min-width: var(--normal);
     min-height: 3px;
     cursor: pointer;
+    border-radius: 1em;
 }
 
 #responseContainer span::before {
@@ -461,7 +462,7 @@ select{
 }
 
 .delete form {
-    padding: 0;    
+    padding: 0 !important;    
 }
 
 .delete header {
@@ -501,6 +502,40 @@ select{
     background-color: var(--button-highlight);
     scale: 1.05;
     transition: scale 300ms ease;
+}
+
+.preview {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    border-radius: var(--radius);
+    border: var(--border);
+    width: min(50rem, 70%);
+}
+
+.preview span {
+    font-size: var(--normal);
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    padding: 0.5em 1em;
+}
+
+.preview label {
+    flex: 0 1 1;
+    font-size: var(--small);
+    width: min(10rem, 20%);
+    opacity: 75%;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+}
+
+.preview h3 {
+    flex: 1 1 0;
+    flex-wrap: wrap;
+    word-wrap: break-word;
+    word-break: break-all;
+    overflow-wrap: break-word;
 }
 
 .form-ui span {
@@ -572,6 +607,33 @@ select{
     border: none;
     padding: 1em;
     border-radius: var(--radius);
+}
+
+.btn-close {
+    display: flex;
+    justify-content: center;
+    width: fit-content;
+    position: relative;
+    align-self: end;
+    border-radius: 50%;
+    padding: 1em !important;
+}
+
+.btn-close::before, .btn-close::after {
+    content: "";
+    position: absolute;
+    background: var(--font-color);
+    width: var(--normal);
+    height: 3px;
+    border-radius: 1em;
+}
+
+.btn-close::before {
+    rotate: 45deg;
+}
+
+.btn-close::after {
+    rotate: -45deg;
 }
 
 .btn-accent,
@@ -913,54 +975,6 @@ select{
     padding: 1em;
 }
 
-#closePreview {
-    width: fit-content;
-    position: relative;
-    align-self: end;
-    border-radius: 50%;
-}
-
-#closePreview::before, #closePreview::after {
-    content: "";
-    position: absolute;
-    background: var(--font-color);
-    width: var(--normal);
-    height: 3px;
-}
-
-#closePreview::before {
-    rotate: 45deg;
-}
-
-#closePreview::after {
-    rotate: -45deg;
-}
-
-#patientPreview span {
-    font-size: var(--normal);
-    display: flex;
-    align-items: center;
-    gap: 1em;
-    padding: 1em;
-}
-
-#patientPreview h3{
-    width: clamp(5rem, 40vw + 5rem, 40rem);
-}
-
-#patientPreview span:nth-of-type(1) {
-    justify-content: center;
-}
-
-#patientPreview span label {
-    opacity: 75%;
-}
-
-#patientPreview span h3 {
-    word-break: break-word;
-    overflow-wrap: break-word;
-}
-
 #registerPatientBtn{
     font-size: var(--bigger);
     font-weight: var(--bold);
@@ -1022,6 +1036,7 @@ select{
 #inventory #collection {
     flex: 1 1 0;
     display: flex;
+    flex-direction: column;
     background: var(--bg-dim);
     border-radius: var(--radius);
     list-style-type: none; 

@@ -10,7 +10,6 @@ class CreatePatientsTable extends Migration {
                         avatar VARCHAR(255),
                         first_name VARCHAR(100) NOT NULL,
                         last_name VARCHAR(100) NOT NULL,
-                        age INTEGER NOT NULL,
                         sex VARCHAR(6) NOT NULL,
                         birthdate DATE NOT NULL,
                         address TEXT NOT NULL,

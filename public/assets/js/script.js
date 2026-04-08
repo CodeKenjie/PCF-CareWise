@@ -1,4 +1,4 @@
-let selectedPatientId = null;
+let id = null;
 let order = 'id';
 let direction = 'ASC';
 
@@ -45,7 +45,7 @@ function renderPatientsData(data){
     const container = document.getElementById(`collection`);
     const template = document.getElementById(`patientsCard`);
 
-    container.innerHTML = "";
+    container.innerHTML = ``;
 
     data.collection.forEach( patient => {
         const clone = template.content.cloneNode(true);
@@ -59,15 +59,21 @@ function renderPatientsData(data){
         clone.querySelector(`.contact`).textContent = patient.contact + " " + patient.extra_contact;
         clone.querySelector(`.referredBy`).textContent = patient.referred_by;
         clone.querySelector(`.patientPreviewBtn`).addEventListener(`click`, () => {
-            document.getElementById(`previewForm`).action = `/patients/view/${patient.id}`;
-            patientPreview(patient.id);
             document.getElementById(`patientPreview`).classList.add(`active`);
+            document.getElementById(`pId`).textContent = patient.id;
+            document.getElementById(`pName`).textContent = `${patient.last_name}, ${patient.first_name}`;
+            document.getElementById(`pAge`).textContent = patient.age;
+            document.getElementById(`pSex`).textContent = patient.sex;
+            document.getElementById(`pBirthdate`).textContent = patient.birthdate;
+            document.getElementById(`pAddress`).textContent = patient.address;
+            document.getElementById(`pContacts`).textContent = patient.contact + " " + patient.extra_contact;
+            document.getElementById(`pReferredBy`).textContent = patient.referred_by;
         });
         
         clone.querySelector(`.editPatientBtn`).addEventListener(`click`, () => {
+            id = patient.id;
             document.getElementById(`editPatientForm`).action = `/patients/edit/${patient.id}`;
             document.getElementById(`editPatient`).classList.add(`active`);
-            selectedPatientId = patient.id;
 
             document.getElementById(`updateFirstName`).value = patient.first_name;
             document.getElementById(`updateLastName`).value = patient.last_name;
@@ -80,38 +86,62 @@ function renderPatientsData(data){
         });
 
         clone.querySelector(`.deletePatientBtn`).addEventListener(`click`, () => {
+            id = patient.id;
             document.getElementById(`deletePatientForm`).action = `/patients/delete/${patient.id}`;
             document.getElementById(`name`).textContent = patient.last_name + ", " + patient.first_name;
             document.getElementById(`id`).textContent = patient.id;
             document.getElementById(`deletePatient`).classList.add(`active`);
-            selectedPatientId = patient.id;
         });
 
         container.appendChild(clone);
     });
 }
 
-async function patientPreview(id){
-    const previewPanel = document.getElementById(`patientPreview`);
-    try{
-        const res = await fetch(`/patients/view/${id}`, {
-            method: "GET"
-        });
-        const data = await res.json();
+function renderItemData(data){
+    const container = document.getElementById(`collection`);
+    const template = document.getElementById(`itemCard`);
 
-        if(previewPanel){
-            document.getElementById(`pId`).textContent = data.information.id;
-            document.getElementById(`pName`).textContent = `${data.information.last_name}, ${data.information.first_name}`;
-            document.getElementById(`pAge`).textContent = data.information.age;
-            document.getElementById(`pSex`).textContent = data.information.sex;
-            document.getElementById(`pBirthdate`).textContent = data.information.birthdate;
-            document.getElementById(`pAddress`).textContent = data.information.address;
-            document.getElementById(`pContacts`).textContent = data.information.contact + data.information.extra_contact;
-            document.getElementById(`pReferredBy`).textContent = data.information.referred_by;
-        }
-    } catch(err) {
-        console.error(err);
-    }
+    container.innerHTML = ``;
+    data.collection.forEach(item => {
+        const clone = template.content.cloneNode(true);
+
+        clone.querySelector(`.name`).textContent = item.item_name;
+        clone.querySelector(`.category`).textContent = item.category;
+        clone.querySelector(`.quantity`).textContent = item.quantity;
+        clone.querySelector(`.previewItemBtn`).addEventListener(`click`, () => {
+            document.getElementById(`itemPreview`).classList.add(`active`);
+            document.getElementById(`iId`).textContent = item.id;
+            document.getElementById(`iName`).textContent = item.item_name;
+            document.getElementById(`iCategory`).textContent = item.category;
+            document.getElementById(`iDescription`).textContent = item.description;
+            document.getElementById(`iQuantity`).textContent = item.quantity;
+            document.getElementById(`iMinQuant`).textContent = item.minimum_quantity;
+            document.getElementById(`iExpiration`).textContent = item.expiration_date;
+            document.getElementById(`iIsDonated`).textContent = item.is_donated;
+        });
+
+        clone.querySelector(`.editItemBtn`).addEventListener(`click`, () => {
+            id = item.id;
+            document.getElementById(`editItemForm`).action = `/inventory/edit/${item.id}`;
+            document.getElementById(`editItem`).classList.add(`active`);
+            document.getElementById(`updateItemName`).value = item.item_name;
+            document.getElementById(`updateCategory`).value = item.category;
+            document.getElementById(`updateQuantity`).value = item.quantity;
+            document.getElementById(`updateMinQuant`).value = item.minimum_quantity;
+            document.getElementById(`updateDescription`).value = item.description;
+            document.getElementById(`updateExpiration`).value = item.expiration_date;
+        });
+        clone.querySelector(`.deleteItemBtn`).addEventListener(`click`, () => {
+            id = item.id;
+            document.getElementById(`deleteItem`).classList.add(`active`);
+            document.getElementById(`deleteItemForm`).action = `/inventory/delete/${item.id}`
+            document.getElementById(`name`).textContent = item.item_name;
+            document.getElementById(`id`).textContent = item.id;
+        });
+
+        container.appendChild(clone);
+    });
+
 }
 
 async function loadPatientsList() {
@@ -132,6 +162,25 @@ async function loadPatientsList() {
     } 
 }
 
+async function loadItemsList(){
+    try {
+        const res = await fetch(`/inventory/all`, {
+            method: "GET"
+        });
+
+        const data = await res.json();
+
+        if(!data.ok){
+            responseMessage(data, data.error);
+            return;
+        }
+
+        renderItemData(data);
+    } catch (err) {
+        console.error(err);
+    }
+}
+
 async function sortPatients() {
     try {
         const res = await fetch(`/patients/sort?order=${order}&direction=${direction}`, {
@@ -149,6 +198,44 @@ async function sortPatients() {
     } catch (err) {
         console.error(err);
     } 
+}
+
+function sorts(sort){
+    const sortDirection = document.getElementById(`direction`);
+    const sort1 = document.getElementById(`sort1`);
+    const sort2 = document.getElementById(`sort2`);
+    const sort3 = document.getElementById(`sort3`);
+
+    sortDirection.addEventListener(`click`, (e) => {
+        e.preventDefault();
+        direction = direction === 'DESC' ? 'ASC' : 'DESC';
+        sortDirection.textContent = direction;
+        return sort();
+    });
+    
+    sort1.addEventListener(`click`, (e) => {
+        e.preventDefault();
+        sort1.classList.add(`activeSort`);
+        sort2.classList.remove(`activeSort`);
+        sort3.classList.remove(`activeSort`);
+        return sort();
+    });
+
+    sort2.addEventListener(`click`, (e) => {
+        e.preventDefault();
+        sort1.classList.remove(`activeSort`);
+        sort2.classList.add(`activeSort`);
+        sort3.classList.remove(`activeSort`);
+        return sort();
+    });
+
+    sort3.addEventListener(`click`, (e) => {
+        e.preventDefault();
+        sort1.classList.remove(`activeSort`);
+        sort2.classList.remove(`activeSort`);
+        sort3.classList.add(`activeSort`);
+        return sort();
+    });
 }
 
 document.addEventListener(`DOMContentLoaded`, function(e) {
@@ -327,6 +414,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
     const patients = document.getElementById(`patients`);
     if(patients){
         loadPatientsList();
+        sorts(sortPatients);
         const firstName = document.getElementById(`firstName`);
         const lastName = document.getElementById(`lastName`);
         const birthdate = document.getElementById(`birthdate`);
@@ -345,6 +433,11 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         const cancelPatientRegistration = document.getElementById(`cancelPatientRegistration`);
         cancelPatientRegistration.addEventListener(`click`, () => {
             registerPatient.classList.remove('active');
+        });
+
+        const closeDelete = document.getElementById(`closeDelete`);
+        closeDelete.addEventListener(`click`, () => {
+            document.getElementById(`deletePatient`).classList.remove(`active`);
         });
 
         const editPanel = document.getElementById(`editPatient`);
@@ -407,14 +500,9 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             }
         });
 
-        const closePreview = document.getElementById(`closePreview`);
+        const closePreview = document.querySelector(`.btn-close`);
         closePreview.addEventListener(`click`, () => {
             document.getElementById(`patientPreview`).classList.remove(`active`);
-        });
-
-        const closeDelete = document.getElementById(`closeDelete`);
-        closeDelete.addEventListener(`click`, () => {
-            document.getElementById(`deletePatient`).classList.remove(`active`);
         });
 
         document.getElementById(`deletePatientForm`).addEventListener(`submit`, async (e) => {
@@ -464,61 +552,133 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
 
     const inventory = document.getElementById(`inventory`);
     if (inventory){
-        document.getElementById(`addItemBtn`).addEventListener(`click`, () => {
-            document.getElementById(`addItem`).classList.add(`active`);
+        loadItemsList();
+        sorts();
+        const itemName = document.getElementById(`itemName`); 
+        const category = document.getElementById(`category`); 
+        const quantity = document.getElementById(`quantity`); 
+        const minQuant = document.getElementById(`minQuant`); 
+        const descrition = document.getElementById(`description`); 
+        const expiration = document.getElementById(`expiration`); 
+        const isDonated = document.getElementById(`isDonated`); 
+
+        const addItem = document.getElementById(`addItem`);
+        const addItemBtn = document.getElementById(`addItemBtn`);
+        addItemBtn.addEventListener(`click`, () => {
+            addItem.classList.add(`active`);
         });
 
-        document.getElementById(`cancelAddItem`).addEventListener(`click`, () => {
-            document.getElementById(`addItem`).classList.remove(`active`);
+        const addItemForm = document.getElementById(`addItemForm`);
+        addItemForm.addEventListener(`submit`, async (e) => {
+            e.preventDefault();
+            try {
+                const formdata = new FormData(e.target);  
+                const res = await fetch(`/inventory/add`, {
+                    method: 'POST',
+                    body: formdata
+                });
+
+                const data = await res.json();
+
+                if(!data.ok){
+                    responseMessage(data, data.error);
+                    return;
+                }
+
+                responseMessage(data, data.message);
+                loadItemsList();
+                addItem.classList.remove(`active`);
+                itemName.value = "";
+                category.value = "";
+                quantity.value = "";
+                minQuant.value = "";
+                descrition.value = "";
+                expiration.value = "";
+                isDonated.value = "";
+            } catch (err) {
+                console.error(err);
+            }
         });
 
-        document.getElementById(`cancelEditItem`).addEventListener(`click`, () => {
-            document.getElementById(`editItem`).classList.remove(`active`);
+        const cancelAddItem = document.getElementById(`cancelAddItem`);
+        cancelAddItem.addEventListener(`click`, () => {
+            addItem.classList.remove(`active`);
+        });
+
+        const deleteItemForm = document.getElementById(`deleteItemForm`);
+        deleteItemForm.addEventListener(`submit`, async (e) => {
+            e.preventDefault();
+            try {
+                const res = await fetch(`/inventory/delete/${id}`, {
+                    method: 'POST'
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    responseMessage(data, data.error);
+                    return;
+                }
+
+                responseMessage(data, data.message);
+                document.getElementById(`deleteItem`).classList.remove(`active`);
+                loadItemsList();
+            } catch (err){
+                console.error(err);
+            }
+        });
+
+        const closeDelete = document.getElementById(`closeDelete`);
+        closeDelete.addEventListener(`click`, () => {
+            document.getElementById(`deleteItem`).classList.remove(`active`);
+        });
+
+        const editItem = document.getElementById(`editItem`);
+        const editItemForm = document.getElementById(`editItemForm`);
+        editItemForm.addEventListener(`submit`, async (e) => {
+            e.preventDefault();
+            const updateItemName = document.getElementById(`updateItemName`); 
+            const updateCategory = document.getElementById(`updateCategory`); 
+            const updateQuantity = document.getElementById(`updateQuantity`); 
+            const updateMinQuant = document.getElementById(`updateMinQuant`); 
+            const updateDescription = document.getElementById(`updateDescription`); 
+            const updateExpiration = document.getElementById(`updateExpiration`); 
+
+            try {
+                const formdata = new FormData(e.target);  
+                const res = await fetch(`/inventory/edit/${id}`, {
+                    method: 'POST',
+                    body: formdata
+                });
+
+                const data = await res.json();
+
+                if(!data.ok){
+                    responseMessage(data, data.error);
+                    return;
+                }
+
+                responseMessage(data, data.message);
+                loadItemsList();
+                editItem.classList.remove(`active`);
+                updateItemName.value = "";
+                updateCategory.value = "";
+                updateQuantity.value = "";
+                updateMinQuant.value = "";
+                updateDescription.value = "";
+                updateExpiration.value = "";
+            } catch (err) {
+                console.error(err);
+            }
+        });
+
+        const cancelEditItem = document.getElementById(`cancelEditItem`);
+        cancelEditItem.addEventListener(`click`, () => {
+            editItem.classList.remove(`active`);
+        });
+
+        const closePreview = document.querySelector(`.btn-close`);
+        closePreview.addEventListener(`click`, () => {
+            document.getElementById(`itemPreview`).classList.remove(`active`);
         });
     }
-
-    const sortDirection = document.getElementById(`direction`);
-    const sort1 = document.getElementById(`sort1`);
-    const sort2 = document.getElementById(`sort2`);
-    const sort3 = document.getElementById(`sort3`);
-
-    sortDirection.addEventListener(`click`, (e) => {
-        e.preventDefault();
-        direction = direction === 'DESC' ? 'ASC' : 'DESC';
-        sortDirection.textContent = direction;
-        (patients) ? sortPatients() : null;
-    });
-    
-    sort1.addEventListener(`click`, (e) => {
-        e.preventDefault();
-        sort1.classList.add(`activeSort`);
-        sort2.classList.remove(`activeSort`);
-        sort3.classList.remove(`activeSort`);
-        if(patients){
-            order = 'id';
-            sortPatients();
-        }
-    });
-
-    sort2.addEventListener(`click`, (e) => {
-        e.preventDefault();
-        sort1.classList.remove(`activeSort`);
-        sort2.classList.add(`activeSort`);
-        sort3.classList.remove(`activeSort`);
-        if(patients){
-            order = 'last_name';
-            sortPatients();
-        }
-    });
-
-    sort3.addEventListener(`click`, (e) => {
-        e.preventDefault();
-        sort1.classList.remove(`activeSort`);
-        sort2.classList.remove(`activeSort`);
-        sort3.classList.add(`activeSort`);
-        if(patients){
-            order = 'age';
-            sortPatients();
-        }
-    });
 })

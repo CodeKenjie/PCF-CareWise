@@ -17,12 +17,6 @@ class PatientsController extends Controller {
         $this->view('/pages/patients', $data);
     }
 
-    private function notApplicable($value){
-        $cleanValue = str_replace(', ', '', $value);
-        $conditions = ['na', 'n.a', 'n/a', 'none', 'undefined'];
-        return in_array(strtolower($cleanValue), $conditions) ? '' : $value;
-    }
-
     public function register(){
         header('Content-Type: application/json');
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
@@ -34,9 +28,6 @@ class PatientsController extends Controller {
             $contact = $_POST['contact'] ?? '';
             $exContact = $this->notApplicable($_POST['exContact'] ?? '');
             $referredBy = $this->notApplicable($_POST['referredBy'] ?? '');
-            $bdayFormat = new DateTime($birthdate);
-            $today = new DateTime('today');
-            $age = $bdayFormat -> diff($today) -> y;
             $response = [];
 
             if(!isset($firstName)){
@@ -47,12 +38,6 @@ class PatientsController extends Controller {
 
             if(!isset($lastName)){
                 $response = [ 'ok' => false, 'code' => 401, 'error' => 'Required: Patients Last name' ];
-                echo json_encode($response);
-                exit;
-            }
-
-            if(!isset($age)){
-                $response = [ 'ok' => false, 'code' => 401, 'error' => 'Required: Patients age' ];
                 echo json_encode($response);
                 exit;
             }
@@ -84,7 +69,6 @@ class PatientsController extends Controller {
             $data = [
                 'firstName' => ucwords($firstName),
                 'lastName' => ucwords($lastName),
-                'age' => $age,
                 'sex' => ucwords($sex),
                 'birthdate' => $birthdate,
                 'address' => ucwords($address),
@@ -105,16 +89,12 @@ class PatientsController extends Controller {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $firstName = $_POST['firstName'] ?? '';
             $lastName = $_POST['lastName'] ?? '';
-            $age = $_POST['age'] ?? '';
             $sex = $_POST['sex'] ?? '';
             $birthdate = $_POST['birthdate'] ?? '';
             $address = $_POST['address'] ?? '';
             $contact = $_POST['contact'] ?? '';
             $exContact = $this->notApplicable($_POST['exContact'] ?? '');
             $referredBy = $this->notApplicable($_POST['referredBy'] ?? '');
-            $bdayFormat = new DateTime($birthdate);
-            $today = new DateTime('today');
-            $age = $bdayFormat -> diff($today) -> y;
             $response = [];
  
             if(!isset($firstName)){
@@ -125,12 +105,6 @@ class PatientsController extends Controller {
 
             if(!isset($lastName)){
                 $response = [ 'ok' => false, 'code' => 401, 'error' => 'Required: Patients Last name' ];
-                echo json_encode($response);
-                exit;
-            }
-
-            if(!isset($age)){
-                $response = [ 'ok' => false, 'code' => 401, 'error' => 'Required: Patients age' ];
                 echo json_encode($response);
                 exit;
             }
@@ -171,7 +145,6 @@ class PatientsController extends Controller {
                 'id' => $id,
                 'firstName' => ucwords($firstName),
                 'lastName' => ucwords($lastName),
-                'age' => $age,
                 'sex' => ucwords($sex),
                 'birthdate' => $birthdate,
                 'address' => ucwords($address),
@@ -194,16 +167,6 @@ class PatientsController extends Controller {
         $patient->deletePatient($id);
 
         $response = [ 'ok' => true, 'code' => 200, 'message' => 'Patient successfully deleted' ];
-        echo json_encode($response);
-    }
-
-    public function get($id){
-        header('Content-Type: application/json');
-        $response = [];
-        $patient = new Patient();
-        $patientInfo = $patient->getPatientById($id);
-        
-        $response = [ 'ok' => true, 'code' => 200, 'information' => $patientInfo ];
         echo json_encode($response);
     }
 

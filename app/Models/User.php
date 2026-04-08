@@ -56,7 +56,7 @@ class User extends Database {
 
     public function getAll(){
         try {
-            $query = 'SELECT * FROM users ORDER BY id ASC';
+            $query = "SELECT *, DATE_PART('year', AGE(CURRENT_DATE, birthdate)) AS age FROM users ORDER BY id ASC";
             $stmt = $this->db->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);

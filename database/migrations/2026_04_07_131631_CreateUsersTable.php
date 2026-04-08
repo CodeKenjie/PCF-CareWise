@@ -1,4 +1,5 @@
 <?php
+
 use App\Core\Migration;
 
 class CreateUsersTable extends Migration {
@@ -10,7 +11,6 @@ class CreateUsersTable extends Migration {
                         display_name VARCHAR(50) NOT NULL, 
                         first_name VARCHAR(200) NOT NULL,
                         last_name VARCHAR(200) NOT NULL,
-                        age INTEGER, 
                         birthdate DATE,
                         sex VARCHAR(10), 
                         address VARCHAR(255), 

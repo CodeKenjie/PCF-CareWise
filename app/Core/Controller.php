@@ -22,4 +22,11 @@ class Controller {
         $user = new User();
         return $user->findById($_SESSION['id']);
     }
+
+    protected function notApplicable($value){
+        $cleanValue = str_replace(', ', '', $value);
+        $conditions = ['na', 'n.a', 'n/a', 'none', 'undefined'];
+        return in_array(strtolower($cleanValue), $conditions) ? '' : $value;
+    }
+
 }

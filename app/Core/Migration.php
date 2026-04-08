@@ -16,6 +16,20 @@ class Migration extends Database {
         $this->createTable($query);
     }
 
+    public function dropMigrationTable(){
+        $query = 'DROP TABLE IF EXISTS migrations';
+        $this->conn()->exec($query);
+    }
+
+    public function makeMigration($name){
+        $timestamp = date('Y_m_d_His');
+        $filename = $timestamp . '_' . $name . '.php';
+
+        $path = $this->files . '/' . $filename;
+
+        file_put_contents($path, '');
+    }
+
     private function logMigration($file){
         $query = "INSERT INTO migrations(name) VALUES (:name)";
         $stmt= $this->conn()->prepare($query);
@@ -24,25 +38,28 @@ class Migration extends Database {
 
     private function getMigrations(){
         $query = 'SELECT name FROM migrations';
-        $result =  $this->conn()->query($query);
-        return $result->fetchAll(PDO::FETCH_ASSOC);
+        $result =  $this->conn()->query($query)->fetchAll(PDO::FETCH_ASSOC);
+
+        return array_column($result, 'name');
     }
 
     public function migrate(){
         $files = scandir($this->files);
+        $files = array_filter($files, fn($file) => pathinfo($file, PATHINFO_EXTENSION) === 'php');
+        sort($files);
         $migrations = $this->getMigrations();
         foreach($files as $file){
-            if(pathinfo($file, PATHINFO_EXTENSION) !== 'php'){
+            if(in_array($file, $migrations)){
                 continue;
             }
 
-            if(!in_array($file, $migrations)) {
-                require $this->files . '/' . $file;
-                $class = str_replace('.php', '', $file);
-                $table = new $class;
-                $table->up();
-                $this->logMigration($file);
-            }
+            require $this->files . '/' . $file;
+            $filename = pathinfo($file, PATHINFO_FILENAME);
+            preg_match('/^\d{4}_\d{2}_\d{2}_\d{6}_(.+)$/', $filename, $matches);
+            $class = $matches[1] ?? '';
+            $table = new $class;
+            $table->up();
+            $this->logMigration($file);
         }
     }
 
@@ -56,11 +73,13 @@ class Migration extends Database {
             }
 
             $file = $lastMigration['name'];
-            require $this->files . '/' . $file;
-            $class = str_replace('.php', '', $file);
+            $path = $this->files . '/' . $file;
+            require_once $path;
+            $filename = pathinfo($file, PATHINFO_FILENAME);
+            preg_match('/^\d{4}_\d{2}_\d{2}_\d{6}_(.+)$/', $filename, $matches);
+            $class = $matches[1] ?? '';
             $deleteLastMigration = new $class;
             $deleteLastMigration->down();
-
             $rollback = 'DELETE FROM migrations WHERE id = ?';
             $this->conn()->prepare($rollback)->execute([$lastMigration['id']]);
         } catch (PDOException $err) {

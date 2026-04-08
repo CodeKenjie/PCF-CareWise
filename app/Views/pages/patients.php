@@ -87,8 +87,8 @@
     </form>
 </div>
 <div id="patientPreview" class="popup">
-    <form id="previewForm" action="/patients/view">
-        <span id="closePreview" class="btn-highlight"></span>
+    <section class="preview">
+        <span class="btn-highlight btn-close"></span>
         <div class="avatar">
             <header class="profile">
                 <img src="assets/images/profile.png" alt="">
@@ -126,7 +126,7 @@
             <label for="pReferredBy"><strong>Referred By:</strong></label>
             <h3 id="pReferredBy"></h3>
         </span>
-    </form>
+    </section>
 </div>
 <div id="editPatient" class="popup">
     <form id="editPatientForm" class="form-ui" action="/patients/edit" method="post">
@@ -192,7 +192,7 @@
             <h4>Delete Patient</h4>
         </header>
         <hr style="height: 1px; color: var(--border-color);">
-        <p class="p-md">Are you sure that you want to delete patient: <strong style="color:var(--critical)" id="name"></strong> id: <strong style="color: var(--critical);" id="id"></strong></p>
+        <p class="p-md">Are you sure that you want to delete patient: <strong style="color:var(--critical)" id="name"></strong> id: <strong style="color: var(--critical);" id="id"></strong> from patients?</p>
         <div>
             <button class="btn-square btn-critical" type="submit">Delete</button>
             <button id="closeDelete" class="btn-square btn-highlight" type="button">Cancel</button>

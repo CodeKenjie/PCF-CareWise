@@ -16,12 +16,11 @@ class Patient extends Database {
 
     public function create(array $data){
         try{
-            $query = 'INSERT INTO patients (first_name, last_name, age, sex, birthdate, address, contact, extra_contact, referred_by) VALUES(:first_name, :last_name, :age, :sex, :birthdate, :address, :contact, :extra_contact, :referred_by)';
+            $query = 'INSERT INTO patients (first_name, last_name, sex, birthdate, address, contact, extra_contact, referred_by) VALUES(:first_name, :last_name, :sex, :birthdate, :address, :contact, :extra_contact, :referred_by)';
             $stmt = $this->db->prepare($query);
             $stmt->execute([
                 ':first_name' => $data['firstName'] ?? '',
                 ':last_name' => $data['lastName'] ?? '',
-                ':age' => $data['age'] ?? '',
                 ':sex' => $data['sex'] ?? '',
                 ':birthdate' => $data['birthdate'] ?? '',
                 ':address' => $data['address'] ?? '',
@@ -36,7 +35,7 @@ class Patient extends Database {
 
     public function getPatientById($id){
         try {
-            $query = 'SELECT * FROM patients WHERE id = ?';
+            $query = "SELECT *, DATE_PART('year', AGE(CURRENT_DATE, birthdate)) AS age FROM patients WHERE id = ?";
             $stmt = $this->db->prepare($query);
             $stmt->execute([$id]);
 
@@ -58,13 +57,12 @@ class Patient extends Database {
 
     public function updatePatient(array $data){
         try {
-            $query = 'UPDATE patients SET first_name = :first_name, last_name = :last_name, age = :age, sex = :sex, birthdate = :birthdate, address = :address, contact = :contact, extra_contact = :extra_contact, referred_by = :referred_by WHERE id = :id';
+            $query = 'UPDATE patients SET first_name = :first_name, last_name = :last_name, sex = :sex, birthdate = :birthdate, address = :address, contact = :contact, extra_contact = :extra_contact, referred_by = :referred_by WHERE id = :id';
             $stmt = $this->db->prepare($query);
             $stmt->execute([
                 ':id' => $data['id'],
                 ':first_name' => $data['firstName'],
                 ':last_name' => $data['lastName'],
-                ':age' => $data['age'],
                 ':sex' => $data['sex'],
                 ':birthdate' => $data['birthdate'],
                 ':address' => $data['address'],
@@ -79,7 +77,7 @@ class Patient extends Database {
 
     public function sortPatients($order, $direction){
         try{
-            $query = "SELECT * FROM patients ORDER BY $order $direction";
+            $query = "SELECT *, DATE_PART('year', AGE(CURRENT_DATE, birthdate)) as age FROM patients ORDER BY $order $direction";
             $stmt = $this->db->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -93,7 +91,7 @@ class Patient extends Database {
             $id = is_numeric($keyWord) ?  (int)$keyWord : null;
             $birthdate = preg_match('/^\d{4}-\d{2}-\d{2}$/', $keyWord) ? $keyWord : null;
             $keyword = ($id === null && $birthdate === null) ? $keyWord : null;
-            $query = "SELECT *, 
+            $query = "SELECT *, DATE_PART('year', AGE(CURRENT_DATE, birthdate)) as age,
                         ts_rank(
                             to_tsvector('english', first_name || ' ' || last_name || ' ' || sex || ' ' || address || ' ' || contact || ' ' || extra_contact || ' ' || referred_by),
                             plainto_tsquery('english', :kw)
@@ -108,7 +106,7 @@ class Patient extends Database {
                             OR contact ILIKE '%' || :kw || '%'
                             OR extra_contact ILIKE '%' || :kw || '%'
                             OR referred_by ILIKE '%' || :kw || '%')
-                            AND (id = :id OR age = :id OR :id IS NULL)
+                            AND (id = :id OR :id IS NULL)
                             AND (birthdate <= :birthdate OR :birthdate IS NULL)
                         ORDER BY rank DESC";
             $stmt = $this->db->prepare($query);
@@ -125,7 +123,7 @@ class Patient extends Database {
 
     public function getAllPatients(){
         try {
-            $query = 'SELECT * FROM patients ORDER BY id ASC';
+            $query = "SELECT *, DATE_PART('year', AGE(CURRENT_DATE, birthdate)) AS age FROM patients ORDER BY id ASC";
             $stmt = $this->db->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);

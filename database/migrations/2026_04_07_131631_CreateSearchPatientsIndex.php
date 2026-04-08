@@ -31,6 +31,5 @@ class CreateSearchPatientsIndex extends Migration{
     public function down() {
         $this->conn()->exec('DROP INDEX IF EXISTS patients_text_idx');
         $this->conn()->exec('DROP INDEX IF EXISTS birthdate_idx');
-        $this->conn()->exec('DROP INDEX IF EXISTS age_idx');
     }
 }
