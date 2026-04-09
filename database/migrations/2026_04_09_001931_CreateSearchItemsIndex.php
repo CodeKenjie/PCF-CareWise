@@ -2,7 +2,7 @@
 
 use App\Core\Migration;
 
-class CreateSearchItemIndex extends Migration {
+class CreateSearchItemsIndex extends Migration {
     public function up(){
 
     }
