@@ -104,20 +104,33 @@ function renderItemData(data){
     container.innerHTML = ``;
     data.collection.forEach(item => {
         const clone = template.content.cloneNode(true);
+        const stockStatus = clone.querySelector(`.stockStatus`);
+        const exprStatus = clone.querySelector(`.exprStatus`);
 
         clone.querySelector(`.name`).textContent = item.item_name;
         clone.querySelector(`.category`).textContent = item.category;
-        clone.querySelector(`.quantity`).textContent = item.quantity;
-        clone.querySelector(`.importBtn`).addEventListener(`click`, () => {
-            document.getElementById(`import`).classList.add(`active`);
+        clone.querySelector(`.stockStatus`).textContent = item.stock_status;
+        if (item.stock_status === "High Stocks"){
+            stockStatus.classList.add(`good`);
+        } else if (item.stock_status === "Medium Stocks") {
+            stockStatus.classList.add(`moderate`);
+        } else {
+            stockStatus.classList.add(`critical`);
+        }
+
+        clone.querySelector(`.exprStatus`).textContent = item.expiration_status;
+        if (item.expiration_status === "Good"){
+            exprStatus.classList.add(`good`);
+        } else if (item.expiration_status === "Expring Soon") {
+            exprStatus.classList.add(`moderate`);
+        } else {
+            exprStatus.classList.add(`critical`);
+        }
+        clone.querySelector(`.adjustBtn`).addEventListener(`click`, () => {
+            id = item.id;
+            document.getElementById(`adjust`).classList.add(`active`);
             document.getElementById(`imCurrentQuant`).textContent = item.quantity;
             document.getElementById(`imName`).textContent = item.item_name;
-        });
-
-        clone.querySelector(`.exportBtn`).addEventListener(`click`, () => {
-            document.getElementById(`export`).classList.add(`active`);
-            document.getElementById(`exCurrentQuant`).textContent = item.quantity;
-            document.getElementById(`exName`).textContent = item.item_name;
         });
 
         clone.querySelector(`.previewItemBtn`).addEventListener(`click`, () => {
@@ -128,7 +141,9 @@ function renderItemData(data){
             document.getElementById(`iDescription`).textContent = item.description;
             document.getElementById(`iQuantity`).textContent = item.quantity;
             document.getElementById(`iMinQuant`).textContent = item.minimum_quantity;
+            document.getElementById(`iQuantStatus`).textContent = item.stock_status;
             document.getElementById(`iExpiration`).textContent = item.expiration_date;
+            document.getElementById(`iExpirationStatus`).textContent = item.expiration_status;
             document.getElementById(`iIsDonated`).textContent = item.is_donated;
         });
 
@@ -138,7 +153,6 @@ function renderItemData(data){
             document.getElementById(`editItem`).classList.add(`active`);
             document.getElementById(`updateItemName`).value = item.item_name;
             document.getElementById(`updateCategory`).value = item.category;
-            document.getElementById(`updateQuantity`).value = item.quantity;
             document.getElementById(`updateMinQuant`).value = item.minimum_quantity;
             document.getElementById(`updateDescription`).value = item.description;
             document.getElementById(`updateExpiration`).value = item.expiration_date;
@@ -156,9 +170,9 @@ function renderItemData(data){
 
 }
 
-async function loadPatientsList() {
+async function loadList(page, render) {
     try {
-        const res = await fetch(`/patients/all`, {
+        const res = await fetch(`/${page}/all`, {
             method: "GET"
         });
 
@@ -168,29 +182,10 @@ async function loadPatientsList() {
             return;
         }
         
-        renderPatientsData(data);
+        return render(data);
     } catch (err) {
         console.error(err);
     } 
-}
-
-async function loadItemsList(){
-    try {
-        const res = await fetch(`/inventory/all`, {
-            method: "GET"
-        });
-
-        const data = await res.json();
-
-        if(!data.ok){
-            responseMessage(data, data.error);
-            return;
-        }
-
-        renderItemData(data);
-    } catch (err) {
-        console.error(err);
-    }
 }
 
 async function sortPatients() {
@@ -270,6 +265,30 @@ function sorts(sort){
         sort3.classList.add(`activeSort`);
         return sort();
     });
+}
+
+async function adjustQuantity(value, type){
+    try{
+        const res = await fetch(`/inventory/adjust/${id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id: id, value: value, type: type })
+        });
+
+        const data = await res.json();
+        if(!data.ok){
+            responseMessage(data, data.error);
+            return;
+        }
+
+        responseMessage(data, data.message);
+        document.getElementById(`valueInput`).value = "";
+        loadList('inventory', renderItemData);
+    } catch(err) {
+        console.error(err);
+    }
 }
 
 document.addEventListener(`DOMContentLoaded`, function(e) {
@@ -447,7 +466,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
 
     const patients = document.getElementById(`patients`);
     if(patients){
-        loadPatientsList();
+        loadList('patients', renderPatientsData);
         sorts(sortPatients);
         const firstName = document.getElementById(`firstName`);
         const lastName = document.getElementById(`lastName`);
@@ -468,21 +487,33 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         const editPatientForm = document.getElementById(`editPatientForm`);
         editPatientForm.addEventListener(`submit`, async (e) => {
             e.preventDefault();
+            const updateFirstName = document.getElementById(`updateFirstName`).value;
+            const updateLastName = document.getElementById(`updateLastName`).value;
+            const updateSex = document.getElementById(`updateSex`).value;
+            const updateBirthdate = document.getElementById(`updateBirthdate`).value;
+            const updateAddress = document.getElementById(`updateAddress`).value;
+            const updateContact = document.getElementById(`updateContact`).value;
+            const updateExContact = document.getElementById(`updateExContact`).value;
+            const updateReferredBy = document.getElementById(`updateReferredBy`).value;
             const formdata = new FormData(e.target);
             try {
-                const res = await fetch(`/patients/edit/${selectedPatientId}`, {
-                    method:'POST',
-                    body: formdata
+                const res = await fetch(`/patients/edit/${id}`, {
+                    method:'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id: id, firstName: updateFirstName, lastName: updateLastName, birthdate: updateBirthdate, address: updateAddress, sex: updateSex, contact: updateContact, exContact: updateExContact, referredBy: updateReferredBy })
                 });
 
                 const data = await res.json();
                 if(!data.ok){
                     responseMessage(data, data.error);
+                    return;
                 }
 
                 responseMessage(data, data.message);
                 editPanel.classList.remove('active');
-                loadPatientsList();
+                loadList('patients', renderPatientsData);
             } catch (err) {
                 console.error(err);
             }
@@ -513,7 +544,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 contact.value = '';
                 exContact.value = '';
                 referredBy.value = '';
-                loadPatientsList();
+                loadList('patients', renderPatientsData);
             } catch (err) {
                 console.error(err);
             }
@@ -522,8 +553,8 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         document.getElementById(`deletePatientForm`).addEventListener(`submit`, async (e) => {
             e.preventDefault();
             try {
-                const res = await fetch(`/patients/delete/${selectedPatientId}`, {
-                    method: 'POST'
+                const res = await fetch(`/patients/delete/${id}`, {
+                    method: 'DELETE'
                 });
 
                 const data = await res.json();
@@ -534,7 +565,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
 
                 responseMessage(data, data.message);
                 document.getElementById(`deletePatient`).classList.remove(`active`);
-                loadPatientsList();
+                loadList('patients', renderPatientsData);
             } catch (err) {
                 console.error(err)
             }
@@ -559,14 +590,14 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             const search = document.getElementById(`search`).value;
             e.preventDefault();
             if(search === "") {
-                loadPatientsList();
+                loadList('patients', renderPatientsData);
             }
         });
     }
 
     const inventory = document.getElementById(`inventory`);
     if (inventory){
-        loadItemsList();
+        loadList('inventory', renderItemData);
         sorts(sortInventory);
         const itemName = document.getElementById(`itemName`); 
         const category = document.getElementById(`category`); 
@@ -600,7 +631,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 }
 
                 responseMessage(data, data.message);
-                loadItemsList();
+                loadList('inventory', renderItemData);
                 addItem.classList.remove(`active`);
                 itemName.value = "";
                 category.value = "";
@@ -619,7 +650,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             e.preventDefault();
             try {
                 const res = await fetch(`/inventory/delete/${id}`, {
-                    method: 'POST'
+                    method: 'DELETE'
                 });
 
                 const data = await res.json();
@@ -630,7 +661,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
 
                 responseMessage(data, data.message);
                 document.getElementById(`deleteItem`).classList.remove(`active`);
-                loadItemsList();
+                loadList('inventory', renderItemData);
             } catch (err){
                 console.error(err);
             }
@@ -640,18 +671,18 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         const editItemForm = document.getElementById(`editItemForm`);
         editItemForm.addEventListener(`submit`, async (e) => {
             e.preventDefault();
-            const updateItemName = document.getElementById(`updateItemName`); 
-            const updateCategory = document.getElementById(`updateCategory`); 
-            const updateQuantity = document.getElementById(`updateQuantity`); 
-            const updateMinQuant = document.getElementById(`updateMinQuant`); 
-            const updateDescription = document.getElementById(`updateDescription`); 
-            const updateExpiration = document.getElementById(`updateExpiration`); 
-
+            const updateItemName = document.getElementById(`updateItemName`).value; 
+            const updateCategory = document.getElementById(`updateCategory`).value; 
+            const updateMinQuant = document.getElementById(`updateMinQuant`).value; 
+            const updateDescription = document.getElementById(`updateDescription`).value; 
+            const updateExpiration = document.getElementById(`updateExpiration`).value; 
             try {
-                const formdata = new FormData(e.target);  
                 const res = await fetch(`/inventory/edit/${id}`, {
-                    method: 'POST',
-                    body: formdata
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id: id, itemName: updateItemName, category:updateCategory, minQuant: updateMinQuant, description: updateDescription, expiration: updateExpiration })
                 });
 
                 const data = await res.json();
@@ -662,17 +693,47 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 }
 
                 responseMessage(data, data.message);
-                loadItemsList();
+                loadList('inventory', renderItemData);
                 editItem.classList.remove(`active`);
-                updateItemName.value = "";
-                updateCategory.value = "";
-                updateQuantity.value = "";
-                updateMinQuant.value = "";
-                updateDescription.value = "";
-                updateExpiration.value = "";
             } catch (err) {
                 console.error(err);
             }
         });
+
+        document.getElementById(`searchForm`).addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const keyword = document.getElementById(`search`).value;
+            try{
+                const res = await fetch(`/inventory/item?search=${keyword}`, {
+                    method: "GET"
+                });
+
+                const data = await res.json();
+                renderItemData(data);
+            } catch(err) {
+                console.error(err);
+            }
+        })
+
+        document.getElementById(`search`).addEventListener(`input`, (e) => {
+            const search = document.getElementById(`search`).value;
+            e.preventDefault();
+            if(search === "") {
+                loadList('inventory', renderItemData);
+            }
+        });
+
+        document.getElementById(`exportBtn`).addEventListener(`click`, (e)=> {
+            e.preventDefault();
+            const valueInput = document.getElementById(`valueInput`).value;
+            adjustQuantity(Number(valueInput), 'export');
+        });
+
+        document.getElementById(`importBtn`).addEventListener(`click`, (e) => {
+            e.preventDefault();
+            const valueInput = document.getElementById(`valueInput`).value;
+            adjustQuantity(Number(valueInput), 'import');
+        });
+
     }
 })

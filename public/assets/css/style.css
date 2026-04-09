@@ -30,9 +30,9 @@
     --button-active: rgb(139, 138, 138);
     --border-color: rgb(170, 170, 170);
     --border: solid 1px var(--border-color);
-    --critical: rgb(212, 66, 66);
-    --moderate: rgb(219, 169, 75);
-    --good: rgb(61, 161, 61);
+    --critical: rgb(109, 46, 46);
+    --moderate: rgb(177, 138, 65);
+    --good: rgb(58, 116, 58);
     --bg-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0.2) 100%);
     --bg-gradient-shine: linear-gradient(120deg, rgba(255, 255, 255, 0.6) 10%, rgba(255, 255, 255, 0.15) 30%, rbga(255, 255, 255, 0) 100%);
 }
@@ -75,15 +75,21 @@
     text-align: center;
 }
 
-.critical {
+.critical, .moderate, .good{
+    background: var(--critical);
+    border-radius: var(--radius);
     border-color: var(--critical);
+    color: var(--alt-font-color);
+    font-weight: var(--bold);
 }
 
 .moderate {
+    background: var(--moderate);
     border-color: var(--moderate);
 }
 
 .good {
+    background: var(--good);
     border-color: var(--good);
 }
 
@@ -514,28 +520,28 @@ select{
 }
 
 .preview span {
+    flex: 1 1 0;
     font-size: var(--normal);
     display: flex;
-    align-items: center;
-    gap: 1em;
+    flex-direction: column;
+    gap: 0.5em;
     padding: 0.5em 1em;
+    border: var(--border);
+}
+
+.preview div {
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .preview label {
-    flex: 0 1 1;
     font-size: var(--small);
-    width: min(10rem, 20%);
     opacity: 75%;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
 }
 
 .preview h3 {
     flex: 1 1 0;
     flex-wrap: wrap;
-    word-wrap: break-word;
-    word-break: break-all;
-    overflow-wrap: break-word;
 }
 
 .form-ui span {
@@ -613,11 +619,13 @@ select{
 .btn-close {
     display: flex;
     justify-content: center;
+    align-items: center;
     width: fit-content;
     position: relative;
     align-self: end;
+    border: none;
     border-radius: 50%;
-    padding: 1em !important;
+    padding: 1em;
 }
 
 .btn-close::before, .btn-close::after {
@@ -1063,6 +1071,7 @@ select{
     display: flex;
     justify-content: center;
     align-items: center;
+    gap: 0.5em;
 }
 
 #inventory #listHeader th,

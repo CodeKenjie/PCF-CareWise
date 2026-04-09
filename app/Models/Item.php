@@ -32,18 +32,30 @@ class Item extends Database {
         }
     }
 
-    public function editItem($data){
+    public function editItem(array $data){
         try {
-            $query = 'UPDATE items SET item_name = :item_name, category = :category, description = :description, quantity = :quantity, minimum_quantity = :minimum_quantity, expiration_date = :expiration_date WHERE id = :id';
+            $query = 'UPDATE items SET item_name = :item_name, category = :category, description = :description, minimum_quantity = :minimum_quantity, expiration_date = :expiration_date WHERE id = :id';
             $stmt = $this->db->prepare($query);
             $stmt->execute([
                 ':id' => $data['id'],
                 ':item_name' => $data['itemName'],
                 ':category' => $data['category'],
                 ':description' => $data['description'],
-                ':quantity' => $data['quantity'],
                 ':minimum_quantity' => $data['minQuant'],
                 ':expiration_date' => $data['expiration'],
+            ]);
+        } catch(PDOException $err) {
+            $this->logger->error($err->getMessage());
+        }
+    }
+
+    public function adjustItemQuantity(array $data){
+        try{
+            $query = 'UPDATE items SET quantity = quantity + :change WHERE id = :id';
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([
+                ':id' => $data['id'],
+                ':change' => $data['value']
             ]);
         } catch(PDOException $err) {
             $this->logger->error($err->getMessage());
@@ -62,7 +74,18 @@ class Item extends Database {
 
     public function getItemById($id){
         try {
-            $query = 'SELECT * FROM items WHERE id = ?';
+            $query = "SELECT *,
+                        CASE 
+                            WHEN quantity < minimum_quantity THEN 'Low Stocks' 
+                            WHEN quantity <= minimum_quantity * 2 THEN 'Medium Stocks' 
+                            ELSE 'High Stocks'
+                        END AS stock_status,
+                        CASE
+                            WHEN expiration_date < CURRENT_DATE THEN 'Expired'
+                            WHEN expiration_date <= CURRENT_DATE + INTERVAL '30 days' THEN 'Expiring Soon'
+                            ELSE 'Good'
+                        END AS expiration_status 
+                      FROM items WHERE id = ?";
             $stmt = $this->db->prepare($query);
             $stmt->execute([$id]);
             return $stmt->fetch(PDO::FETCH_ASSOC);
@@ -73,8 +96,74 @@ class Item extends Database {
 
     public function sortAllItems($order, $direction){
         try {
-            $query = "SELECT * FROM items ORDER BY $order $direction";
+            $query = "SELECT *,
+                        CASE 
+                            WHEN quantity < minimum_quantity THEN 'Low Stocks' 
+                            WHEN quantity <= minimum_quantity * 2 THEN 'Medium Stocks' 
+                            ELSE 'High Stocks'
+                        END AS stock_status,
+                        CASE
+                            WHEN expiration_date < CURRENT_DATE THEN 'Expired'
+                            WHEN expiration_date <= CURRENT_DATE + INTERVAL '30 days' THEN 'Expiring Soon'
+                            ELSE 'Good'
+                        END AS expiration_status 
+                      FROM items ORDER BY $order $direction";
             $stmt = $this->db->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch(PDOException $err) {
+            $this->logger->error($err->getMessage());
+        }
+    }
+
+    public function searchItem($keyWord){
+        try{
+            $id = is_numeric($keyWord) ?  (int)$keyWord : null;
+            $expiration = preg_match('/^\d{4}-\d{2}-\d{2}$/', $keyWord) ? $keyWord : null;
+            $keyword = ($id === null && $expiration === null) ? $keyWord : null;
+            $query = "SELECT *,
+                        CASE 
+                            WHEN quantity < minimum_quantity THEN 'Low Stocks' 
+                            WHEN quantity <= minimum_quantity * 2 THEN 'Medium Stocks' 
+                            ELSE 'High Stocks'
+                        END AS stock_status,
+                        CASE
+                            WHEN expiration_date < CURRENT_DATE THEN 'Expired'
+                            WHEN expiration_date <= CURRENT_DATE + INTERVAL '30 days' THEN 'Expiring Soon'
+                            ELSE 'Good'
+                        END AS expiration_status,
+                        ts_rank(
+                            to_tsvector('english', item_name || ' ' || category || ' ' || description),
+                            plainto_tsquery('english', COALESCE(:kw, ''))
+                        ) AS rank
+                        FROM items
+                        WHERE (:kw IS NULL OR to_tsvector('english', item_name || ' ' || category || ' ' || description)
+                            @@ plainto_tsquery('english', :kw)
+                            OR item_name ILIKE '%' || :kw || '%'
+                            OR category ILIKE '%' || :kw || '%'
+                            OR description ILIKE '%' || :kw || '%'
+                            OR (
+                                CASE 
+                                    WHEN quantity < minimum_quantity THEN 'Low Stocks' 
+                                    WHEN quantity <= minimum_quantity * 2 THEN 'Medium Stocks' 
+                                    ELSE 'High Stocks'
+                                END
+                            ) ILIKE '%' || :kw || '%'
+                            OR (
+                                CASE
+                                    WHEN expiration_date < CURRENT_DATE THEN 'Expired'
+                                    WHEN expiration_date <= CURRENT_DATE + INTERVAL '30 days' THEN 'Expiring Soon'
+                                    ELSE 'Good'
+                                END
+                            ) ILIKE '%' || :kw || '%' )
+                        AND (id = :id OR :id IS NULL)
+                        AND (expiration_date <= :expiration_date OR :expiration_date IS NULL)
+                        ORDER BY rank DESC";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindValue(':kw', $keyword);
+            $stmt->bindValue(':id', $id);
+            $stmt->bindValue(':expiration_date', $expiration);
+
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch(PDOException $err) {
@@ -84,7 +173,18 @@ class Item extends Database {
 
     public function getAllItems() {
         try {
-            $query = 'SELECT * FROM items ORDER BY id ASC';
+            $query = "SELECT *,
+                        CASE 
+                            WHEN quantity < minimum_quantity THEN 'Low Stocks' 
+                            WHEN quantity <= minimum_quantity * 2 THEN 'Medium Stocks' 
+                            ELSE 'High Stocks'
+                        END AS stock_status,
+                        CASE
+                            WHEN expiration_date < CURRENT_DATE THEN 'Expired'
+                            WHEN expiration_date <= CURRENT_DATE + INTERVAL '30 days' THEN 'Expiring Soon'
+                            ELSE 'Good'
+                        END AS expiration_status 
+                      FROM items ORDER BY id ASC";
             $stmt = $this->db->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);

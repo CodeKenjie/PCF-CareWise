@@ -12,6 +12,18 @@ class Router {
         $this->routes['POST'][rtrim($url, '/')] = $controllerAction;
     }
 
+    public function put($url, $controllerAction) {
+        $this->routes['PUT'][rtrim($url, '/')] = $controllerAction;
+    }
+    
+    public function patch($url, $controllerAction){
+        $this->routes['PATCH'][rtrim($url, '/')] = $controllerAction;
+    }
+    
+    public function delete($url, $controllerAction){
+        $this->routes['DELETE'][rtrim($url, '/')] = $controllerAction;
+    }
+
     public function direct($uri, $method) {
         $method = strtoupper($method);
         $uri = rtrim(parse_url($uri, PHP_URL_PATH), '/') ?: '/';

@@ -94,7 +94,7 @@ class Patient extends Database {
             $query = "SELECT *, DATE_PART('year', AGE(CURRENT_DATE, birthdate)) as age,
                         ts_rank(
                             to_tsvector('english', first_name || ' ' || last_name || ' ' || sex || ' ' || address || ' ' || contact || ' ' || extra_contact || ' ' || referred_by),
-                            plainto_tsquery('english', :kw)
+                            plainto_tsquery('english', COALESCE(:kw, ''))
                         ) AS rank
                         FROM patients
                         WHERE (:kw IS NULL OR to_tsvector('english', first_name || ' ' || last_name || ' ' || sex || ' ' || address || ' ' || contact || ' ' || extra_contact || ' ' || referred_by)
@@ -106,8 +106,8 @@ class Patient extends Database {
                             OR contact ILIKE '%' || :kw || '%'
                             OR extra_contact ILIKE '%' || :kw || '%'
                             OR referred_by ILIKE '%' || :kw || '%')
-                            AND (id = :id OR :id IS NULL)
-                            AND (birthdate <= :birthdate OR :birthdate IS NULL)
+                        AND (id = :id OR :id IS NULL OR DATE_PART('year', AGE(CURRENT_DATE, birthdate)) = :id)
+                        AND (birthdate <= :birthdate OR :birthdate IS NULL)
                         ORDER BY rank DESC";
             $stmt = $this->db->prepare($query);
             $stmt->bindValue(':kw', $keyword);

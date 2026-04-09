@@ -23,14 +23,16 @@ $router->get('/patients/all', 'App\Controllers\PatientsController@getAll');
 $router->get('/patients/sort', 'App\Controllers\PatientsController@sort');
 $router->get('/patients/patient', 'App\Controllers\PatientsController@search');
 $router->post('/patients/register', 'App\Controllers\PatientsController@register');
-$router->post('/patients/edit/{id}', 'App\Controllers\PatientsController@edit');
-$router->post('/patients/delete/{id}', 'App\Controllers\PatientsController@delete');
+$router->put('/patients/edit/{id}', 'App\Controllers\PatientsController@edit');
+$router->delete('/patients/delete/{id}', 'App\Controllers\PatientsController@delete');
 
 $router->get('/inventory', 'App\Controllers\InventoryController@index');
 $router->get('/inventory/all', 'App\Controllers\InventoryController@getAll');
 $router->get('/inventory/sort', 'App\Controllers\InventoryController@sort');
+$router->get('/inventory/item', 'App\Controllers\InventoryController@search');
 $router->post('/inventory/add', 'App\Controllers\InventoryController@add');
-$router->post('/inventory/edit/{id}', 'App\Controllers\InventoryController@edit');
-$router->post('/inventory/delete/{id}', 'App\Controllers\InventoryController@delete');
+$router->put('/inventory/edit/{id}', 'App\Controllers\InventoryController@edit');
+$router->patch('/inventory/adjust/{id}', 'App\Controllers\InventoryController@adjust');
+$router->delete('/inventory/delete/{id}', 'App\Controllers\InventoryController@delete');
 
 $router->direct($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);

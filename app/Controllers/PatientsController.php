@@ -85,60 +85,54 @@ class PatientsController extends Controller {
     }
 
     public function edit($id){
+        $input = json_decode(file_get_contents('php://input'), true);
         header('Content-Type: application/json');
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $firstName = $_POST['firstName'] ?? '';
-            $lastName = $_POST['lastName'] ?? '';
-            $sex = $_POST['sex'] ?? '';
-            $birthdate = $_POST['birthdate'] ?? '';
-            $address = $_POST['address'] ?? '';
-            $contact = $_POST['contact'] ?? '';
-            $exContact = $this->notApplicable($_POST['exContact'] ?? '');
-            $referredBy = $this->notApplicable($_POST['referredBy'] ?? '');
+        if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
+            $id = $input['id'] ?? '';
+            $firstName = $input['firstName'] ?? '';
+            $lastName = $input['lastName'] ?? '';
+            $sex = $input['sex'] ?? '';
+            $birthdate = $input['birthdate'] ?? '';
+            $address = $input['address'] ?? '';
+            $contact = $input['contact'] ?? '';
+            $exContact = $this->notApplicable($input['exContact'] ?? '');
+            $referredBy = $this->notApplicable($input['referredBy'] ?? '');
             $response = [];
  
-            if(!isset($firstName)){
+            if(empty($firstName)){
                 $response = [ 'ok' => false, 'code' => 401, 'error' => 'Required: Patients First name' ];
                 echo json_encode($response);
                 exit;
             }
 
-            if(!isset($lastName)){
+            if(empty($lastName)){
                 $response = [ 'ok' => false, 'code' => 401, 'error' => 'Required: Patients Last name' ];
                 echo json_encode($response);
                 exit;
             }
 
-            if(!isset($sex)){
+            if(empty($sex)){
                 $response = [ 'ok' => false, 'code' => 401, 'error' => 'Required: Patients sex' ];
                 echo json_encode($response);
                 exit;
             }
 
-            if(!isset($birthdate)){
+            if(empty($birthdate)){
                 $response = [ 'ok' => false, 'code' => 401, 'error' => 'Required: Patients birthdate' ];
                 echo json_encode($response);
                 exit;
             }
 
-            if(!isset($address)){
+            if(empty($address)){
                 $response = [ 'ok' => false, 'code' => 401, 'error' => 'Required: Patients address' ];
                 echo json_encode($response);
                 exit;
             }
 
-            if(!isset($contact)){
+            if(empty($contact)){
                 $response = [ 'ok' => false, 'code' => 401, 'error' => 'Required: Patients contact' ];
                 echo json_encode($response);
                 exit;
-            }
-
-            if($exContact === 'na' || $exContact === 'n.a' || $exContact === 'n/a') {
-                $exContact = '';
-            }
-
-            if($referredBy === 'Na' || $referredBy === 'N.a' || $exContact === 'N/a') {
-                $referredBy = '';
             }
 
            $data = [
@@ -155,7 +149,7 @@ class PatientsController extends Controller {
             $patient = new Patient();
             $patient->updatePatient($data);
 
-            $response = [ 'ok' => true, 'code' => 200, 'message' => 'Patient: ' . ucwords($lastName) . ', ' . ucwords($firstName) . 'update success' ];
+            $response = [ 'ok' => true, 'code' => 200, 'message' => 'Patient: ' . ucwords($lastName) . ', ' . ucwords($firstName) . ' update success' ];
             echo json_encode($response);
         }
     }

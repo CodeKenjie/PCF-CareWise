@@ -4,7 +4,6 @@ use App\Core\Migration;
 
 class CreateSearchPatientsIndex extends Migration{
     public function up(){
-
         $idIndex = "CREATE INDEX IF NOT EXISTS id_idx ON patients(id)";
         $this->conn()->exec($idIndex);
 
@@ -29,6 +28,7 @@ class CreateSearchPatientsIndex extends Migration{
     }
     
     public function down() {
+        $this->conn()->exec('DROP INDEX IF EXISTS id_idx');
         $this->conn()->exec('DROP INDEX IF EXISTS patients_text_idx');
         $this->conn()->exec('DROP INDEX IF EXISTS birthdate_idx');
     }

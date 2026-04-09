@@ -42,7 +42,7 @@ class InventoryController extends Controller {
             $response = [];
             $order = $_GET['order'] ?? 'item_name';
             $direction = $_GET['direction'] ?? 'ASC';
-            $allowedOrder = ['item_name', 'quantity', 'expiration'];
+            $allowedOrder = ['item_name', 'quantity', 'expiration_date'];
 
             if(!in_array($order, $allowedOrder)){
                 $order = 'id';
@@ -53,6 +53,15 @@ class InventoryController extends Controller {
             $response = [ 'ok' => true, 'code' => 200, 'message' => 'Item sorted by: ' . ucwords($order) . ' direction: ' . ucwords($direction), 'collection' => $sorted ];
             echo json_encode($response);
         }
+    }
+
+    public function search(){
+        $keyword = $_GET['search'] ?? '';
+        $response = [];
+
+        $result = (new Item())->searchItem($keyword);
+        $response = [ 'ok' => true, 'code' => 200, 'collection' => $result ];
+        echo json_encode($response);
     }
 
     public function add(){
@@ -90,18 +99,18 @@ class InventoryController extends Controller {
     }
 
     public function edit($id){
+        $input = json_decode(file_get_contents('php://input'), true);
         header('Content-Type: application/json');
-        if($_SERVER['REQUEST_METHOD'] === 'POST'){
-            $itemName = $_POST['updateItemName'] ?? '';
-            $category = $_POST['updateCategory'] ?? '';
-            $quantity = $_POST['updateQuantity'] ?? '';
-            $minQuant = $_POST['updateMinQuant'] ?? '';
-            $description = $this->notApplicable($_POST['updateDescription'] ?? '');
-            $expiration = $_POST['updateExpiration'] ?? '';
+        if($_SERVER['REQUEST_METHOD'] === 'PUT'){
+            $itemName = $input['itemName'] ?? '';
+            $category = $input['category'] ?? '';
+            $minQuant = $input['minQuant'] ?? '';
+            $description = $this->notApplicable($input['description'] ?? '');
+            $expiration = $input['expiration'] ?? '';
             $response = [];
 
-            if(!is_numeric($quantity) || !is_numeric($minQuant)){
-                $response = [ 'ok' => false, 'code' => 400, 'error' => 'Error: please enter a number value for quantity!'];
+            if(!is_numeric($minQuant)){
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'Error: please enter a number value for minimum quantity!'];
                 echo json_encode($response);
                 exit;
             }
@@ -110,7 +119,6 @@ class InventoryController extends Controller {
                 'id' => $id,
                 'itemName' => ucwords($itemName),
                 'category' => ucwords($category),
-                'quantity' => $quantity,
                 'minQuant' => $minQuant,
                 'description' => $description,
                 'expiration' => $expiration,
@@ -118,6 +126,41 @@ class InventoryController extends Controller {
             $item = new Item();
             $item->editItem($data);
             $response = [ 'ok' => true, 'code' => 200, 'message' => ucwords($itemName) . ' Edited successfully!' ];
+            echo json_encode($response);
+        }
+    }
+
+    public function adjust(){
+        $input = json_decode(file_get_contents('php://input'), true);
+        header('Content-Type: application/json');
+        if($_SERVER['REQUEST_METHOD'] === 'PATCH'){
+            $type = $input['type']?? '';
+            $id = $input['id'] ?? '';
+            $value = $input['value'] ?? 0;
+            $response = [];
+            $message = null;
+
+            if (!is_numeric($value)) {
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'Invalid value please enter an amout '];
+                echo json_encode($response);
+                exit;
+            }
+
+            if($type === 'export'){
+                $value = -$value;
+                $message = 'Successfully exported: ' . $value;
+            } else {
+                $message = 'Successfully imported: ' . $value;
+            }
+
+            $data = [
+                'id' => $id,
+                'value' => (int) $value
+            ];
+
+            $item = new Item();
+            $item->adjustItemQuantity($data);
+            $response = [ 'ok' => true, 'code' => 200, 'message' => $message ];
             echo json_encode($response);
         }
     }
