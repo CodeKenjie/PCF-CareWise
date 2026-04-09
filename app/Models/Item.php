@@ -71,6 +71,17 @@ class Item extends Database {
         }
     }
 
+    public function sortAllItems($order, $direction){
+        try {
+            $query = "SELECT * FROM items ORDER BY $order $direction";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch(PDOException $err) {
+            $this->logger->error($err->getMessage());
+        }
+    }
+
     public function getAllItems() {
         try {
             $query = 'SELECT * FROM items ORDER BY id ASC';

@@ -108,6 +108,18 @@ function renderItemData(data){
         clone.querySelector(`.name`).textContent = item.item_name;
         clone.querySelector(`.category`).textContent = item.category;
         clone.querySelector(`.quantity`).textContent = item.quantity;
+        clone.querySelector(`.importBtn`).addEventListener(`click`, () => {
+            document.getElementById(`import`).classList.add(`active`);
+            document.getElementById(`imCurrentQuant`).textContent = item.quantity;
+            document.getElementById(`imName`).textContent = item.item_name;
+        });
+
+        clone.querySelector(`.exportBtn`).addEventListener(`click`, () => {
+            document.getElementById(`export`).classList.add(`active`);
+            document.getElementById(`exCurrentQuant`).textContent = item.quantity;
+            document.getElementById(`exName`).textContent = item.item_name;
+        });
+
         clone.querySelector(`.previewItemBtn`).addEventListener(`click`, () => {
             document.getElementById(`itemPreview`).classList.add(`active`);
             document.getElementById(`iId`).textContent = item.id;
@@ -200,6 +212,25 @@ async function sortPatients() {
     } 
 }
 
+async function sortInventory() {
+    try{
+        const res = await fetch(`/inventory/sort?order=${order}&direction=${direction}`, {
+            method: 'GET'
+        });
+
+        const data = await res.json();
+        if(!data.ok){
+            responseMessage(data, data.error);
+            return;
+        }
+
+        responseMessage(data, data.message);
+        renderItemData(data);
+    } catch (err){
+        console.error(err);
+    }
+}
+
 function sorts(sort){
     const sortDirection = document.getElementById(`direction`);
     const sort1 = document.getElementById(`sort1`);
@@ -215,6 +246,7 @@ function sorts(sort){
     
     sort1.addEventListener(`click`, (e) => {
         e.preventDefault();
+        order = sort1.value;
         sort1.classList.add(`activeSort`);
         sort2.classList.remove(`activeSort`);
         sort3.classList.remove(`activeSort`);
@@ -223,6 +255,7 @@ function sorts(sort){
 
     sort2.addEventListener(`click`, (e) => {
         e.preventDefault();
+        order = sort2.value;
         sort1.classList.remove(`activeSort`);
         sort2.classList.add(`activeSort`);
         sort3.classList.remove(`activeSort`);
@@ -231,6 +264,7 @@ function sorts(sort){
 
     sort3.addEventListener(`click`, (e) => {
         e.preventDefault();
+        order = sort3.value;
         sort1.classList.remove(`activeSort`);
         sort2.classList.remove(`activeSort`);
         sort3.classList.add(`activeSort`);
@@ -430,22 +464,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             registerPatient.classList.add('active');
         }); 
 
-        const cancelPatientRegistration = document.getElementById(`cancelPatientRegistration`);
-        cancelPatientRegistration.addEventListener(`click`, () => {
-            registerPatient.classList.remove('active');
-        });
-
-        const closeDelete = document.getElementById(`closeDelete`);
-        closeDelete.addEventListener(`click`, () => {
-            document.getElementById(`deletePatient`).classList.remove(`active`);
-        });
-
         const editPanel = document.getElementById(`editPatient`);
-        const cancelPatientEdit = document.getElementById(`cancelPatientEdit`);
-        cancelPatientEdit.addEventListener(`click`, () => {
-            editPanel.classList.remove('active');
-        });
-
         const editPatientForm = document.getElementById(`editPatientForm`);
         editPatientForm.addEventListener(`submit`, async (e) => {
             e.preventDefault();
@@ -500,11 +519,6 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             }
         });
 
-        const closePreview = document.querySelector(`.btn-close`);
-        closePreview.addEventListener(`click`, () => {
-            document.getElementById(`patientPreview`).classList.remove(`active`);
-        });
-
         document.getElementById(`deletePatientForm`).addEventListener(`submit`, async (e) => {
             e.preventDefault();
             try {
@@ -553,7 +567,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
     const inventory = document.getElementById(`inventory`);
     if (inventory){
         loadItemsList();
-        sorts();
+        sorts(sortInventory);
         const itemName = document.getElementById(`itemName`); 
         const category = document.getElementById(`category`); 
         const quantity = document.getElementById(`quantity`); 
@@ -600,11 +614,6 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             }
         });
 
-        const cancelAddItem = document.getElementById(`cancelAddItem`);
-        cancelAddItem.addEventListener(`click`, () => {
-            addItem.classList.remove(`active`);
-        });
-
         const deleteItemForm = document.getElementById(`deleteItemForm`);
         deleteItemForm.addEventListener(`submit`, async (e) => {
             e.preventDefault();
@@ -625,11 +634,6 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             } catch (err){
                 console.error(err);
             }
-        });
-
-        const closeDelete = document.getElementById(`closeDelete`);
-        closeDelete.addEventListener(`click`, () => {
-            document.getElementById(`deleteItem`).classList.remove(`active`);
         });
 
         const editItem = document.getElementById(`editItem`);
@@ -669,16 +673,6 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             } catch (err) {
                 console.error(err);
             }
-        });
-
-        const cancelEditItem = document.getElementById(`cancelEditItem`);
-        cancelEditItem.addEventListener(`click`, () => {
-            editItem.classList.remove(`active`);
-        });
-
-        const closePreview = document.querySelector(`.btn-close`);
-        closePreview.addEventListener(`click`, () => {
-            document.getElementById(`itemPreview`).classList.remove(`active`);
         });
     }
 })

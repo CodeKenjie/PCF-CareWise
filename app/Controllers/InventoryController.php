@@ -36,6 +36,25 @@ class InventoryController extends Controller {
         echo json_encode($response);
     }
 
+    public function sort(){
+        header('Content-Type: application/json');
+        if($_SERVER['REQUEST_METHOD'] === 'GET') {
+            $response = [];
+            $order = $_GET['order'] ?? 'item_name';
+            $direction = $_GET['direction'] ?? 'ASC';
+            $allowedOrder = ['item_name', 'quantity', 'expiration'];
+
+            if(!in_array($order, $allowedOrder)){
+                $order = 'id';
+            }
+
+            $item = new Item();
+            $sorted = $item->sortAllItems($order, $direction);
+            $response = [ 'ok' => true, 'code' => 200, 'message' => 'Item sorted by: ' . ucwords($order) . ' direction: ' . ucwords($direction), 'collection' => $sorted ];
+            echo json_encode($response);
+        }
+    }
+
     public function add(){
         header('Content-Type: application/json');
         if($_SERVER['REQUEST_METHOD'] === 'POST'){

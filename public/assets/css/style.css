@@ -607,6 +607,7 @@ select{
     border: none;
     padding: 1em;
     border-radius: var(--radius);
+    border: var(--border);
 }
 
 .btn-close {

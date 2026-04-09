@@ -1,4 +1,3 @@
-
 <?php require __DIR__ . "/../partials/header.php"; ?>
 <?php require __DIR__ . "/../partials/sidebar.php"; ?>
 <main id="inventory">
@@ -8,15 +7,15 @@
             <span>Add Item</span>
         </button>
         <div class="actions">
-            <form action="/inventory/sort">
+            <form action="/inventory/sort" method="get">
                 <span class="sortsSpan">
-                    <button id="sort1" class="btn-highlight activeSort">Item</button>
-                    <button id="sort2" class="btn-highlight">Quantity</button>
-                    <button id="sort3" class="btn-highlight">Expiration</button>
-                    <button id="direction" class="btn-highlight">ASC</button>
+                    <button id="sort1" class="btn-highlight activeSort" type="button" value="item_name">Name</button>
+                    <button id="sort2" class="btn-highlight" type="button" value="quantity">Quantity</button>
+                    <button id="sort3" class="btn-highlight" type="button" value="expiration_date">Expiration</button>
+                    <button id="direction" class="btn-highlight" type="button" value="ASC">ASC</button>
                 </span>
             </form>
-            <form action="/inventory/item">
+            <form action="/inventory/item" metohd="get">
                 <span class="searchSpan">
                     <input id="search" name="search" style="padding-right: 4em;" type="text" placeholder="Search">
                     <button class="searchBtn" type="submit">
@@ -40,6 +39,50 @@
         </ul>
     </section>
 </main>
+<div id="import" class="popup">
+    <form class="form-ui" action="">
+        <span class="btn-close btn-highlight" style="align-items: center;" onclick="closePopup()"></span>
+        <div class="part p-sm" style="align-items: center;">
+            <div>
+                <h3 style="opacity: 75%; font-size: var(--small);">Item:</h3>
+                <h3 id="imName"></h3>
+            </div>
+            <div>
+                <h3 style="opacity: 75%; font-size: var(--small);">Quantity:</h3>
+                <h3 id="imCurrentQuant"></h3>
+            </div>
+        </div>
+        <span class="p-sm">
+            <input id="import" name="import" type="text" required>
+            <label for="import">Import</label>
+        </span>
+        <span class="p-sm">
+            <button class="btn-square btn-accent" type="submit">Import</button>
+        </span>
+    </form>
+</div>
+<div id="export" class="popup">
+    <form class="form-ui" action="">
+        <span class="btn-close btn-highlight" style="align-items: center;" onclick="closePopup()"></span>
+        <div class="part p-sm" style="align-items: center;">
+            <div>
+                <h3 style="opacity: 75%; font-size: var(--small);">Item:</h3>
+                <h3 id="exName"></h3>
+            </div>
+            <div>
+                <h3 style="opacity: 75%; font-size: var(--small);">Quantity: </h3>
+                <h3 id="exCurrentQuant"></h3>
+            </div>
+        </div>
+        <span class="p-sm">
+            <input id="export" name="export" type="text" required>
+            <label for="export">Export</label>
+        </span>
+        <span class="p-sm">
+            <button class="btn-square btn-accent" type="submit">Export</button>
+        </span>
+    </form>
+</div>
 <div id="addItem" class="popup">
     <form id="addItemForm" class="form-ui" action="/inventory/add" method="post">
         <span class="p-sm">
@@ -80,13 +123,13 @@
         </div>
         <div class="part p-sm">
             <button class="btn-accent btn-pill" type="submit">Add</button>
-            <button id="cancelAddItem" class="btn-highlight btn-pill" type="reset">Cancel</button>
+            <button class="btn-highlight btn-pill" type="reset" onclick="closePopup()">Cancel</button>
         </div>
     </form>
 </div>
 <div id="itemPreview" class="popup">
     <section class="preview">
-        <span class="btn-highlight btn-close"></span>
+        <span class="btn-highlight btn-close" onclick="closePopup()"></span>
         <span>
             <label for="iId"><strong>I.D:</strong></label>
             <h3 id="iId"></h3>
@@ -151,7 +194,7 @@
         </span>
         <div class="part p-sm">
             <button class="btn-accent btn-pill" type="submit">Update</button>
-            <button id="cancelEditItem" class="btn-highlight btn-pill" type="reset">Cancel</button>
+            <button class="btn-highlight btn-pill" type="reset" onclick="closePopup()">Cancel</button>
         </div>
     </form>
 </div>
@@ -165,7 +208,7 @@
         <p class="p-md">Are you sure that you want to delete item: <strong style="color:var(--critical)" id="name"></strong> id: <strong style="color: var(--critical);" id="id"></strong> from inventory?</p>
         <div>
             <button class="btn-square btn-critical" type="submit">Delete</button>
-            <button id="closeDelete" class="btn-square btn-highlight" type="button">Cancel</button>
+            <button class="btn-square btn-highlight" type="button" onclick="closePopup()">Cancel</button>
         </div>
     </form>
 </div>
@@ -178,10 +221,10 @@
                 <td class="quantity">quantity</td>
                 <td class="status">status</td>
                 <td>
-                    <button class="btn-accent">
+                    <button class="importBtn btn-accent">
                         <svg class="sm-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M16.4405 8.8999C20.0405 9.2099 21.5105 11.0599 21.5105 15.1099V15.2399C21.5105 19.7099 19.7205 21.4999 15.2505 21.4999H8.74047C4.27047 21.4999 2.48047 19.7099 2.48047 15.2399V15.1099C2.48047 11.0899 3.93047 9.2399 7.47047 8.9099" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M12 2V14.88" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M15.3504 12.6504L12.0004 16.0004L8.65039 12.6504" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g></svg>
                     </button>
-                    <button class="btn-accent">
+                    <button class="exportBtn btn-accent">
                         <svg class="sm-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M16.44 8.8999C20.04 9.2099 21.51 11.0599 21.51 15.1099V15.2399C21.51 19.7099 19.72 21.4999 15.25 21.4999H8.73998C4.26998 21.4999 2.47998 19.7099 2.47998 15.2399V15.1099C2.47998 11.0899 3.92998 9.2399 7.46998 8.9099" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M12 15.0001V3.62012" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M15.35 5.85L12 2.5L8.65002 5.85" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
                     </button>
                     <button class="previewItemBtn btn-highlight">

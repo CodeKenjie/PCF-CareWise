@@ -9,9 +9,9 @@
         <div>
             <form action="/patients/sort" method="get">
                 <span class="sortsSpan">
-                    <button id="sort1" class="btn-highlight activeSort" type="button">I.D</button>
-                    <button id="sort2" class="btn-highlight" type="button">Name</button>
-                    <button id="sort3" class="btn-highlight" type="button">Age</button>
+                    <button id="sort1" class="btn-highlight activeSort" type="button" value="id">I.D</button>
+                    <button id="sort2" class="btn-highlight" type="button" value="last_name">Name</button>
+                    <button id="sort3" class="btn-highlight" type="button" value="age">Age</button>
                     <button id="direction" class="btn-highlight" type="button" value="ASC">ASC</button>
                 </span>
             </form>
@@ -82,13 +82,13 @@
         </span>
         <div class="part p-sm">
             <button class="btn-accent btn-pill" type="submit">Submit</button>
-            <button id="cancelPatientRegistration" class="btn-highlight btn-pill" type="reset">Cancel</button>
+            <button class="btn-highlight btn-pill" type="reset" onclick="closePopup()">Cancel</button>
         </div>
     </form>
 </div>
 <div id="patientPreview" class="popup">
     <section class="preview">
-        <span class="btn-highlight btn-close"></span>
+        <span class="btn-highlight btn-close" onclick="closePopup()"></span>
         <div class="avatar">
             <header class="profile">
                 <img src="assets/images/profile.png" alt="">
@@ -181,7 +181,7 @@
         </span>
         <div class="part p-sm">
             <button class="btn-pill btn-accent" type="submit">Submit</button>
-            <button id="cancelPatientEdit" class="btn-pill btn-highlight" type="reset">Cancel</button>
+            <button class="btn-pill btn-highlight" type="reset" onclick="closePopup()">Cancel</button>
         </div>
     </form>
 </div>
@@ -195,7 +195,7 @@
         <p class="p-md">Are you sure that you want to delete patient: <strong style="color:var(--critical)" id="name"></strong> id: <strong style="color: var(--critical);" id="id"></strong> from patients?</p>
         <div>
             <button class="btn-square btn-critical" type="submit">Delete</button>
-            <button id="closeDelete" class="btn-square btn-highlight" type="button">Cancel</button>
+            <button class="btn-square btn-highlight" type="button" onclick="closePopup()">Cancel</button>
         </div>
     </form>
 </div>

@@ -28,6 +28,7 @@ $router->post('/patients/delete/{id}', 'App\Controllers\PatientsController@delet
 
 $router->get('/inventory', 'App\Controllers\InventoryController@index');
 $router->get('/inventory/all', 'App\Controllers\InventoryController@getAll');
+$router->get('/inventory/sort', 'App\Controllers\InventoryController@sort');
 $router->post('/inventory/add', 'App\Controllers\InventoryController@add');
 $router->post('/inventory/edit/{id}', 'App\Controllers\InventoryController@edit');
 $router->post('/inventory/delete/{id}', 'App\Controllers\InventoryController@delete');
