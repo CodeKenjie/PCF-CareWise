@@ -1,4 +1,4 @@
-<?php require __DIR__ . '/partials/header.php' ?>
+<?php require __DIR__ . '/../partials/header.php' ?>
 <main id="login">
     <a class="redirect p-md" href="/register">Register</a>
     <section>
@@ -32,4 +32,4 @@
         <img src="assets/images/site.jpg" alt="">
     </div>
 </main>
-<?php require __DIR__ . '/partials/footer.php' ?>
+<?php require __DIR__ . '/../partials/footer.php' ?>

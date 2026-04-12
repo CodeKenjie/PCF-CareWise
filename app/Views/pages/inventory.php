@@ -1,12 +1,11 @@
 <?php require __DIR__ . "/../partials/header.php"; ?>
-<?php require __DIR__ . "/../partials/sidebar.php"; ?>
 <main id="inventory">
-    <section id="actions" class="acrylic-bg">
+    <section class="actions acrylic-bg">
         <button id="addItemBtn" class="btn-accent">
             <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M9 22H15C20 22 22 20 22 15V9C22 4 20 2 15 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M8.46997 10.6399L12 14.1599L15.53 10.6399" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
             <span>Add Item</span>
         </button>
-        <div class="actions">
+        <div>
             <form action="/inventory/sort" method="get">
                 <span class="sortsSpan">
                     <button id="sort1" class="btn-highlight activeSort" type="button" value="item_name">Name</button>
@@ -18,7 +17,7 @@
             <form id="searchForm" action="/inventory/item" metohd="get">
                 <span class="searchSpan">
                     <input id="search" name="search" style="padding-right: 4em;" type="text" placeholder="Search">
-                    <button class="searchBtn" type="submit">
+                    <button type="submit">
                         <svg viewBox="0 0 20 20" class="svg icon" xmlns="http://www.w3.org/2000/svg" fill="none"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill="currentColor" fill-rule="evenodd" d="M4 9a5 5 0 1110 0A5 5 0 014 9zm5-7a7 7 0 104.2 12.6.999.999 0 00.093.107l3 3a1 1 0 001.414-1.414l-3-3a.999.999 0 00-.107-.093A7 7 0 009 2z"></path> </g></svg>
                     </button>
                 </span>

@@ -25,8 +25,8 @@
     --transparent-bg: rgba(0, 0, 0, 0.5);
     --hover-color: rgb(65, 228, 160);
     --shadow: 0px 4px 32px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.6);
-    --button-color: rgba(26, 77, 92, 0.8);
-    --button-hover:  rgb(26, 77, 92);
+    --button-color: rgba(26, 77, 92, 0.9);
+    --button-hover:  rgba(26, 77, 92, 0.8);
     --button-active: rgb(139, 138, 138);
     --border-color: rgb(170, 170, 170);
     --border: solid 1px var(--border-color);
@@ -110,11 +110,11 @@ body {
     background: var(--bg);
     position: relative;
     display: flex;
-    flex-direction: row;
+    flex-wrap: wrap-reverse;
     color: var(--font-color);
     font-size: var(--normal);
     font-family: var(--font-fam);
-    min-height: 100dvh;
+    height: 100dvh;
     width: 100%;
     margin: 0;
 }
@@ -128,7 +128,7 @@ main {
     gap: 1em;
     width: inherit;
     height: 100dvh;
-    overflow: hidden;
+    overflow: auto;
 }
 
 section {
@@ -576,10 +576,11 @@ select{
     display: none;
     background: var(--disable-bg);
     position: absolute;
+    top:0;
     justify-content: center;
     align-items: center;
-    min-width: 100vw;
-    min-height: 100vh;
+    width: 100dvw;
+    height: 100dvh;
     z-index: 11;
 }
 
@@ -599,7 +600,19 @@ select{
     display: flex;
 }
 
+.btn-circle{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1em;
+    border: none;
+    border-radius: 50%;
+}
+
 .btn-pill {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     font-size: var(--bigger);
     font-weight: var(--bold);
     padding: 1em;
@@ -608,6 +621,9 @@ select{
 }
 
 .btn-square {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     font-size: var(--normal);
     font-weight: var(--bold);
     border: none;
@@ -703,10 +719,6 @@ select{
 }
 
 #sidebar {
-    position: relative;
-    position: sticky;
-    top: 0;
-    left: 0;
     width: 20rem;
     height: 100vh;
     display: flex;
@@ -984,7 +996,11 @@ select{
     padding: 1em;
 }
 
-#registerPatientBtn{
+#patients section:nth-of-type(1) {
+    height: fit-content;
+}
+
+#patients #registerPatientBtn{
     font-size: var(--bigger);
     font-weight: var(--bold);
     background: var(--button-color);
@@ -997,24 +1013,139 @@ select{
     gap: 0.5em;
 }
 
-#patients #actions {
+.actions div {
     display: flex;
-    height: fit-content;
-    align-items: center;
-}
-
-#inventory #actions div,
-#patients #actions div {
-    display: flex;
-    flex-direction: row;
     align-items: center;
     gap: 1em;
     width: 100%;
 }
 
-#inventory #actions div form,
-#patients #actions div form {
+.actions div form {
     flex: 1 1 0;
+}
+
+#schedule {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+#calendar{
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+}
+
+#calendar #month {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 1em;
+}
+
+#calendar #month label {
+    font-size: var(--super-small-header);
+    font-weight: var(--semi-bold);
+    text-align: center;
+}
+
+#calendar #weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+
+#calendar #weekdays span {
+    text-align: center;
+    font-size: var(--bigger);
+    font-weight: var(--bold);
+}
+
+#calendar #days {
+    flex: 1 1 0;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    font-size: var(--small-header);
+    font-weight: var(--semi-bold);
+    gap: 0.5em;
+}
+
+#calendar #days span {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: var(--radius);
+    padding: 0.5em;
+    border: none;
+}
+
+
+#calendar #days span.set{
+    position: relative;
+    color: var(--button-color);
+}
+
+.set::before {
+    content: "";
+    position: absolute;
+    bottom: 10%;
+    background: currentColor;
+    width: var(--big-header);
+    height: 5px;
+    border-radius: 1em;
+}
+
+
+#calendar .next-days,
+#calendar .prev-days{
+    opacity: 50%;
+}
+
+#calendar #days span.current {
+    position: relative;
+    border: var(--border);
+}
+
+.current::before {
+    position: absolute;
+    content: "today";
+    font-size: var(--normal);
+    font-weight: var(--bold);
+    top: 10%;
+}
+
+#calendar #days span.active {
+    color: var(--alt-font-color);
+    box-shadow: var(--shadow);
+    scale: 1.1;
+    transition: scale 300ms ease;
+    background: var(--button-color);
+}
+
+.set:hover,
+#calendar #days span:not(.prev-days, .next-days, .set):hover {
+    color: var(--alt-font-color) !important;
+    background: var(--button-hover);
+    border: none;
+}
+
+#schedule #collection {
+    background: var(--bg-dim);
+    display: flex;
+    flex-direction: column;
+    list-style-type: none;
+    padding: 0.5em;
+    border-radius: var(--radius);
+}
+
+#schedule #collection li {
+    border-radius: var(--radius);
+    background: var(--bg);
+    display: flex;
+    padding: 1em;
+    gap: 1em;
+    align-items: center;
 }
 
 #inventory section:nth-of-type(1) {
@@ -1077,11 +1208,15 @@ select{
 #inventory #listHeader th,
 #inventory #collection td {
     flex: 1 1 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
     min-width: 10rem;
     padding: 0.5em;
 }
 
 #inventory #collection button {
+    flex: 1 1 0;
     border-radius: var(--radius);
     border: none;
     padding: 0.5em 1em;

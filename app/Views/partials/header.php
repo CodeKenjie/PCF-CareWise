@@ -10,3 +10,4 @@
 </head>
 <body>
     <div id="responseContainer"></div>
+    <?php require __DIR__ . "/../partials/sidebar.php"; ?>

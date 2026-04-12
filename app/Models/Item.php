@@ -76,7 +76,7 @@ class Item extends Database {
         try {
             $query = "SELECT *,
                         CASE 
-                            WHEN quantity < minimum_quantity THEN 'Low Stocks' 
+                            WHEN quantity <= minimum_quantity THEN 'Low Stocks' 
                             WHEN quantity <= minimum_quantity * 2 THEN 'Medium Stocks' 
                             ELSE 'High Stocks'
                         END AS stock_status,
@@ -98,7 +98,7 @@ class Item extends Database {
         try {
             $query = "SELECT *,
                         CASE 
-                            WHEN quantity < minimum_quantity THEN 'Low Stocks' 
+                            WHEN quantity <= minimum_quantity THEN 'Low Stocks' 
                             WHEN quantity <= minimum_quantity * 2 THEN 'Medium Stocks' 
                             ELSE 'High Stocks'
                         END AS stock_status,
@@ -118,12 +118,28 @@ class Item extends Database {
 
     public function searchItem($keyWord){
         try{
+            $normalized = strtolower(trim($keyWord));
+            switch(true) {
+                case str_contains($normalized, 'not donated'):
+                case str_contains($normalized, 'undonated'):
+                case str_contains($normalized, 'no donations'):
+                    $isDonated = false;
+                    break;
+
+                case str_contains($normalized, 'donated'):
+                case str_contains($normalized, 'donations'):
+                    $isDonated = true;
+                    break;
+
+                default:
+                    $isDonated = null;
+            }
             $id = is_numeric($keyWord) ?  (int)$keyWord : null;
             $expiration = preg_match('/^\d{4}-\d{2}-\d{2}$/', $keyWord) ? $keyWord : null;
-            $keyword = ($id === null && $expiration === null) ? $keyWord : null;
+            $keyword = ($id === null && $expiration === null && $isDonated === null) ? $keyWord : null;
             $query = "SELECT *,
                         CASE 
-                            WHEN quantity < minimum_quantity THEN 'Low Stocks' 
+                            WHEN quantity <= minimum_quantity THEN 'Low Stocks' 
                             WHEN quantity <= minimum_quantity * 2 THEN 'Medium Stocks' 
                             ELSE 'High Stocks'
                         END AS stock_status,
@@ -144,7 +160,7 @@ class Item extends Database {
                             OR description ILIKE '%' || :kw || '%'
                             OR (
                                 CASE 
-                                    WHEN quantity < minimum_quantity THEN 'Low Stocks' 
+                                    WHEN quantity <= minimum_quantity THEN 'Low Stocks' 
                                     WHEN quantity <= minimum_quantity * 2 THEN 'Medium Stocks' 
                                     ELSE 'High Stocks'
                                 END
@@ -157,12 +173,18 @@ class Item extends Database {
                                 END
                             ) ILIKE '%' || :kw || '%' )
                         AND (id = :id OR :id IS NULL)
+                        AND (is_donated = :is_donated OR :is_donated IS NULL)
                         AND (expiration_date <= :expiration_date OR :expiration_date IS NULL)
                         ORDER BY rank DESC";
             $stmt = $this->db->prepare($query);
             $stmt->bindValue(':kw', $keyword);
             $stmt->bindValue(':id', $id);
             $stmt->bindValue(':expiration_date', $expiration);
+            if($isDonated === null){
+                $stmt->bindValue(':is_donated', null, PDO::PARAM_NULL);
+            } else {
+                $stmt->bindValue(':is_donated', $isDonated, PDO::PARAM_BOOL);
+            }
 
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -175,7 +197,7 @@ class Item extends Database {
         try {
             $query = "SELECT *,
                         CASE 
-                            WHEN quantity < minimum_quantity THEN 'Low Stocks' 
+                            WHEN quantity <= minimum_quantity THEN 'Low Stocks' 
                             WHEN quantity <= minimum_quantity * 2 THEN 'Medium Stocks' 
                             ELSE 'High Stocks'
                         END AS stock_status,

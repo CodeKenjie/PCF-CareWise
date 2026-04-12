@@ -13,6 +13,6 @@ class LoginController extends Controller {
             'title' => 'PCF:CareWise - Login Account' 
         ];
         
-        $this->view('/login', $data);
+        $this->view('pages/login', $data);
     }
 }

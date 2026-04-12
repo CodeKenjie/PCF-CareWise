@@ -1,4 +1,4 @@
-<?php require __DIR__ . "/partials/header.php" ?>
+<?php require __DIR__ . "/../partials/header.php" ?>
 <main id="register">
     <a class="redirect p-md" href="/login">Login</a>
     <div class="site">
@@ -77,4 +77,4 @@
         </form>
     </section>
 </main>
-<?php require __DIR__ . "/partials/footer.php" ?>
+<?php require __DIR__ . "/../partials/footer.php" ?>

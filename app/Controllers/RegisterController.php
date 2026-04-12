@@ -13,6 +13,6 @@ class RegisterController extends Controller {
             'title' => 'PCF:CareWise - Register Account'
         ];
 
-        $this->view('/register', $data);
+        $this->view('pages/register', $data);
     }
 }
