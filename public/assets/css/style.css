@@ -129,11 +129,11 @@ main {
     width: inherit;
     height: 100dvh;
     overflow: auto;
+    scrollbar-width: none;
 }
 
 section {
     display: flex;
-    height: fit-content;
     padding: 1em;
     gap: 1em;
 }
@@ -902,8 +902,8 @@ select{
     flex: 1 1 0;
     display: flex;
     flex-direction: column;
-    gap: 0.5em;
     border-radius: var(--radius);
+    list-style-type: none;
     overflow: auto;
     scrollbar-width: none;
 }
@@ -912,7 +912,6 @@ select{
     background: var(--bg);
     display: grid;
     grid-template-columns: auto 1fr auto; 
-    list-style-type: none;
     padding: 1em;
     gap: 1em;
     border: var(--border);
@@ -1000,6 +999,13 @@ select{
     height: fit-content;
 }
 
+#patients section:nth-of-type(2) {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow: hidden;
+}
+
 #patients #registerPatientBtn{
     font-size: var(--bigger);
     font-weight: var(--bold);
@@ -1007,8 +1013,9 @@ select{
     color: var(--alt-font-color);
     border: none;
     border-radius: var(--radius);
-    padding: 1em;
+    padding: 0.5em 1em;
     display: flex;
+    justify-content: center;
     align-items: center;
     gap: 0.5em;
 }
@@ -1130,7 +1137,12 @@ select{
     border: none;
 }
 
+#schedule #list {
+    flex: 1 1 0;
+}
+
 #schedule #collection {
+    flex: 1 1 0;
     background: var(--bg-dim);
     display: flex;
     flex-direction: column;
@@ -1142,7 +1154,7 @@ select{
 #schedule #collection li {
     border-radius: var(--radius);
     background: var(--bg);
-    display: flex;
+    display: grid;
     padding: 1em;
     gap: 1em;
     align-items: center;
@@ -1177,10 +1189,10 @@ select{
     flex: 1 1 0;
     display: flex;
     flex-direction: column;
-    background: var(--bg-dim);
     border-radius: var(--radius);
     list-style-type: none; 
     overflow: auto;
+    scrollbar-width: none;
 }
 
 #inventory #collection li {

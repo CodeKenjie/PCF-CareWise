@@ -60,12 +60,14 @@
     <section id="list" class="acrylic-bg">
         <ul id="collection">
             <li>
-                <input type="radio"></td>
                 <h3>nov 21, 2026</h3>
                 <h3>firstname, lastname</h3>
-                <button>edit</button>
-                <button>delete</button>
-                <button>preview</button>
+                <h3>for:</h3>
+                <div>
+                    <button>edit</button>
+                    <button>preview</button>
+                    <button>delete</button>
+                </div>
             </li>
         </ul>
     </section>

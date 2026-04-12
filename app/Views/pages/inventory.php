@@ -34,8 +34,7 @@
                 <th>Actions</th>
             </tr>
         </table>
-        <ul id="collection">
-        </ul>
+        <ul id="collection"></ul>
     </section>
 </main>
 <div id="adjust" class="popup">
