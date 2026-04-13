@@ -736,4 +736,104 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         });
 
     }
+
+    const schedule = document.getElementById(`schedule`);
+    if(schedule){
+        const date = document.getElementById(`date`);
+        const daysContainer = document.getElementById(`days`);
+        let today = new Date();
+        let month = today.getMonth();
+        let year = today.getFullYear();
+        const months = [ `January`, `February`, `March`, `April`, `May`, `June`, `July`, `August`, `September`, `Octover`, `November`, `December` ];
+
+        function initCalendar(){ 
+            const firstDay = new Date(year, month, 1).getDay();
+            const lastDate = new Date(year, month + 1, 0).getDate();
+            const prevLastDate = new Date(year, month, 0).getDate();
+            const lastDay = new Date(year, month + 1, 0).getDay();
+            const totalCells = firstDay + lastDate + (6 - lastDay);
+
+            date.textContent = months[month] + ` ` + year; 
+            daysContainer.innerHTML = "";
+
+            for(let i = 0; i < totalCells; i++){
+                const daySpan = document.createElement(`span`);
+                const currentDate = i - firstDay + 1;
+
+                if(i < firstDay) {
+                    daySpan.textContent = prevLastDate - firstDay + i + 1;
+                    daySpan.classList.add(`prev-days`);
+                } else if (i < firstDay + lastDate) {
+                    daySpan.textContent = currentDate;
+                    if(currentDate === new Date().getDate() && year === new Date().getFullYear() && month === new Date().getMonth()){
+                        daySpan.classList.add(`current`);
+                    }
+                } else {
+                    daySpan.textContent = i - (firstDay + lastDate) + 1;
+                    daySpan.classList.add(`next-days`);
+                }
+
+                daySpan.addEventListener(`click`, () => {
+                    console.log(`${months[month]} ${currentDate}, ${year}`);
+                });
+                daysContainer.append(daySpan);
+            }
+        }
+
+        initCalendar();
+
+        document.getElementById(`prev`).addEventListener(`click`, () => {
+            month--;
+            if(month < 0){
+                month = 11;
+                year--;
+            }
+            initCalendar();
+        });
+
+        document.getElementById(`next`).addEventListener(`click`, () => {
+            month++;
+            if(month > 11){
+                month = 0;
+                year++;
+            }
+            initCalendar();
+        });
+
+        document.getElementById(`todayBtn`).addEventListener(`click`, () => {
+            today = new Date();
+            month = today.getMonth();
+            year = today.getFullYear();
+            initCalendar();
+        });
+
+        document.getElementById(`dateInput`).addEventListener(`input`, (e)=> {
+            const input = document.getElementById(`dateInput`);
+            input.value = input.value.replace(/[^0-9/]/g, "");
+
+            if(input.value.length === 2){
+                input.value += "/";
+            }
+
+            if(e.inputType === "deleteContentBackward") {
+                if(input.value.length === 3){
+                    input.value = input.value.slice(0, 2);
+                }
+            }
+        });
+        
+        document.getElementById(`dateGotoBtn`).addEventListener(`click`, () => {
+            const input = document.getElementById(`dateInput`);
+            const date = input.value.split(`/`)
+            if(date.length === 2){
+                if(date[0] > 0 && date[0] < 13 && date[1].length === 4){
+                    month = date[0] - 1;
+                    year = date[1];
+                    initCalendar();
+                    return;
+                }
+                responseMessage(false, `Please enter a proper date`);
+            }
+        });
+    }
 })

@@ -30,9 +30,9 @@
     --button-active: rgb(139, 138, 138);
     --border-color: rgb(170, 170, 170);
     --border: solid 1px var(--border-color);
-    --critical: rgb(109, 46, 46);
-    --moderate: rgb(177, 138, 65);
-    --good: rgb(58, 116, 58);
+    --critical: rgb(178, 34, 34);
+    --moderate: rgb(221, 162, 52);
+    --good: rgb(34, 139, 34);
     --bg-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.4) 50%, rgba(255, 255, 255, 0.2) 100%);
     --bg-gradient-shine: linear-gradient(120deg, rgba(255, 255, 255, 0.6) 10%, rgba(255, 255, 255, 0.15) 30%, rbga(255, 255, 255, 0) 100%);
 }
@@ -600,6 +600,28 @@ select{
     display: flex;
 }
 
+.goto {
+    display: flex;
+    align-items: center;
+}
+
+.goto button {
+    margin-left: -3.9rem;
+    font-size: var(--normal);
+    padding: 1em;
+    background: transparent;
+    border-radius: 0 var(--radius) var(--radius) 0;
+    border-left: solid var(--border-color) 1px;
+    border-right: none;
+    border-bottom: none;
+    border-top: none;
+    z-index: 10;
+}
+
+.goto button:hover {
+    background: var(--button-highlight);
+}
+
 .btn-circle{
     display: flex;
     justify-content: center;
@@ -1107,6 +1129,7 @@ select{
 #calendar .next-days,
 #calendar .prev-days{
     opacity: 50%;
+    pointer-events: none;
 }
 
 #calendar #days span.current {
@@ -1137,6 +1160,12 @@ select{
     border: none;
 }
 
+#calendar #nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
 #schedule #list {
     flex: 1 1 0;
 }
@@ -1155,9 +1184,21 @@ select{
     border-radius: var(--radius);
     background: var(--bg);
     display: grid;
+    grid-template-columns: 1fr auto;
     padding: 1em;
     gap: 1em;
     align-items: center;
+}
+
+#schedule #collection div {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+#schedule #collection button {
+    border: none;
+    padding: 1em;
+    border-radius: 50%;
 }
 
 #inventory section:nth-of-type(1) {
