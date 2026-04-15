@@ -23,10 +23,14 @@ $router->get('/patients/all', 'App\Controllers\PatientsController@getAll');
 $router->get('/patients/sort', 'App\Controllers\PatientsController@sort');
 $router->get('/patients/patient', 'App\Controllers\PatientsController@search');
 $router->post('/patients/register', 'App\Controllers\PatientsController@register');
-$router->put('/patients/edit/{id}', 'App\Controllers\PatientsController@edit');
+$router->put('/patients/edit', 'App\Controllers\PatientsController@edit');
 $router->delete('/patients/delete/{id}', 'App\Controllers\PatientsController@delete');
 
 $router->get('/schedule', 'App\Controllers\ScheduleController@index');
+$router->get('/schedule/all', 'App\Controllers\ScheduleController@all');
+$router->post('/schedule/add', 'App\Controllers\ScheduleController@add');
+$router->patch('/schedule/edit', 'App\Controllers\ScheduleController@edit');
+$router->delete('/schedule/delete/{id}', 'App\Controllers\ScheduleController@delete');
 
 $router->get('/inventory', 'App\Controllers\InventoryController@index');
 $router->get('/inventory/all', 'App\Controllers\InventoryController@getAll');

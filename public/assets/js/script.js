@@ -36,8 +36,12 @@ function responseMessage(res, message){
 
 function closePopup(){
     const activePopup = document.querySelector(`.active`);
+    const selected = document.querySelector(`.selected`);
     if(activePopup){ 
-        activePopup.classList.remove(`active`) 
+        activePopup.classList.remove(`active`);
+        if(selected){
+            selected.classList.remove(`selected`);
+        }
     }
 }
 
@@ -72,27 +76,45 @@ function renderPatientsData(data){
         
         clone.querySelector(`.editPatientBtn`).addEventListener(`click`, () => {
             id = patient.id;
-            document.getElementById(`editPatientForm`).action = `/patients/edit/${patient.id}`;
             document.getElementById(`editPatient`).classList.add(`active`);
-
             document.getElementById(`updateFirstName`).value = patient.first_name;
             document.getElementById(`updateLastName`).value = patient.last_name;
             document.querySelector(`.updateSex`).value = patient.sex;
             document.getElementById(`updateBirthdate`).value = patient.birthdate;
             document.getElementById(`updateAddress`).value = patient.address;
             document.getElementById(`updateContact`).value = patient.contact;
-            document.getElementById(`updateExContact`).value = patient.extra_contact;
-            document.getElementById(`updateReferredBy`).value = patient.referred_by;
+            document.getElementById(`updateExContact`).value = patient.extra_contact ? patient.extra_contact : `N/A`;
+            document.getElementById(`updateReferredBy`).value = patient.referred_by ? patient.referred_by : `N/A`;
         });
 
         clone.querySelector(`.deletePatientBtn`).addEventListener(`click`, () => {
             id = patient.id;
-            document.getElementById(`deletePatientForm`).action = `/patients/delete/${patient.id}`;
             document.getElementById(`name`).textContent = patient.last_name + ", " + patient.first_name;
             document.getElementById(`id`).textContent = patient.id;
             document.getElementById(`deletePatient`).classList.add(`active`);
         });
 
+        container.appendChild(clone);
+    });
+}
+
+function renderPatientsDrop(data){
+    const container = document.getElementById(`patientOption`);
+    const template = document.getElementById(`patientOptnTemplate`);
+
+    container.innerHTML = ``;
+    data.collection.forEach(patient => {
+        const clone = template.content.cloneNode(true);
+        clone.querySelector(`.id`).textContent = patient.id;
+        clone.querySelector(`.name`).textContent = `${patient.last_name}, ${patient.first_name}`;
+
+        clone.querySelector(`.patient`).addEventListener(`click`, () => {
+            document.getElementById(`firstName`).value = patient.first_name;
+            document.getElementById(`lastName`).value = patient.last_name;
+            document.getElementById(`contact`).value = patient.contact;
+            document.getElementById(`exContact`).value = patient.extra_contact ? patient.extra_contact : 'N/A';
+            document.getElementById(`patientOption`).classList.remove(`active`);
+        });
         container.appendChild(clone);
     });
 }
@@ -108,6 +130,9 @@ function renderItemData(data){
         const exprStatus = clone.querySelector(`.exprStatus`);
 
         clone.querySelector(`.name`).textContent = item.item_name;
+        if(item.is_donated){
+            clone.querySelector(`.name`).classList.add(`donated`);
+        }
         clone.querySelector(`.category`).textContent = item.category;
         clone.querySelector(`.stockStatus`).textContent = item.stock_status;
         if (item.stock_status === "High Stocks"){
@@ -149,7 +174,6 @@ function renderItemData(data){
 
         clone.querySelector(`.editItemBtn`).addEventListener(`click`, () => {
             id = item.id;
-            document.getElementById(`editItemForm`).action = `/inventory/edit/${item.id}`;
             document.getElementById(`editItem`).classList.add(`active`);
             document.getElementById(`updateItemName`).value = item.item_name;
             document.getElementById(`updateCategory`).value = item.category;
@@ -160,14 +184,39 @@ function renderItemData(data){
         clone.querySelector(`.deleteItemBtn`).addEventListener(`click`, () => {
             id = item.id;
             document.getElementById(`deleteItem`).classList.add(`active`);
-            document.getElementById(`deleteItemForm`).action = `/inventory/delete/${item.id}`
             document.getElementById(`name`).textContent = item.item_name;
             document.getElementById(`id`).textContent = item.id;
         });
 
         container.appendChild(clone);
     });
+}
 
+function renderSchedulesData(data){
+    const container = document.getElementById(`collection`);
+    const template = document.getElementById(`scheduleCard`);
+
+    container.innerHTML = ``;
+
+    data.collection.forEach(schedule => {
+        const clone = template.content.cloneNode(true);
+        
+        clone.querySelector(`.schedDate`).textContent = schedule.date;
+        clone.querySelector(`.patientName`).textContent = `${schedule.last_name}, ${schedule.first_name}`;
+        clone.querySelector(`.schedFor`).textContent = schedule.scheduled_for;
+        clone.querySelector(`.editBtn`).addEventListener(`click`, () => {
+            id = schedule.id;
+            document.getElementById(`editSched`).classList.add(`active`);
+            document.getElementById(`updateSchedFor`).value = schedule.scheduled_for;
+        });
+        clone.querySelector(`.deleteBtn`).addEventListener(`click`, () => {
+            id = schedule.id;
+            document.getElementById(`deleteSched`).classList.add(`active`);
+            document.getElementById(`name`).textContent = `${schedule.last_name}, ${schedule.first_name}`;
+            document.getElementById(`schedDate`).textContent = schedule.date;
+        });;
+        container.appendChild(clone);
+    });
 }
 
 async function loadList(page, render) {
@@ -497,7 +546,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             const updateReferredBy = document.getElementById(`updateReferredBy`).value;
             const formdata = new FormData(e.target);
             try {
-                const res = await fetch(`/patients/edit/${id}`, {
+                const res = await fetch(`/patients/edit`, {
                     method:'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -677,7 +726,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             const updateDescription = document.getElementById(`updateDescription`).value; 
             const updateExpiration = document.getElementById(`updateExpiration`).value; 
             try {
-                const res = await fetch(`/inventory/edit/${id}`, {
+                const res = await fetch(`/inventory/edit`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -739,6 +788,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
 
     const schedule = document.getElementById(`schedule`);
     if(schedule){
+        loadList(`schedule`, renderSchedulesData);
         const date = document.getElementById(`date`);
         const daysContainer = document.getElementById(`days`);
         let today = new Date();
@@ -757,26 +807,31 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             daysContainer.innerHTML = "";
 
             for(let i = 0; i < totalCells; i++){
-                const daySpan = document.createElement(`span`);
+                const day = document.createElement(`span`);
                 const currentDate = i - firstDay + 1;
 
                 if(i < firstDay) {
-                    daySpan.textContent = prevLastDate - firstDay + i + 1;
-                    daySpan.classList.add(`prev-days`);
+                    day.textContent = prevLastDate - firstDay + i + 1;
+                    day.classList.add(`prev-days`);
                 } else if (i < firstDay + lastDate) {
-                    daySpan.textContent = currentDate;
+                    day.textContent = currentDate;
                     if(currentDate === new Date().getDate() && year === new Date().getFullYear() && month === new Date().getMonth()){
-                        daySpan.classList.add(`current`);
+                        day.classList.add(`current`);
                     }
                 } else {
-                    daySpan.textContent = i - (firstDay + lastDate) + 1;
-                    daySpan.classList.add(`next-days`);
+                    day.textContent = i - (firstDay + lastDate) + 1;
+                    day.classList.add(`next-days`);
                 }
 
-                daySpan.addEventListener(`click`, () => {
-                    console.log(`${months[month]} ${currentDate}, ${year}`);
+                day.addEventListener(`click`, () => {
+                    day.classList.add(`selected`);
+                    const formattedDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(currentDate).padStart(2, '0')}`;
+                    document.getElementById(`selectedDate`).textContent = `${months[month]} ${currentDate}, ${year}`;
+                    document.getElementById(`getDate`).value = formattedDate;
+                    document.getElementById(`setSched`).classList.add(`active`);
                 });
-                daysContainer.append(daySpan);
+
+                daysContainer.append(day);
             }
         }
 
@@ -833,6 +888,89 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                     return;
                 }
                 responseMessage(false, `Please enter a proper date`);
+            }
+        });
+
+        const pickPatient = document.getElementById(`pickPatient`);
+        const patientOptionDropDown = document.getElementById(`patientOption`); 
+        pickPatient.addEventListener(`click`, () => {
+            patientOptionDropDown.classList.toggle(`active`);
+            loadList(`patients`, renderPatientsDrop);
+            document.getElementById(`firstName`).value = "";
+            document.getElementById(`lastName`).value = "";
+            document.getElementById(`contact`).value = "";
+            document.getElementById(`exContact`).value = "";
+        });
+
+        document.getElementById(`setSched`).addEventListener(`submit`, async (e) => {
+            e.preventDefault();
+            try {
+                const formdata = new FormData(e.target);
+                const res = await fetch(`/schedule/add`, {
+                    method: 'POST',
+                    body: formdata
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    responseMessage(data, data.error);
+                    return;
+                }
+
+                responseMessage(data, data.message);
+                document.getElementById(`setSched`).classList.remove(`active`);
+                selected.classList.remove(`selected`);
+                loadList(`schedule`, renderSchedulesData);
+            } catch(err) {
+                console.error(err);
+            }
+        });
+
+        document.getElementById(`editSched`).addEventListener(`submit`, async (e) => {
+            e.preventDefault();
+            const updateSchedFor = document.getElementById(`updateSchedFor`).value;
+            try {
+                const res = await fetch(`/schedule/edit`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ id: id, schedFor: updateSchedFor })
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    responseMessage(data, data.error);
+                    return;
+                }
+
+                responseMessage(data, data.message);
+                loadList(`schedule`, renderSchedulesData);
+                document.getElementById(`editSched`).classList.remove(`active`);
+            } catch (err) {
+                console.error(err);
+            }
+        });
+
+        document.getElementById(`deleteSchedForm`).addEventListener(`submit`, async (e) => {
+            e.preventDefault();
+            try{
+                const res = await fetch(`/schedule/delete/${id}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await res.json();
+
+                if(!data.ok){
+                    responseMessage(data, data.error);
+                    return;
+                }
+
+                responseMessage(data, data.message);
+                loadList(`schedule`, renderSchedulesData);
+                document.getElementById(`deleteSched`).classList.remove(`active`);
+            } catch(err) {
+                console.error(err);
             }
         });
     }

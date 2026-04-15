@@ -84,7 +84,7 @@ class PatientsController extends Controller {
         }
     }
 
-    public function edit($id){
+    public function edit(){
         $input = json_decode(file_get_contents('php://input'), true);
         header('Content-Type: application/json');
         if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
@@ -157,6 +157,13 @@ class PatientsController extends Controller {
     public function delete($id) {
         header('Content-Type: application/json');
         $response = [];
+
+        if($id === 'null'){
+            $response = [ 'ok' => false, 'code' => 400, 'error' => 'Please select a Patient to delete'];
+            echo json_encode($response);
+            exit;
+        }
+
         $patient = new Patient();
         $patient->deletePatient($id);
 

@@ -192,7 +192,13 @@
             <h4>Delete Item</h4>
         </header>
         <hr style="height: 1px; color: var(--border-color);">
-        <p class="p-md">Are you sure that you want to delete item: <strong style="color:var(--critical)" id="name"></strong> id: <strong style="color: var(--critical);" id="id"></strong> from inventory?</p>
+        <span class="p-md">
+            <p>Are you sure that you want to delete 
+                item: <strong style="color:var(--critical)" id="name"></strong> 
+                id: <strong style="color: var(--critical);" id="id"></strong> from inventory?
+            </p>
+            <p>Reminder: You will not be able to recover deleted data.</p>
+        </span>
         <div>
             <button class="btn-square btn-critical" type="submit">Delete</button>
             <button class="btn-square btn-highlight" type="button" onclick="closePopup()">Cancel</button>
@@ -203,7 +209,7 @@
     <li>
         <table>
             <tr>
-                <td class="name"></td>
+                <td class="rel name"></td>
                 <td class="category"></td>
                 <td class="stockStatus"></td>
                 <td class="exprStatus"></td>

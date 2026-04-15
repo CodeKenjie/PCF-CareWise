@@ -594,6 +594,7 @@ select{
     border: var(--border);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
+    max-width: 40rem;
 }
 
 .popup.active{
@@ -1102,13 +1103,15 @@ select{
     display: flex;
     flex-direction: column;
     justify-content: center;
+    font-size: var(--bigger);
+    font-weight: var(--bold);
+    background: transparent;
     align-items: center;
     cursor: pointer;
     border-radius: var(--radius);
     padding: 0.5em;
     border: none;
 }
-
 
 #calendar #days span.set{
     position: relative;
@@ -1137,20 +1140,13 @@ select{
     border: var(--border);
 }
 
-.current::before {
-    position: absolute;
-    content: "today";
-    font-size: var(--normal);
-    font-weight: var(--bold);
-    top: 10%;
-}
-
-#calendar #days span.active {
+#calendar #days span.selected {
     color: var(--alt-font-color);
     box-shadow: var(--shadow);
     scale: 1.1;
     transition: scale 300ms ease;
     background: var(--button-color);
+    border: none;
 }
 
 .set:hover,
@@ -1178,16 +1174,23 @@ select{
     list-style-type: none;
     padding: 0.5em;
     border-radius: var(--radius);
+    gap: 1em;
 }
 
 #schedule #collection li {
     border-radius: var(--radius);
     background: var(--bg);
     display: grid;
+    box-shadow: var(--shadow);
     grid-template-columns: 1fr auto;
     padding: 1em;
     gap: 1em;
     align-items: center;
+}
+
+#schedule #collection span {
+    display: grid;
+    gap: 0.5em;
 }
 
 #schedule #collection div {
@@ -1199,6 +1202,60 @@ select{
     border: none;
     padding: 1em;
     border-radius: 50%;
+}
+
+.rel{
+    position: relative;
+}
+
+#setSched #pickPatient {
+    display: flex;
+    font-size: var(--normal);
+    font-weight: var(--bold);
+    gap: 1em;
+    flex-wrap: wrap;
+}
+
+#setSched #patientOption {
+    position: absolute;
+    top: 90%;
+    background: var(--bg);
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--radius);
+    list-style-type: none;
+    width: 97%;
+    height: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    z-index: 11;
+}
+
+#setSched #patientOption.active {
+    border: var(--border);
+    height: 20em;
+    transition: height 300ms ease-in;
+}
+
+#setSched #patientOption li {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+    border-radius: var(--radius);
+    cursor: pointer;
+}
+
+#setSched #patientOption li:hover {
+    background: var(--button-highlight);
+}
+
+#setSched #patientOption .profile {
+    width: var(--big-header);
+    height: var(--big-header);
+}
+
+#setSched #patientOption h4{
+    font-size: var(--normal);
 }
 
 #inventory section:nth-of-type(1) {
@@ -1266,6 +1323,17 @@ select{
     justify-content: center;
     min-width: 10rem;
     padding: 0.5em;
+}
+
+#inventory #collection .name.donated::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: var(--button-color);
+    width: 0.5rem;
+    height: 100%;
+    border-radius: var(--radius);
 }
 
 #inventory #collection button {

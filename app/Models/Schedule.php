@@ -1,0 +1,80 @@
+<?php
+
+namespace App\Models;
+
+use App\Core\Database;
+use App\Core\Logger;
+use PDO;
+use PDOException;
+
+class Schedule extends Database {
+    private $db;
+    private $logger;
+
+    public function __construct($database = new Database){
+        $this->db = $database->conn();
+        $this->logger = new Logger();
+    }
+
+    public function createSchedule(array $data){
+        try {
+            $query = 'INSERT INTO schedules (date, first_name, last_name, contact, extra_contact, scheduled_for) VALUES(:date, :first_name, :last_name, :contact, :extra_contact, :scheduled_for)';
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([
+                ':date' => $data['date'],
+                ':first_name' => $data['firstName'],
+                ':last_name' => $data['lastName'],
+                ':contact' => $data['contact'],
+                ':extra_contact' => $data['exContact'],
+                ':scheduled_for' => $data['scheduledFor']
+            ]);
+        } catch (PDOException $err) {
+            $this->logger->error($err->getMessage());
+        }
+    }
+
+    public function editSchedule(array $data){
+        try{
+            $query = 'UPDATE schedules SET scheduled_for = :scheduled_for WHERE id = :id';
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([
+                ':id' => $data['id'],
+                ':scheduled_for' => $data['scheduledFor'],
+            ]);
+        } catch(PDOException $err) {
+            $this->logger->error($err->getMessage());
+        }
+    }
+
+    public function deleteScheduleById($id){
+        try{
+            $query = 'DELETE FROM schedules WHERE id = ?';
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([$id]);
+        } catch (PDOException $err) {
+            $this->logger->error($err->getMessage());
+        }
+    }
+
+    public function getScheduleById($id){
+        try{
+            $query = 'SELECT * FROM schedules WHERE id = ?';
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([$id]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch(PDOException $err) {
+            $this->logger->error($err->getMessage());
+        }
+    }
+
+    public function getAll(){
+        try{
+            $query = 'SELECT * FROM schedules ORDER BY id ASC';
+            $stmt = $this->db->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch(PDOException $err) {
+            $this->logger->error($err->getMessage());
+        }
+    }
+}

@@ -98,10 +98,11 @@ class InventoryController extends Controller {
         }
     }
 
-    public function edit($id){
+    public function edit(){
         $input = json_decode(file_get_contents('php://input'), true);
         header('Content-Type: application/json');
         if($_SERVER['REQUEST_METHOD'] === 'PUT'){
+            $id = $input['id'];
             $itemName = $input['itemName'] ?? '';
             $category = $input['category'] ?? '';
             $minQuant = $input['minQuant'] ?? '';
@@ -168,11 +169,13 @@ class InventoryController extends Controller {
     public function delete($id){
         header('Content-Type: application/json');
         $response = [];
-        if(!$id){
+
+        if($id === 'null'){
            $response = [ 'ok' => false, 'code' => 400, 'error' => 'No selected item']; 
            echo json_encode($response);
            exit;
         }
+
         $item = new Item();
         $item->deleteItem($id);
 
