@@ -29,8 +29,7 @@
         </div>
     </section>
     <section id="list" class="acrylic-bg">
-        <ul id="collection">
-        </ul>
+        <ul id="collection"></ul>
     </section>
 </main>
 <div id="setSched" class="popup">

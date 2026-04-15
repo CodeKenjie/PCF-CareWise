@@ -1,6 +1,7 @@
 let id = null;
 let order = 'id';
 let direction = 'ASC';
+const months = [ `January`, `February`, `March`, `April`, `May`, `June`, `July`, `August`, `September`, `Octover`, `November`, `December` ];
 
 function view(id, type){
     const img = document.getElementById(id);
@@ -200,8 +201,8 @@ function renderSchedulesData(data){
 
     data.collection.forEach(schedule => {
         const clone = template.content.cloneNode(true);
-        
-        clone.querySelector(`.schedDate`).textContent = schedule.date;
+        const [year, month, day] = schedule.date.split('-');
+        clone.querySelector(`.schedDate`).textContent = `${months[month - 1]} ${day}, ${year}`;
         clone.querySelector(`.patientName`).textContent = `${schedule.last_name}, ${schedule.first_name}`;
         clone.querySelector(`.schedFor`).textContent = schedule.scheduled_for;
         clone.querySelector(`.editBtn`).addEventListener(`click`, () => {
@@ -237,9 +238,9 @@ async function loadList(page, render) {
     } 
 }
 
-async function sortPatients() {
+async function sortList(page, render) {
     try {
-        const res = await fetch(`/patients/sort?order=${order}&direction=${direction}`, {
+        const res = await fetch(`/${page}/sort?order=${order}&direction=${direction}`, {
             method: "GET"
         });
 
@@ -250,32 +251,13 @@ async function sortPatients() {
         }
         
         responseMessage(data, data.message);
-        renderPatientsData(data);
+        return render(data);
     } catch (err) {
         console.error(err);
     } 
 }
 
-async function sortInventory() {
-    try{
-        const res = await fetch(`/inventory/sort?order=${order}&direction=${direction}`, {
-            method: 'GET'
-        });
-
-        const data = await res.json();
-        if(!data.ok){
-            responseMessage(data, data.error);
-            return;
-        }
-
-        responseMessage(data, data.message);
-        renderItemData(data);
-    } catch (err){
-        console.error(err);
-    }
-}
-
-function sorts(sort){
+function sorts(page, render){
     const sortDirection = document.getElementById(`direction`);
     const sort1 = document.getElementById(`sort1`);
     const sort2 = document.getElementById(`sort2`);
@@ -285,7 +267,8 @@ function sorts(sort){
         e.preventDefault();
         direction = direction === 'DESC' ? 'ASC' : 'DESC';
         sortDirection.textContent = direction;
-        return sort();
+
+        return sortList(page, render);
     });
     
     sort1.addEventListener(`click`, (e) => {
@@ -294,7 +277,7 @@ function sorts(sort){
         sort1.classList.add(`activeSort`);
         sort2.classList.remove(`activeSort`);
         sort3.classList.remove(`activeSort`);
-        return sort();
+        return sortList(page, render);
     });
 
     sort2.addEventListener(`click`, (e) => {
@@ -303,7 +286,7 @@ function sorts(sort){
         sort1.classList.remove(`activeSort`);
         sort2.classList.add(`activeSort`);
         sort3.classList.remove(`activeSort`);
-        return sort();
+        return sortList(page, render);
     });
 
     sort3.addEventListener(`click`, (e) => {
@@ -312,7 +295,7 @@ function sorts(sort){
         sort1.classList.remove(`activeSort`);
         sort2.classList.remove(`activeSort`);
         sort3.classList.add(`activeSort`);
-        return sort();
+        return sortList(page, render);
     });
 }
 
@@ -516,7 +499,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
     const patients = document.getElementById(`patients`);
     if(patients){
         loadList('patients', renderPatientsData);
-        sorts(sortPatients);
+        sorts(`patients`, renderPatientsData);
         const firstName = document.getElementById(`firstName`);
         const lastName = document.getElementById(`lastName`);
         const birthdate = document.getElementById(`birthdate`);
@@ -647,7 +630,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
     const inventory = document.getElementById(`inventory`);
     if (inventory){
         loadList('inventory', renderItemData);
-        sorts(sortInventory);
+        sorts(`inventory`, renderItemData);
         const itemName = document.getElementById(`itemName`); 
         const category = document.getElementById(`category`); 
         const quantity = document.getElementById(`quantity`); 
@@ -794,7 +777,6 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         let today = new Date();
         let month = today.getMonth();
         let year = today.getFullYear();
-        const months = [ `January`, `February`, `March`, `April`, `May`, `June`, `July`, `August`, `September`, `Octover`, `November`, `December` ];
 
         function initCalendar(){ 
             const firstDay = new Date(year, month, 1).getDay();

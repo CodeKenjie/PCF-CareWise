@@ -37,7 +37,7 @@ $router->get('/inventory/all', 'App\Controllers\InventoryController@getAll');
 $router->get('/inventory/sort', 'App\Controllers\InventoryController@sort');
 $router->get('/inventory/item', 'App\Controllers\InventoryController@search');
 $router->post('/inventory/add', 'App\Controllers\InventoryController@add');
-$router->put('/inventory/edit/{id}', 'App\Controllers\InventoryController@edit');
+$router->put('/inventory/edit', 'App\Controllers\InventoryController@edit');
 $router->patch('/inventory/adjust/{id}', 'App\Controllers\InventoryController@adjust');
 $router->delete('/inventory/delete/{id}', 'App\Controllers\InventoryController@delete');
 
