@@ -9,6 +9,9 @@
             <button id="next" class="btn-circle btn-highlight">
                 <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill-rule="evenodd" clip-rule="evenodd" d="M8.29289 4.29289C8.68342 3.90237 9.31658 3.90237 9.70711 4.29289L16.7071 11.2929C17.0976 11.6834 17.0976 12.3166 16.7071 12.7071L9.70711 19.7071C9.31658 20.0976 8.68342 20.0976 8.29289 19.7071C7.90237 19.3166 7.90237 18.6834 8.29289 18.2929L14.5858 12L8.29289 5.70711C7.90237 5.31658 7.90237 4.68342 8.29289 4.29289Z" fill="currentColor"></path> </g></svg>
             </button>
+            <button id="addSchedBtn" class="btn-square btn-accent hidden" style="background: var(--button-color); color: var(--alt-font-color); border: none">
+                <span>Schedule a Patient</span>
+            </button>
         </div>
         <div id="weekdays">
             <span>Sun</span>
@@ -25,7 +28,7 @@
                 <input id="dateInput" type="text" style="width: fit-content;" placeholder="month/year" maxlength="7">
                 <button id="dateGotoBtn">Go</button>
             </span>
-            <button id="todayBtn" class="btn-pill btn-highlight">Today</button>
+            <button id="todayBtn" class="btn-square btn-highlight">Today</button>
         </div>
     </section>
     <section id="list" class="acrylic-bg">
@@ -44,7 +47,7 @@
             </button>
             <ul id="patientOption"></ul>
         </span>
-        <span>
+        <span class="p-sm">
             <input id="getDate" name="getDate" type="date" required hidden>
         </span>
         <div class="part p-sm">
@@ -79,6 +82,8 @@
 </div>
 <div id="editSched" class="popup">
     <form id="editSchedForm" class="form-ui">
+        <h3 id="sDate" class="p-sm"></h3>
+        <h3 id="patientName" class="p-sm"></h3>
         <span class="p-sm">
             <input id="updateSchedFor" type="text" required>
             <label for="updateSchedFor">For</label>
@@ -88,6 +93,35 @@
             <button class="btn-pill btn-highlight" type="reset" onclick="closePopup()">Cancel</button>
         </div>
     </form>
+</div>
+<div id="schedInfo" class="popup">
+    <section class="preview">
+        <section class="btn-close btn-highlight" onclick="closePopup()"></section>
+        <div>
+            <span>
+                <label for="">Schedule ID:</label>
+                <h3 id="sId"></h3>
+            </span>
+            <span>
+                <label for="">Date:</label>
+                <h3 id="vDate"></h3>
+            </span>
+        </div>
+        <span>
+            <label for="">Patient Name:</label>
+            <h3 id="sName"></h3>
+        </span>
+        <div>
+            <span>
+                <label for="">Patient Contact:</label>
+                <h3 id="sContact"></h3>
+            </span>
+            <span>
+                <label for="">Additional Contact:</label>
+                <h3 id="sExContact"></h3>
+            </span>
+        </div>
+    </section>
 </div>
 <div id="deleteSched" class="delete popup">
     <form id="deleteSchedForm" class="form-ui" action="/schedule/delete" method="post">

@@ -42,6 +42,7 @@ function closePopup(){
         activePopup.classList.remove(`active`);
         if(selected){
             selected.classList.remove(`selected`);
+            document.getElementById(`addSchedBtn`).classList.add(`hidden`);
         }
     }
 }
@@ -207,8 +208,18 @@ function renderSchedulesData(data){
         clone.querySelector(`.schedFor`).textContent = schedule.scheduled_for;
         clone.querySelector(`.editBtn`).addEventListener(`click`, () => {
             id = schedule.id;
+            document.getElementById(`sDate`).textContent = `${months[month - 1]} ${day}, ${year}`;
+            document.getElementById(`patientName`).textContent = `${schedule.last_name}, ${schedule.first_name}`;
             document.getElementById(`editSched`).classList.add(`active`);
             document.getElementById(`updateSchedFor`).value = schedule.scheduled_for;
+        });
+        clone.querySelector(`.viewBtn`).addEventListener(`click`, () => {
+            document.getElementById(`schedInfo`).classList.add(`active`);
+            document.getElementById(`sId`).textContent = schedule.id;
+            document.getElementById(`vDate`).textContent = `${months[month - 1]} ${day}, ${year}`;
+            document.getElementById(`sName`).textContent = `${schedule.last_name}, ${schedule.first_name}`;
+            document.getElementById(`sContact`).textContent = schedule.contact;
+            document.getElementById(`sExContact`).textContent = schedule.extra_contact;
         });
         clone.querySelector(`.deleteBtn`).addEventListener(`click`, () => {
             id = schedule.id;
@@ -318,6 +329,28 @@ async function adjustQuantity(value, type){
         responseMessage(data, data.message);
         document.getElementById(`valueInput`).value = "";
         loadList('inventory', renderItemData);
+    } catch(err) {
+        console.error(err);
+    }
+}
+
+async function filter(page, render, by) {
+    try {
+        const res = await fetch(`/${page}/filter`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ filter: by })
+        });
+
+        const data = await res.json();
+        if(!data.ok){
+            responseMessage(data, data.error);
+            return;
+        }
+
+        render(data);
     } catch(err) {
         console.error(err);
     }
@@ -777,6 +810,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         let today = new Date();
         let month = today.getMonth();
         let year = today.getFullYear();
+        const addSchedBtn = document.getElementById(`addSchedBtn`);
 
         function initCalendar(){ 
             const firstDay = new Date(year, month, 1).getDay();
@@ -791,26 +825,39 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             for(let i = 0; i < totalCells; i++){
                 const day = document.createElement(`span`);
                 const currentDate = i - firstDay + 1;
+                const formattedDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(currentDate).padStart(2, '0')}`;
 
                 if(i < firstDay) {
                     day.textContent = prevLastDate - firstDay + i + 1;
                     day.classList.add(`prev-days`);
                 } else if (i < firstDay + lastDate) {
                     day.textContent = currentDate;
+
                     if(currentDate === new Date().getDate() && year === new Date().getFullYear() && month === new Date().getMonth()){
                         day.classList.add(`current`);
                     }
+
                 } else {
                     day.textContent = i - (firstDay + lastDate) + 1;
                     day.classList.add(`next-days`);
                 }
 
-                day.addEventListener(`click`, () => {
+                day.addEventListener(`click`, async (e) => {
+                    e.preventDefault();
+                    if(day.classList.contains(`selected`)){
+                        day.classList.remove(`selected`);
+                        addSchedBtn.classList.add(`hidden`);
+                        loadList(`schedule`, renderSchedulesData);
+                        return;
+                    }
+
+                    document.querySelectorAll(`#calendar #days span`).forEach(d => { d.classList.remove(`selected`); });
                     day.classList.add(`selected`);
-                    const formattedDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(currentDate).padStart(2, '0')}`;
+                    addSchedBtn.classList.remove(`hidden`);
                     document.getElementById(`selectedDate`).textContent = `${months[month]} ${currentDate}, ${year}`;
                     document.getElementById(`getDate`).value = formattedDate;
-                    document.getElementById(`setSched`).classList.add(`active`);
+
+                    filter(`schedule`, renderSchedulesData, formattedDate);
                 });
 
                 daysContainer.append(day);
@@ -818,6 +865,10 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         }
 
         initCalendar();
+
+        document.getElementById(`addSchedBtn`).addEventListener(`click`, () => {
+            document.getElementById(`setSched`).classList.add(`active`);
+        });
 
         document.getElementById(`prev`).addEventListener(`click`, () => {
             month--;
@@ -841,7 +892,9 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             today = new Date();
             month = today.getMonth();
             year = today.getFullYear();
+            addSchedBtn.classList.add(`hidden`);
             initCalendar();
+            loadList(`schedule`, renderSchedulesData);
         });
 
         document.getElementById(`dateInput`).addEventListener(`input`, (e)=> {
@@ -901,8 +954,8 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
 
                 responseMessage(data, data.message);
                 document.getElementById(`setSched`).classList.remove(`active`);
-                selected.classList.remove(`selected`);
                 loadList(`schedule`, renderSchedulesData);
+                selected.classList.remove(`selected`);
             } catch(err) {
                 console.error(err);
             }
@@ -955,5 +1008,6 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 console.error(err);
             }
         });
+
     }
 })

@@ -74,6 +74,24 @@ class ScheduleController extends Controller {
 
     }
 
+    public function filter(){
+        header('Content-Type: application/json');
+        $input = json_decode(file_get_contents('php://input'), true);
+        $response = [];
+        $date = $input['filter'] ?? '';
+
+        if(empty($input['filter'])){
+            $response = [ 'ok' => false, 'code' => 400, 'error' => 'Please select a date' ];
+            echo json_encode($response);
+            exit;
+        }
+
+        $shedules = (new Schedule())->getSchedByDate($date);
+
+        $response = [ 'ok' => true, 'code' => 200, 'message' => 'Patients scheduled on ' . $date, 'collection' => $shedules ];
+        echo json_encode($response);
+    }
+
     public function edit(){
         $input = json_decode(file_get_contents('php://input'), true);
         header('Content-Type: application/json');

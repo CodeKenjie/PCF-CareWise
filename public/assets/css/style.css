@@ -644,7 +644,6 @@ select{
 }
 
 .btn-square {
-    display: flex;
     justify-content: center;
     align-items: center;
     font-size: var(--normal);
@@ -1062,13 +1061,12 @@ select{
 
 #calendar{
     flex: 1 1 0;
-    display: flex;
     flex-direction: column;
 }
 
 #calendar #month {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     gap: 1em;
 }
@@ -1105,7 +1103,6 @@ select{
     justify-content: center;
     font-size: var(--bigger);
     font-weight: var(--bold);
-    background: transparent;
     align-items: center;
     cursor: pointer;
     border-radius: var(--radius);
@@ -1113,7 +1110,7 @@ select{
     border: none;
 }
 
-#calendar #days span.set{
+.set{
     position: relative;
     color: var(--button-color);
 }
@@ -1126,6 +1123,11 @@ select{
     width: var(--big-header);
     height: 5px;
     border-radius: 1em;
+}
+
+.set:hover {
+    color: var(--alt-font-color);
+    background: var(--button-color);
 }
 
 
@@ -1149,9 +1151,8 @@ select{
     border: none;
 }
 
-.set:hover,
 #calendar #days span:not(.prev-days, .next-days, .set):hover {
-    color: var(--alt-font-color) !important;
+    color: var(--alt-font-color);
     background: var(--button-hover);
     border: none;
 }
@@ -1175,6 +1176,7 @@ select{
     padding: 0.5em;
     border-radius: var(--radius);
     gap: 1em;
+    min-width: 20rem;
 }
 
 #schedule #collection li {

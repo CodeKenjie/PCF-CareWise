@@ -46,23 +46,23 @@ class Schedule extends Database {
         }
     }
 
+    public function getSchedByDate($date){
+        try{
+            $query = "SELECT * FROM schedules WHERE date = ? ";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([$date]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        }catch(PDOException $err){
+            $this->logger->error($err->getMessage());
+        }
+    }
+
     public function deleteScheduleById($id){
         try{
             $query = 'DELETE FROM schedules WHERE id = ?';
             $stmt = $this->db->prepare($query);
             $stmt->execute([$id]);
         } catch (PDOException $err) {
-            $this->logger->error($err->getMessage());
-        }
-    }
-
-    public function getScheduleById($id){
-        try{
-            $query = 'SELECT * FROM schedules WHERE id = ?';
-            $stmt = $this->db->prepare($query);
-            $stmt->execute([$id]);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch(PDOException $err) {
             $this->logger->error($err->getMessage());
         }
     }
