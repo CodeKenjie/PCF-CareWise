@@ -130,11 +130,20 @@ main {
     height: 100dvh;
     overflow: auto;
     scrollbar-width: none;
+    z-index: 1;
 }
 
 section {
     display: flex;
     padding: 1em;
+    gap: 1em;
+    z-index: 1;
+}
+
+.fw {
+    flex: 1 1 0;
+    display: flex;
+    flex-wrap: wrap;
     gap: 1em;
 }
 
@@ -490,6 +499,7 @@ select{
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
     padding: 1em;
 }
 
@@ -920,6 +930,99 @@ select{
     left: 110%;
 }
 
+#care section:not(.actions) {
+    flex: 1 1 0;
+    height: 100%;
+}
+
+#care #collection {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    list-style-type: none;
+    overflow: auto;
+    scrollbar-width: none;
+    gap: 0.1em;
+}
+
+#care #collection li {
+    display: flex;
+    flex-wrap: wrap;
+    text-align: center;
+    justify-content: center;
+    padding: 0.5em;
+    border: var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    min-width: 15rem;
+    box-shadow: var(--shadow);
+    opacity: 75%;
+    gap: 1em;
+}
+
+#care #collection li:hover {
+    color: var(--alt-font-color);
+    background: var(--button-hover);
+    border: none;
+    opacity: 100%;
+}
+
+#care #collection li.selected {
+    color: var(--alt-font-color);
+    background: var(--button-color);
+    scale: 1.05;
+    transition: scale 300ms ease;
+}
+
+#care #collection li h3 {
+    flex: 1 1 0;
+    min-width: 10rem;
+}
+
+#care #diagnose{
+    display: none;
+}
+
+#care #diagnose.active {
+    display: flex;
+}
+
+#care #diagnose #info {
+    display: flex;
+    flex-wrap: wrap;
+    height: fit-content;
+    width: 100%;
+    gap: 1em;
+}
+
+#care #diagnose #info span {
+    display: flex;
+    gap: 0.5em;
+    align-items: center;
+}
+
+#care #diagnose #info label {
+    font-weight: var(--bold);
+    font-size: var(--small);
+    opacity: 75%;
+}
+
+#care #diagnose #info div:nth-of-type(1) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: auto;
+}
+
+#care #diagnose #info div:nth-of-type(2) {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    padding: 1em 0;
+    justify-content: center;
+    gap: 0.5em;
+}
+
 #patients #collection {
     flex: 1 1 0;
     display: flex;
@@ -1017,10 +1120,6 @@ select{
     padding: 1em;
 }
 
-#patients section:nth-of-type(1) {
-    height: fit-content;
-}
-
 #patients section:nth-of-type(2) {
     display: flex;
     flex-direction: column;
@@ -1040,6 +1139,10 @@ select{
     justify-content: center;
     align-items: center;
     gap: 0.5em;
+}
+
+.actions {
+    height: fit-content;
 }
 
 .actions div {
@@ -1146,7 +1249,6 @@ select{
     color: var(--alt-font-color);
     box-shadow: var(--shadow);
     scale: 1.1;
-    transition: scale 300ms ease;
     background: var(--button-color);
     border: none;
 }
@@ -1182,15 +1284,15 @@ select{
 #schedule #collection li {
     border-radius: var(--radius);
     background: var(--bg);
-    display: grid;
+    display: flex;
     box-shadow: var(--shadow);
-    grid-template-columns: 1fr auto;
     padding: 1em;
     gap: 1em;
     align-items: center;
 }
 
 #schedule #collection span {
+    flex: 1 1 0;
     display: grid;
     gap: 0.5em;
 }
@@ -1260,10 +1362,6 @@ select{
     font-size: var(--normal);
 }
 
-#inventory section:nth-of-type(1) {
-    height: fit-content;
-}
-
 #inventory section:nth-of-type(2) {
     display: flex;
     flex-direction: column;
@@ -1307,7 +1405,6 @@ select{
     box-shadow: var(--shadow);
 }
 
-#inventory #listHeader tr,
 #inventory #collection tr {
     flex: 1 1 0;
     flex-wrap: wrap;
@@ -1317,7 +1414,6 @@ select{
     gap: 0.5em;
 }
 
-#inventory #listHeader th,
 #inventory #collection td {
     flex: 1 1 0;
     display: flex;

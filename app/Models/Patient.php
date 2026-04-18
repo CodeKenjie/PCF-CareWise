@@ -108,7 +108,7 @@ class Patient extends Database {
                             OR referred_by ILIKE '%' || :kw || '%')
                         AND (id = :id OR :id IS NULL OR DATE_PART('year', AGE(CURRENT_DATE, birthdate)) = :id)
                         AND (birthdate <= :birthdate OR :birthdate IS NULL)
-                        ORDER BY rank DESC";
+                        ORDER BY rank ASC";
             $stmt = $this->db->prepare($query);
             $stmt->bindValue(':kw', $keyword);
             $stmt->bindValue(':id', $id);

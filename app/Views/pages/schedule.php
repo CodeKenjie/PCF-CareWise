@@ -47,9 +47,16 @@
             </button>
             <ul id="patientOption"></ul>
         </span>
-        <span class="p-sm">
-            <input id="getDate" name="getDate" type="date" required hidden>
-        </span>
+        <div class="part p-sm">
+            <span>
+                <input id="getDate" name="getDate" type="date" required>
+                <label for="firstName">Date</label>
+            </span>
+            <span>
+                <input id="getTime" name="getTime" type="time" required>
+                <label for="firstName">Time</label>
+            </span>
+        </div>
         <div class="part p-sm">
             <span>
                 <input id="firstName" name="firstName" type="text" required>
@@ -85,6 +92,10 @@
         <h3 id="sDate" class="p-sm"></h3>
         <h3 id="patientName" class="p-sm"></h3>
         <span class="p-sm">
+            <input id="updateTime" type="time" required>
+            <label for="updateTime">Time</label>
+        </span>
+        <span class="p-sm">
             <input id="updateSchedFor" type="text" required>
             <label for="updateSchedFor">For</label>
         </span>
@@ -105,6 +116,10 @@
             <span>
                 <label for="">Date:</label>
                 <h3 id="vDate"></h3>
+            </span>
+            <span>
+                <label for="">Time:</label>
+                <h3 id="vTime"></h3>
             </span>
         </div>
         <span>
@@ -157,9 +172,12 @@
 <template id="scheduleCard">
     <li>
         <span>
-            <h3 class="schedDate" style="font-size: var(--normal); opacity: 75%">nov 21, 2026</h3>
-            <h3 class="patientName" style="font-size: var(--normal); opacity: 75%">firstname, lastname</h3>
-            <h3 class="schedFor" style="background: var(--bg-dim); padding: 0.5em; border-radius: var(--radius)">for:</h3>
+            <div class="part">
+                <h3 class="schedDate" style="font-size: var(--normal); opacity: 75%"></h3>
+                <h3 class="schedTime" style="font-size: var(--normal); opacity: 75%"></h3>
+            </div>
+            <h3 class="patientName" style="font-size: var(--normal); opacity: 75%"></h3>
+            <h3 class="schedFor" style="background: var(--bg-dim); padding: 0.5em; border-radius: var(--radius)"></h3>
         </span>
         <div>
             <button class="editBtn btn-highlight">

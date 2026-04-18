@@ -20,6 +20,7 @@ class ScheduleController extends Controller {
         header('Content-Type: application/json');
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
             $date = $_POST['getDate'] ?? '';
+            $time = $_POST['getTime'] ?? '';
             $firstName = $_POST['firstName'] ?? '';
             $lastName = $_POST['lastName'] ?? '';
             $contact = $_POST['contact'] ?? '';
@@ -29,6 +30,12 @@ class ScheduleController extends Controller {
 
             if(empty($date)){
                 $response = [ 'ok' => false, 'code' => 400, 'error' => 'Error: invalid Date'];
+                echo json_encode($response);
+                exit;
+            }
+
+            if(empty($time)){
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'Error: invalid Time'];
                 echo json_encode($response);
                 exit;
             }
@@ -59,6 +66,7 @@ class ScheduleController extends Controller {
 
             $data = [
                 'date' => $date,
+                'time' => $time,
                 'firstName' => ucwords($firstName),
                 'lastName' => ucwords($lastName),
                 'contact' => $contact,
@@ -98,6 +106,7 @@ class ScheduleController extends Controller {
         if($_SERVER['REQUEST_METHOD'] === 'PATCH'){
             $id = $input['id'] ?? '';
             $scheduledFor = $input['schedFor'] ?? '';
+            $time = $input['time'] ?? '';
             $response = [];
 
             if($id === 'null' || empty($id)){
@@ -114,7 +123,8 @@ class ScheduleController extends Controller {
 
             $data = [
                 'id' => $id,
-                'scheduledFor' => $scheduledFor
+                'scheduledFor' => $scheduledFor,
+                'time' => $time
             ];
             $sched = new Schedule();
             $sched->editSchedule($data);

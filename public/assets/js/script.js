@@ -2,6 +2,74 @@ let id = null;
 let order = 'id';
 let direction = 'ASC';
 const months = [ `January`, `February`, `March`, `April`, `May`, `June`, `July`, `August`, `September`, `Octover`, `November`, `December` ];
+const date = document.getElementById(`date`);
+const daysContainer = document.getElementById(`days`);
+let today = new Date();
+let month = today.getMonth();
+let year = today.getFullYear();
+let selected = null;
+
+let occupiedDate = [];
+
+function initCalendar(){ 
+    const firstDay = new Date(year, month, 1).getDay();
+    const lastDate = new Date(year, month + 1, 0).getDate();
+    const prevLastDate = new Date(year, month, 0).getDate();
+    const lastDay = new Date(year, month + 1, 0).getDay();
+    const totalCells = firstDay + lastDate + (6 - lastDay);
+
+    date.textContent = months[month] + ` ` + year; 
+    daysContainer.innerHTML = "";
+
+    for(let i = 0; i < totalCells; i++){
+        const day = document.createElement(`span`);
+        const currentDate = i - firstDay + 1;
+        const formattedDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(currentDate).padStart(2, '0')}`;
+
+        if(i < firstDay) {
+            day.textContent = prevLastDate - firstDay + i + 1;
+            day.classList.add(`prev-days`);
+        } else if (i < firstDay + lastDate) {
+            day.textContent = currentDate;
+
+            if(occupiedDate.includes(formattedDate)) {
+                day.classList.add(`set`);
+            }
+
+            if(formattedDate === selected){
+                day.classList.add(`selected`);
+            }
+
+            if(currentDate === new Date().getDate() && year === new Date().getFullYear() && month === new Date().getMonth()){
+                day.classList.add(`current`);
+            }
+
+        } else {
+            day.textContent = i - (firstDay + lastDate) + 1;
+            day.classList.add(`next-days`);
+        }
+
+        day.addEventListener(`click`, async (e) => {
+            e.preventDefault();
+            selected = formattedDate;
+
+            if(day.classList.contains(`selected`)){
+                selected = null;
+                loadList(`schedule`, renderSchedulesData);
+                document.getElementById(`addSchedBtn`).classList.add(`hidden`);
+                return;
+            }
+
+            document.getElementById(`addSchedBtn`).classList.remove(`hidden`);
+            document.getElementById(`selectedDate`).textContent = `${months[month]} ${currentDate}, ${year}`;
+            document.getElementById(`getDate`).value = formattedDate;
+            filter(`schedule`, renderSchedulesData, formattedDate);
+        });
+
+        daysContainer.append(day);
+    }
+
+}
 
 function view(id, type){
     const img = document.getElementById(id);
@@ -54,12 +122,12 @@ function renderPatientsData(data){
     container.innerHTML = ``;
 
     data.collection.forEach( patient => {
+        const [year, month, day] = patient.birthdate.split('-');
         const clone = template.content.cloneNode(true);
-
         clone.querySelector(`.id`).textContent = patient.id;
         clone.querySelector(`.name`).textContent = patient.last_name + ", " + patient.first_name;
         clone.querySelector(`.address`).textContent = patient.address;
-        clone.querySelector(`.birthdate`).textContent = patient.birthdate;
+        clone.querySelector(`.birthdate`).textContent = `${months[month - 1]} ${day}, ${year}`;
         clone.querySelector(`.age`).textContent = patient.age;
         clone.querySelector(`.sex`).textContent = patient.sex;
         clone.querySelector(`.contact`).textContent = patient.contact + " " + patient.extra_contact;
@@ -70,7 +138,7 @@ function renderPatientsData(data){
             document.getElementById(`pName`).textContent = `${patient.last_name}, ${patient.first_name}`;
             document.getElementById(`pAge`).textContent = patient.age;
             document.getElementById(`pSex`).textContent = patient.sex;
-            document.getElementById(`pBirthdate`).textContent = patient.birthdate;
+            document.getElementById(`pBirthdate`).textContent = `${months[month - 1]} ${day}, ${year}`;
             document.getElementById(`pAddress`).textContent = patient.address;
             document.getElementById(`pContacts`).textContent = patient.contact + " " + patient.extra_contact;
             document.getElementById(`pReferredBy`).textContent = patient.referred_by;
@@ -121,12 +189,35 @@ function renderPatientsDrop(data){
     });
 }
 
+function renderPatientsDataForCare(data){
+    const container = document.getElementById(`collection`);
+    const template = document.getElementById(`patientCareCard`);
+
+    container.innerHTML = ``;
+    data.collection.forEach(patient => {
+        const [year, month, day] = patient.birthdate.split('-');
+        const clone = template.content.cloneNode(true);
+        clone.querySelector(`.patient`).addEventListener(`click`, () => {
+            document.getElementById(`diagnose`).classList.add(`active`);
+            document.getElementById(`patientId`).textContent = patient.id;
+            document.getElementById(`patientName`).textContent = `${patient.last_name}, ${patient.first_name}`;
+            document.getElementById(`patientAge`).textContent = patient.age;
+            document.getElementById(`patientBirthdate`).textContent =  `${months[month - 1]} ${day}, ${year}`;
+        });
+        clone.querySelector(`.name`).textContent = `${patient.last_name}, ${patient.first_name}`;
+        clone.querySelector(`.age`).textContent = patient.age;
+
+        container.appendChild(clone);
+    });
+}
+
 function renderItemData(data){
     const container = document.getElementById(`collection`);
     const template = document.getElementById(`itemCard`);
 
     container.innerHTML = ``;
     data.collection.forEach(item => {
+        const [year, month, day] = item.expiration_date.split('-');
         const clone = template.content.cloneNode(true);
         const stockStatus = clone.querySelector(`.stockStatus`);
         const exprStatus = clone.querySelector(`.exprStatus`);
@@ -169,7 +260,7 @@ function renderItemData(data){
             document.getElementById(`iQuantity`).textContent = item.quantity;
             document.getElementById(`iMinQuant`).textContent = item.minimum_quantity;
             document.getElementById(`iQuantStatus`).textContent = item.stock_status;
-            document.getElementById(`iExpiration`).textContent = item.expiration_date;
+            document.getElementById(`iExpiration`).textContent = `${months[month - 1]} ${day}, ${year}`;
             document.getElementById(`iExpirationStatus`).textContent = item.expiration_status;
             document.getElementById(`iIsDonated`).textContent = item.is_donated;
         });
@@ -201,9 +292,14 @@ function renderSchedulesData(data){
     container.innerHTML = ``;
 
     data.collection.forEach(schedule => {
+        if(!occupiedDate.includes(schedule.date)){
+            occupiedDate.push(schedule.date);
+        }
         const clone = template.content.cloneNode(true);
         const [year, month, day] = schedule.date.split('-');
+        const timeFormat = new Date(`1972-12-01T${schedule.time}`).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
         clone.querySelector(`.schedDate`).textContent = `${months[month - 1]} ${day}, ${year}`;
+        clone.querySelector(`.schedTime`).textContent = timeFormat;
         clone.querySelector(`.patientName`).textContent = `${schedule.last_name}, ${schedule.first_name}`;
         clone.querySelector(`.schedFor`).textContent = schedule.scheduled_for;
         clone.querySelector(`.editBtn`).addEventListener(`click`, () => {
@@ -212,11 +308,13 @@ function renderSchedulesData(data){
             document.getElementById(`patientName`).textContent = `${schedule.last_name}, ${schedule.first_name}`;
             document.getElementById(`editSched`).classList.add(`active`);
             document.getElementById(`updateSchedFor`).value = schedule.scheduled_for;
+            document.getElementById(`updateTime`).value = schedule.time;
         });
         clone.querySelector(`.viewBtn`).addEventListener(`click`, () => {
             document.getElementById(`schedInfo`).classList.add(`active`);
             document.getElementById(`sId`).textContent = schedule.id;
             document.getElementById(`vDate`).textContent = `${months[month - 1]} ${day}, ${year}`;
+            document.getElementById(`vTime`).textContent = timeFormat;
             document.getElementById(`sName`).textContent = `${schedule.last_name}, ${schedule.first_name}`;
             document.getElementById(`sContact`).textContent = schedule.contact;
             document.getElementById(`sExContact`).textContent = schedule.extra_contact;
@@ -229,6 +327,8 @@ function renderSchedulesData(data){
         });;
         container.appendChild(clone);
     });
+
+    initCalendar();
 }
 
 async function loadList(page, render) {
@@ -307,6 +407,32 @@ function sorts(page, render){
         sort2.classList.remove(`activeSort`);
         sort3.classList.add(`activeSort`);
         return sortList(page, render);
+    });
+}
+
+async function search(url, render) {
+    const sliced = url.split(`/`);
+    document.getElementById(`searchForm`).addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const keyword = document.getElementById(`search`).value;
+        try{
+            const res = await fetch(`${url}?search=${keyword}`, {
+                method: "GET"
+            });
+
+            const data = await res.json();
+            return render(data);
+        } catch(err) {
+            console.error(err);
+        }
+    });
+    
+    document.getElementById(`search`).addEventListener(`input`, (e) => {
+        const search = document.getElementById(`search`).value;
+        e.preventDefault();
+        if(search === "") {
+            loadList(sliced[0], render);
+        }
     });
 }
 
@@ -533,6 +659,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
     if(patients){
         loadList('patients', renderPatientsData);
         sorts(`patients`, renderPatientsData);
+        search(`patients/patient`, renderPatientsData);
         const firstName = document.getElementById(`firstName`);
         const lastName = document.getElementById(`lastName`);
         const birthdate = document.getElementById(`birthdate`);
@@ -635,35 +762,13 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 console.error(err)
             }
         });
-
-        document.getElementById(`searchForm`).addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const keyword = document.getElementById(`search`).value;
-            try{
-                const res = await fetch(`/patients/patient?search=${keyword}`, {
-                    method: "GET"
-                });
-
-                const data = await res.json();
-                renderPatientsData(data);
-            } catch(err) {
-                console.error(err);
-            }
-        })
-
-        document.getElementById(`search`).addEventListener(`input`, (e) => {
-            const search = document.getElementById(`search`).value;
-            e.preventDefault();
-            if(search === "") {
-                loadList('patients', renderPatientsData);
-            }
-        });
     }
 
     const inventory = document.getElementById(`inventory`);
     if (inventory){
         loadList('inventory', renderItemData);
         sorts(`inventory`, renderItemData);
+        search(`inventory/item`, renderItemData);
         const itemName = document.getElementById(`itemName`); 
         const category = document.getElementById(`category`); 
         const quantity = document.getElementById(`quantity`); 
@@ -765,29 +870,6 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             }
         });
 
-        document.getElementById(`searchForm`).addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const keyword = document.getElementById(`search`).value;
-            try{
-                const res = await fetch(`/inventory/item?search=${keyword}`, {
-                    method: "GET"
-                });
-
-                const data = await res.json();
-                renderItemData(data);
-            } catch(err) {
-                console.error(err);
-            }
-        })
-
-        document.getElementById(`search`).addEventListener(`input`, (e) => {
-            const search = document.getElementById(`search`).value;
-            e.preventDefault();
-            if(search === "") {
-                loadList('inventory', renderItemData);
-            }
-        });
-
         document.getElementById(`exportBtn`).addEventListener(`click`, (e)=> {
             e.preventDefault();
             const valueInput = document.getElementById(`valueInput`).value;
@@ -805,70 +887,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
     const schedule = document.getElementById(`schedule`);
     if(schedule){
         loadList(`schedule`, renderSchedulesData);
-        const date = document.getElementById(`date`);
-        const daysContainer = document.getElementById(`days`);
-        let today = new Date();
-        let month = today.getMonth();
-        let year = today.getFullYear();
         const addSchedBtn = document.getElementById(`addSchedBtn`);
-
-        function initCalendar(){ 
-            const firstDay = new Date(year, month, 1).getDay();
-            const lastDate = new Date(year, month + 1, 0).getDate();
-            const prevLastDate = new Date(year, month, 0).getDate();
-            const lastDay = new Date(year, month + 1, 0).getDay();
-            const totalCells = firstDay + lastDate + (6 - lastDay);
-
-            date.textContent = months[month] + ` ` + year; 
-            daysContainer.innerHTML = "";
-
-            for(let i = 0; i < totalCells; i++){
-                const day = document.createElement(`span`);
-                const currentDate = i - firstDay + 1;
-                const formattedDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(currentDate).padStart(2, '0')}`;
-
-                if(i < firstDay) {
-                    day.textContent = prevLastDate - firstDay + i + 1;
-                    day.classList.add(`prev-days`);
-                } else if (i < firstDay + lastDate) {
-                    day.textContent = currentDate;
-
-                    if(currentDate === new Date().getDate() && year === new Date().getFullYear() && month === new Date().getMonth()){
-                        day.classList.add(`current`);
-                    }
-
-                } else {
-                    day.textContent = i - (firstDay + lastDate) + 1;
-                    day.classList.add(`next-days`);
-                }
-
-                day.addEventListener(`click`, async (e) => {
-                    e.preventDefault();
-                    if(day.classList.contains(`selected`)){
-                        day.classList.remove(`selected`);
-                        addSchedBtn.classList.add(`hidden`);
-                        loadList(`schedule`, renderSchedulesData);
-                        return;
-                    }
-
-                    document.querySelectorAll(`#calendar #days span`).forEach(d => { d.classList.remove(`selected`); });
-                    day.classList.add(`selected`);
-                    addSchedBtn.classList.remove(`hidden`);
-                    document.getElementById(`selectedDate`).textContent = `${months[month]} ${currentDate}, ${year}`;
-                    document.getElementById(`getDate`).value = formattedDate;
-
-                    filter(`schedule`, renderSchedulesData, formattedDate);
-                });
-
-                daysContainer.append(day);
-            }
-        }
-
-        initCalendar();
-
-        document.getElementById(`addSchedBtn`).addEventListener(`click`, () => {
-            document.getElementById(`setSched`).classList.add(`active`);
-        });
 
         document.getElementById(`prev`).addEventListener(`click`, () => {
             month--;
@@ -926,6 +945,10 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             }
         });
 
+        document.getElementById(`addSchedBtn`).addEventListener(`click`, () => {
+            document.getElementById(`setSched`).classList.add(`active`);
+        });
+
         const pickPatient = document.getElementById(`pickPatient`);
         const patientOptionDropDown = document.getElementById(`patientOption`); 
         pickPatient.addEventListener(`click`, () => {
@@ -964,13 +987,14 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         document.getElementById(`editSched`).addEventListener(`submit`, async (e) => {
             e.preventDefault();
             const updateSchedFor = document.getElementById(`updateSchedFor`).value;
+            const updateTime = document.getElementById(`updateTime`).value;
             try {
                 const res = await fetch(`/schedule/edit`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ id: id, schedFor: updateSchedFor })
+                    body: JSON.stringify({ id: id, schedFor: updateSchedFor, time: updateTime })
                 });
 
                 const data = await res.json();
@@ -1008,6 +1032,12 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 console.error(err);
             }
         });
+    }
 
+    const care = document.getElementById(`care`);
+    if(care){
+        loadList(`care`, renderPatientsDataForCare);
+        sorts(`care`, renderPatientsDataForCare);
+        search(`care/patient`, renderPatientsDataForCare);
     }
 })

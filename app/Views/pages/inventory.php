@@ -25,15 +25,6 @@
         </div>
     </section>
     <section class="acrylic-bg">
-        <table id="listHeader">
-            <tr>
-                <th>Item</th>
-                <th>Category</th>
-                <th>Stocks</th>
-                <th>Expiration</th>
-                <th>Actions</th>
-            </tr>
-        </table>
         <ul id="collection"></ul>
     </section>
 </main>

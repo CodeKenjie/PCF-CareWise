@@ -23,7 +23,7 @@
 
 @media ( max-width: 1000px) and ( orientation: portrait) {
 
-    #inventory #listHeader,
+    .listHeader,
     .site {
         display: none;
     }

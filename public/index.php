@@ -18,6 +18,11 @@ $router->post('/register', 'App\Controllers\UserController@register');
 
 $router->get('/dashboard', 'App\Controllers\DashboardController@index');
 
+$router->get('/care', 'App\Controllers\CareController@index');
+$router->get('/care/all', 'App\Controllers\PatientsController@getAll');
+$router->get('/care/sort', 'App\Controllers\PatientsController@sort');
+$router->get('/care/patient', 'App\Controllers\PatientsController@search');
+
 $router->get('/patients', 'App\Controllers\PatientsController@index');
 $router->get('/patients/all', 'App\Controllers\PatientsController@getAll');
 $router->get('/patients/sort', 'App\Controllers\PatientsController@sort');

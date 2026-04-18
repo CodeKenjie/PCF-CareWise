@@ -18,10 +18,11 @@ class Schedule extends Database {
 
     public function createSchedule(array $data){
         try {
-            $query = 'INSERT INTO schedules (date, first_name, last_name, contact, extra_contact, scheduled_for) VALUES(:date, :first_name, :last_name, :contact, :extra_contact, :scheduled_for)';
+            $query = 'INSERT INTO schedules (date, time, first_name, last_name, contact, extra_contact, scheduled_for) VALUES(:date, :time, :first_name, :last_name, :contact, :extra_contact, :scheduled_for)';
             $stmt = $this->db->prepare($query);
             $stmt->execute([
                 ':date' => $data['date'],
+                ':time' => $data['time'],
                 ':first_name' => $data['firstName'],
                 ':last_name' => $data['lastName'],
                 ':contact' => $data['contact'],
@@ -35,11 +36,12 @@ class Schedule extends Database {
 
     public function editSchedule(array $data){
         try{
-            $query = 'UPDATE schedules SET scheduled_for = :scheduled_for WHERE id = :id';
+            $query = 'UPDATE schedules SET time = :time, scheduled_for = :scheduled_for WHERE id = :id';
             $stmt = $this->db->prepare($query);
             $stmt->execute([
                 ':id' => $data['id'],
                 ':scheduled_for' => $data['scheduledFor'],
+                ':time' => $data['time'],
             ]);
         } catch(PDOException $err) {
             $this->logger->error($err->getMessage());
