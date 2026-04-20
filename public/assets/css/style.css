@@ -653,6 +653,12 @@ select{
     border: var(--border);
 }
 
+.btn-borderless {
+    border: none;
+    border-radius: var(--radius);
+    padding: 0.5em;
+}
+
 .btn-square {
     justify-content: center;
     align-items: center;
@@ -692,7 +698,7 @@ select{
 .btn-close::after {
     rotate: -45deg;
 }
-
+ 
 .btn-accent,
 .btn-highlight,
 .btn-critical {
@@ -970,8 +976,8 @@ select{
 #care #collection li.selected {
     color: var(--alt-font-color);
     background: var(--button-color);
-    scale: 1.05;
-    transition: scale 300ms ease;
+    border: none;
+    opacity: 100%;
 }
 
 #care #collection li h3 {
@@ -981,10 +987,12 @@ select{
 
 #care #diagnose{
     display: none;
+    gap: 0;
 }
 
 #care #diagnose.active {
     display: flex;
+    flex-direction: column;
 }
 
 #care #diagnose #info {
@@ -1005,6 +1013,7 @@ select{
     font-weight: var(--bold);
     font-size: var(--small);
     opacity: 75%;
+    width: 5rem;
 }
 
 #care #diagnose #info div:nth-of-type(1) {
@@ -1021,6 +1030,54 @@ select{
     padding: 1em 0;
     justify-content: center;
     gap: 0.5em;
+}
+
+#care #diagnose form {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5em;
+    padding: 0.5em;
+}
+
+#care #diagnosis {
+    flex: 1 1 0;
+    background: var(--bg-dim);
+    display: flex;
+    padding: 0.5em;
+    flex-direction: column;
+    border-radius: var(--radius);
+    list-style-type: none;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+#care #diagnosis li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 0.2em;
+}
+
+#care #diagnosis li:hover {
+    background: var(--button-active);
+}
+
+#care #prescription {
+    flex: 1 1 0;
+    list-style-type: none;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+#care #prescription li {
+    flex: 1 1 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border: var(--border);
+    border-radius: var(--radius);
+    padding: 0.5em;
 }
 
 #patients #collection {
@@ -1061,6 +1118,17 @@ select{
     object-fit: cover;
 }
 
+.status {
+    color: var(--alt-font-color);
+    font-size: var(--super-small);
+    font-weight: var(--bold);
+    padding: 0.5em;
+    width: fit-content;
+    height: fit-content;
+    border: solid 5px var(--bg);
+    border-radius: 2em;
+    margin-top: -3rem;
+}
 
 #patients #collection div {
     display: flex;
@@ -1127,7 +1195,7 @@ select{
     overflow: hidden;
 }
 
-#patients #registerPatientBtn{
+.addBtn {
     font-size: var(--bigger);
     font-weight: var(--bold);
     background: var(--button-color);
@@ -1360,6 +1428,31 @@ select{
 
 #setSched #patientOption h4{
     font-size: var(--normal);
+}
+
+#medicines #collection {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    scrollbar-width: none;
+    list-style-type: none;
+}
+
+#medicines #collection li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    padding: 1em;
+    border: var(--border);
+    border-radius: var(--radius);
+}
+
+#medicines #collection button {
+    border: none;
+    padding: 0.5em;
+    border-radius: var(--radius);
 }
 
 #inventory section:nth-of-type(2) {

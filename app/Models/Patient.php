@@ -16,7 +16,7 @@ class Patient extends Database {
 
     public function create(array $data){
         try{
-            $query = 'INSERT INTO patients (first_name, last_name, sex, birthdate, address, contact, extra_contact, referred_by) VALUES(:first_name, :last_name, :sex, :birthdate, :address, :contact, :extra_contact, :referred_by)';
+            $query = 'INSERT INTO patients (first_name, last_name, sex, birthdate, address, contact, extra_contact, status, referred_by) VALUES(:first_name, :last_name, :sex, :birthdate, :address, :contact, :extra_contact, :status, :referred_by)';
             $stmt = $this->db->prepare($query);
             $stmt->execute([
                 ':first_name' => $data['firstName'] ?? '',
@@ -26,6 +26,7 @@ class Patient extends Database {
                 ':address' => $data['address'] ?? '',
                 ':contact' => $data['contact'] ?? '',
                 ':extra_contact' => $data['extraContact'] ?? '',
+                ':status' => $data['status'] ?? '',
                 ':referred_by' => $data['referredBy'] ?? ''
             ]);
         }catch(PDOException $err){
@@ -57,7 +58,7 @@ class Patient extends Database {
 
     public function updatePatient(array $data){
         try {
-            $query = 'UPDATE patients SET first_name = :first_name, last_name = :last_name, sex = :sex, birthdate = :birthdate, address = :address, contact = :contact, extra_contact = :extra_contact, referred_by = :referred_by WHERE id = :id';
+            $query = 'UPDATE patients SET first_name = :first_name, last_name = :last_name, sex = :sex, birthdate = :birthdate, address = :address, contact = :contact, extra_contact = :extra_contact, status = :status, referred_by = :referred_by WHERE id = :id';
             $stmt = $this->db->prepare($query);
             $stmt->execute([
                 ':id' => $data['id'],
@@ -68,6 +69,7 @@ class Patient extends Database {
                 ':address' => $data['address'],
                 ':contact' => $data['contact'],
                 ':extra_contact' => $data['extraContact'],
+                ':status' => $data['status'],
                 ':referred_by' => $data['referredBy']
             ]);
         } catch(PDOException $err){
@@ -93,11 +95,11 @@ class Patient extends Database {
             $keyword = ($id === null && $birthdate === null) ? $keyWord : null;
             $query = "SELECT *, DATE_PART('year', AGE(CURRENT_DATE, birthdate)) as age,
                         ts_rank(
-                            to_tsvector('english', first_name || ' ' || last_name || ' ' || sex || ' ' || address || ' ' || contact || ' ' || extra_contact || ' ' || referred_by),
+                            to_tsvector('english', first_name || ' ' || last_name || ' ' || sex || ' ' || address || ' ' || contact || ' ' || extra_contact || ' ' || status || ' ' || referred_by),
                             plainto_tsquery('english', COALESCE(:kw, ''))
                         ) AS rank
                         FROM patients
-                        WHERE (:kw IS NULL OR to_tsvector('english', first_name || ' ' || last_name || ' ' || sex || ' ' || address || ' ' || contact || ' ' || extra_contact || ' ' || referred_by)
+                        WHERE (:kw IS NULL OR to_tsvector('english', first_name || ' ' || last_name || ' ' || sex || ' ' || address || ' ' || contact || ' ' || extra_contact || ' ' || status || ' ' || referred_by)
                             @@ plainto_tsquery('english', :kw)
                             OR first_name ILIKE '%' || :kw || '%'
                             OR last_name ILIKE '%' || :kw || '%'
@@ -105,10 +107,11 @@ class Patient extends Database {
                             OR address ILIKE '%' || :kw || '%'
                             OR contact ILIKE '%' || :kw || '%'
                             OR extra_contact ILIKE '%' || :kw || '%'
+                            OR status ILIKE '%' || :kw || '%'
                             OR referred_by ILIKE '%' || :kw || '%')
                         AND (id = :id OR :id IS NULL OR DATE_PART('year', AGE(CURRENT_DATE, birthdate)) = :id)
                         AND (birthdate <= :birthdate OR :birthdate IS NULL)
-                        ORDER BY rank ASC";
+                        ORDER BY rank DESC";
             $stmt = $this->db->prepare($query);
             $stmt->bindValue(':kw', $keyword);
             $stmt->bindValue(':id', $id);

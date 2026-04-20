@@ -18,6 +18,7 @@ class CreateSearchPatientsIndex extends Migration{
                                     coalesce(address, '') || ' ' || 
                                     coalesce(contact, '') || ' ' || 
                                     coalesce(extra_contact, '') || ' ' || 
+                                    coalesce(status, '') || ' ' || 
                                     coalesce(referred_by, '')
                                 )
                         );";

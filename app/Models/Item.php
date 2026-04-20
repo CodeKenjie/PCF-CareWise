@@ -16,13 +16,15 @@ class Item extends Database {
 
     public function createItem(array $data){
         try {
-            $query = 'INSERT INTO items (item_name, category, description, quantity, minimum_quantity, expiration_date, is_donated) VALUES(:item_name, :category, :description, :quantity, :minimum_quantity, :expiration_date, :is_donated)';
+            $query = 'INSERT INTO inventory (medicine_id, name, category, description, quantity, quantity_type, minimum_quantity, expiration_date, is_donated) VALUES(:medicine_id, :name, :category, :description, :quantity, :quantity_type, :minimum_quantity, :expiration_date, :is_donated)';
             $stmt = $this->db->prepare($query);
             $stmt->execute([
-                ':item_name' => $data['itemName'],
+                ':medicine_id' => $data['medicineId'],
+                ':name' => $data['itemName'],
                 ':category' => $data['category'],
                 ':description' => $data['description'],
                 ':quantity' => $data['quantity'],
+                ':quantity_type' => $data['quantityType'],
                 ':minimum_quantity' => $data['minQuant'],
                 ':expiration_date' => $data['expiration'],
                 ':is_donated' => $data['isDonated'],
@@ -34,13 +36,14 @@ class Item extends Database {
 
     public function editItem(array $data){
         try {
-            $query = 'UPDATE items SET item_name = :item_name, category = :category, description = :description, minimum_quantity = :minimum_quantity, expiration_date = :expiration_date WHERE id = :id';
+            $query = 'UPDATE inventory SET name = :name, category = :category, description = :description, quantity_type = :quantity_type, minimum_quantity = :minimum_quantity, expiration_date = :expiration_date WHERE id = :id';
             $stmt = $this->db->prepare($query);
             $stmt->execute([
                 ':id' => $data['id'],
-                ':item_name' => $data['itemName'],
+                ':name' => $data['itemName'],
                 ':category' => $data['category'],
                 ':description' => $data['description'],
+                ':quantity_type' => $data['quantityType'],
                 ':minimum_quantity' => $data['minQuant'],
                 ':expiration_date' => $data['expiration'],
             ]);
@@ -51,7 +54,7 @@ class Item extends Database {
 
     public function adjustItemQuantity(array $data){
         try{
-            $query = 'UPDATE items SET quantity = quantity + :change WHERE id = :id';
+            $query = 'UPDATE inventory SET quantity = quantity + :change WHERE id = :id';
             $stmt = $this->db->prepare($query);
             $stmt->execute([
                 ':id' => $data['id'],
@@ -64,7 +67,7 @@ class Item extends Database {
 
     public function deleteItem($id){
         try {
-            $query = 'DELETE FROM items WHERE id = ?';
+            $query = 'DELETE FROM inventory WHERE id = ?';
             $stmt = $this->db->prepare($query);
             $stmt->execute([$id]);
         } catch (PDOException $err) {
@@ -85,7 +88,7 @@ class Item extends Database {
                             WHEN expiration_date <= CURRENT_DATE + INTERVAL '30 days' THEN 'Expiring Soon'
                             ELSE 'Good'
                         END AS expiration_status 
-                      FROM items WHERE id = ?";
+                      FROM inventory WHERE id = ?";
             $stmt = $this->db->prepare($query);
             $stmt->execute([$id]);
             return $stmt->fetch(PDO::FETCH_ASSOC);
@@ -107,7 +110,7 @@ class Item extends Database {
                             WHEN expiration_date <= CURRENT_DATE + INTERVAL '30 days' THEN 'Expiring Soon'
                             ELSE 'Good'
                         END AS expiration_status 
-                      FROM items ORDER BY $order $direction";
+                      FROM inventory ORDER BY $order $direction";
             $stmt = $this->db->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -149,13 +152,14 @@ class Item extends Database {
                             ELSE 'Good'
                         END AS expiration_status,
                         ts_rank(
-                            to_tsvector('english', item_name || ' ' || category || ' ' || description),
+                            to_tsvector('english', name || ' ' || quantity_type || ' ' || category || ' ' || description),
                             plainto_tsquery('english', COALESCE(:kw, ''))
                         ) AS rank
-                        FROM items
-                        WHERE (:kw IS NULL OR to_tsvector('english', item_name || ' ' || category || ' ' || description)
+                        FROM inventory
+                        WHERE (:kw IS NULL OR to_tsvector('english', name || ' ' || quantity_type || ' ' || category || ' ' || description)
                             @@ plainto_tsquery('english', :kw)
-                            OR item_name ILIKE '%' || :kw || '%'
+                            OR name ILIKE '%' || :kw || '%'
+                            OR quantity_type ILIKE '%' || :kw || '%'
                             OR category ILIKE '%' || :kw || '%'
                             OR description ILIKE '%' || :kw || '%'
                             OR (
@@ -206,7 +210,7 @@ class Item extends Database {
                             WHEN expiration_date <= CURRENT_DATE + INTERVAL '30 days' THEN 'Expiring Soon'
                             ELSE 'Good'
                         END AS expiration_status 
-                      FROM items ORDER BY id ASC";
+                      FROM inventory ORDER BY id ASC";
             $stmt = $this->db->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);

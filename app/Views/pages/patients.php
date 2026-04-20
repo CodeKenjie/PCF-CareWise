@@ -1,7 +1,7 @@
 <?php require __DIR__ . "/../partials/header.php"; ?>
 <main id="patients">
     <section class="actions acrylic-bg">
-        <button id="registerPatientBtn" class="btn-accent">
+        <button id="registerPatientBtn" class="addBtn btn-accent">
             <svg class="svg icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M2,21h8a1,1,0,0,0,0-2H3.071A7.011,7.011,0,0,1,10,13a5.044,5.044,0,1,0-3.377-1.337A9.01,9.01,0,0,0,1,20,1,1,0,0,0,2,21ZM10,5A3,3,0,1,1,7,8,3,3,0,0,1,10,5ZM23,16a1,1,0,0,1-1,1H19v3a1,1,0,0,1-2,0V17H14a1,1,0,0,1,0-2h3V12a1,1,0,0,1,2,0v3h3A1,1,0,0,1,23,16Z"></path></g></svg>
             <span>Register Patient</span>
         </button>
@@ -53,7 +53,7 @@
                 <label for="birthdate">Birthdate</label>
             </span>
             <span>
-                <select id="sex" name="sex" id="sex" required>
+                <select id="sex" name="sex" required>
                     <option value="" hidden></option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
@@ -75,10 +75,24 @@
                 <label for="exContact">Contact#2(N/A)</label>
             </span>
         </div>
-        <span class="p-sm">
-            <input id="referredBy" name="referredBy" type="text" placeholder="N/A" required>
-            <label for="referredBy">Referred by</label>
-        </span>
+        <div class="part p-sm">
+            <span>
+                <input id="referredBy" name="referredBy" type="text" placeholder="N/A" required>
+                <label for="referredBy">Referred by</label>
+            </span>
+            <span>
+                <select id="status" name="status" required>
+                    <option value="" hidden></option>
+                    <option value="" hidden></option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Follow up">Follow up</option>
+                    <option value="Complete">Complete</option>
+                    <option value="Deceased">Deceased</option>
+                </select>
+                <label for="status">Status</label>
+            </span>
+        </div>
         <div class="part p-sm">
             <button class="btn-accent btn-pill" type="submit">Submit</button>
             <button class="btn-highlight btn-pill" type="reset" onclick="closePopup()">Cancel</button>
@@ -94,13 +108,17 @@
             </header>
         </div>
         <div>
-            <span>
+            <span style="flex: 0 0 fit-content">
                 <label for="pId"><strong>I.D:</strong></label>
                 <h3 id="pId"></h3>
             </span>
             <span>
                 <label for="pName"><strong>Name:</strong></label>
                 <h3 id="pName"></h3>
+            </span>
+            <span>
+                <label for="pStatus"><strong>Status:</strong></label>
+                <h3 id="pStatus"></h3>
             </span>
         </div>
         <div>
@@ -145,20 +163,20 @@
             </label>
         </div>
         <span class="p-sm">
-            <input id="updateFirstName" name="firstName" type="text" required>
+            <input id="updateFirstName" type="text" required>
             <label for="upadateFirstName">First Name</label>
         </span>
         <span class="p-sm">
-            <input id="updateLastName" name="lastName" type="text" required>
+            <input id="updateLastName" type="text" required>
             <label for="updateLastName">Last Name</label>
         </span>
         <div class="part p-sm">
             <span>
-                <input id="updateBirthdate" name="birthdate" type="date" required>
+                <input id="updateBirthdate" type="date" required>
                 <label for="updateBirthdate">Birthdate</label>
             </span>
             <span>
-                <select id="updateSex" class="updateSex" name="sex" required>
+                <select id="updateSex" class="updateSex" required>
                     <option value="" hidden></option>
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
@@ -167,23 +185,36 @@
             </span>
         </div>
         <span class="p-sm">
-            <input id="updateAddress" name="address" type="text" required>
+            <input id="updateAddress" type="text" required>
             <label for="upadateAddress">Address</label>
         </span>
         <div class="part p-sm">
             <span>
-                <input id="updateContact" name="contact" type="text" required>
+                <input id="updateContact" type="text" required>
                 <label for="updateContact">Contact</label>
             </span>
             <span>
-                <input id="updateExContact" name="exContact" type="text" placeholder="N/A" required>
+                <input id="updateExContact" type="text" placeholder="N/A" required>
                 <label for="updateExContact">Contact#2(N/A)</label>
             </span>
         </div>
-        <span class="p-sm">
-            <input id="updateReferredBy" name="referredBy" type="text" placeholder="N/A" required>
-            <label for="updateReferredBy">Referred by</label>
-        </span>
+        <div class="part p-sm">
+            <span>
+                <input id="updateReferredBy" type="text" placeholder="N/A" required>
+                <label for="updateReferredBy">Referred by</label>
+            </span>
+            <span>
+                <select id="updateStatus" required>
+                    <option value="" hidden></option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Follow up">Follow up</option>
+                    <option value="Complete">Complete</option>
+                    <option value="Deceased">Deceased</option>
+                </select>
+                <label for="updateStatus">Status</label>
+            </span>
+        </div>
         <div class="part p-sm">
             <button class="btn-pill btn-accent" type="submit">Submit</button>
             <button class="btn-pill btn-highlight" type="reset" onclick="closePopup()">Cancel</button>
@@ -212,9 +243,12 @@
 </div>
 <template id="patientsCard">
     <li>
-        <span class="profile">
-            <img src="assets/images/profile.png" alt="">
-        </span>
+        <div class="rel" style="display: flex; flex-direction: column; align-items:center">
+            <span class="profile">
+                <img src="assets/images/profile.png" alt="">
+            </span>
+            <span class="status" style="font-weight: 800;"></span>
+        </div>
         <table>
             <tbody>
                 <tr>

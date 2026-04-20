@@ -27,41 +27,48 @@ class PatientsController extends Controller {
             $address = $_POST['address'] ?? '';
             $contact = $_POST['contact'] ?? '';
             $exContact = $this->notApplicable($_POST['exContact'] ?? '');
+            $status = $_POST['status'] ?? '';
             $referredBy = $this->notApplicable($_POST['referredBy'] ?? '');
             $response = [];
 
-            if(!isset($firstName)){
+            if(empty($firstName)){
                 $response = [ 'ok' => false, 'code' => 401, 'error' => 'Required: Patients First name' ];
                 echo json_encode($response);
                 exit;
             }
 
-            if(!isset($lastName)){
+            if(empty($lastName)){
                 $response = [ 'ok' => false, 'code' => 401, 'error' => 'Required: Patients Last name' ];
                 echo json_encode($response);
                 exit;
             }
 
-            if(!isset($sex)){
+            if(empty($sex)){
                 $response = [ 'ok' => false, 'code' => 401, 'error' => 'Required: Patients sex' ];
                 echo json_encode($response);
                 exit;
             }
 
-            if(!isset($birthdate)){
+            if(empty($birthdate)){
                 $response = [ 'ok' => false, 'code' => 401, 'error' => 'Required: Patients birthdate' ];
                 echo json_encode($response);
                 exit;
             }
 
-            if(!isset($address)){
+            if(empty($address)){
                 $response = [ 'ok' => false, 'code' => 401, 'error' => 'Required: Patients address' ];
                 echo json_encode($response);
                 exit;
             }
 
-            if(!isset($contact)){
+            if(empty($contact)){
                 $response = [ 'ok' => false, 'code' => 401, 'error' => 'Required: Patients contact' ];
+                echo json_encode($response);
+                exit;
+            }
+
+            if(empty($status)){
+                $response = [ 'ok' => false, 'code' => 401, 'error' => 'Required: Patients status' ];
                 echo json_encode($response);
                 exit;
             }
@@ -74,6 +81,7 @@ class PatientsController extends Controller {
                 'address' => ucwords($address),
                 'contact' => $contact,
                 'extraContact' =>$exContact,
+                'status' => ucwords($status),
                 'referredBy' => ucwords($referredBy),
             ];
 
@@ -96,6 +104,7 @@ class PatientsController extends Controller {
             $address = $input['address'] ?? '';
             $contact = $input['contact'] ?? '';
             $exContact = $this->notApplicable($input['exContact'] ?? '');
+            $status = $input['status'] ?? '';
             $referredBy = $this->notApplicable($input['referredBy'] ?? '');
             $response = [];
  
@@ -144,6 +153,7 @@ class PatientsController extends Controller {
                 'address' => ucwords($address),
                 'contact' => $contact,
                 'extraContact' =>$exContact,
+                'status' => ucwords($status),
                 'referredBy' => ucwords($referredBy),
             ];
             $patient = new Patient();

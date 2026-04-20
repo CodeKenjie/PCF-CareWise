@@ -67,9 +67,11 @@ class InventoryController extends Controller {
     public function add(){
         header('Content-Type: application/json');
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
+            $medicineId = $_POST['medicineId'] ?? null;
             $itemName = $_POST['itemName'] ?? '';
             $category = $_POST['category'] ?? '';
             $quantity = $_POST['quantity'] ?? '';
+            $quantityType = $_POST['quantityType'] ?? '';
             $minQuant = $_POST['minQuant'] ?? '';
             $description = $this->notApplicable($_POST['description'] ?? '');
             $expiration = $_POST['expiration'] ?? '';
@@ -83,9 +85,11 @@ class InventoryController extends Controller {
             }
 
             $data = [
+                'medicineId' => $medicineId,
                 'itemName' => ucwords($itemName),
                 'category' => ucwords($category),
                 'quantity' => $quantity,
+                'quantityType' => strtolower($quantityType),
                 'minQuant' => $minQuant,
                 'description' => $description,
                 'expiration' => $expiration,
@@ -106,6 +110,7 @@ class InventoryController extends Controller {
             $itemName = $input['itemName'] ?? '';
             $category = $input['category'] ?? '';
             $minQuant = $input['minQuant'] ?? '';
+            $quantityType = $input['quantityType'] ?? '';
             $description = $this->notApplicable($input['description'] ?? '');
             $expiration = $input['expiration'] ?? '';
             $response = [];
@@ -121,6 +126,7 @@ class InventoryController extends Controller {
                 'itemName' => ucwords($itemName),
                 'category' => ucwords($category),
                 'minQuant' => $minQuant,
+                'quantityType' => strtolower($quantityType),
                 'description' => $description,
                 'expiration' => $expiration,
             ];

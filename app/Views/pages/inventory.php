@@ -1,14 +1,14 @@
 <?php require __DIR__ . "/../partials/header.php"; ?>
 <main id="inventory">
     <section class="actions acrylic-bg">
-        <button id="addItemBtn" class="btn-accent">
+        <button id="addItemBtn" class="addBtn btn-accent">
             <svg class="icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M9 22H15C20 22 22 20 22 15V9C22 4 20 2 15 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M8.46997 10.6399L12 14.1599L15.53 10.6399" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
             <span>Add Item</span>
         </button>
         <div>
             <form action="/inventory/sort" method="get">
                 <span class="sortsSpan">
-                    <button id="sort1" class="btn-highlight activeSort" type="button" value="item_name">Name</button>
+                    <button id="sort1" class="btn-highlight" type="button" value="name">Name</button>
                     <button id="sort2" class="btn-highlight" type="button" value="quantity">Quantity</button>
                     <button id="sort3" class="btn-highlight" type="button" value="expiration_date">Expiration</button>
                     <button id="direction" class="btn-highlight" type="button" value="ASC">ASC</button>
@@ -61,14 +61,18 @@
             <input id="category" name="category" type="text" required>
             <label>Category</label>
         </span>
-        <div class="part p-sm">
+        <div class="p-sm" style="display: flex; gap: 1em;">
             <span>
                 <input id="quantity" name="quantity" type="text" required>
                 <label>Stocks</label>
             </span>
             <span>
+                <input id="quantityType" name="quantityType" type="text" required>
+                <label>per</label>
+            </span>
+            <span>
                 <input id="minQuant" name="minQuant" type="text" required>
-                <label>Minimum Stock</label>
+                <label>Min Stock</label>
             </span>
         </div>
         <span class="p-sm">
@@ -152,22 +156,28 @@
             <input id="updateItemName" name="updateItemName" type="text" required>
             <label>Item Name</label>
         </span>
-        <span class="p-sm">
-            <input id="updateCategory" name="updateCategory" type="text" required>
-            <label>Category</label>
-        </span>
         <div class="part p-sm">
             <span>
-                <input id="updateMinQuant" name="updateMinQuant" type="text" required>
-                <label>Minimum Stock</label>
+                <input id="updateCategory" type="text" required>
+                <label>Category</label>
             </span>
             <span>
-                <input id="updateExpiration" name="updateExpiration" type="date" required>
+                <input id="updateExpiration" type="date" required>
                 <label>Expiration Date</label>
             </span>
         </div>
+        <div class="part p-sm">
+            <span>
+                <input id="updateMinQuant" type="text" required>
+                <label>Minimum Stock</label>
+            </span>
+            <span>
+                <input id="updateQuantityType" type="text" required>
+                <label>per</label>
+            </span>
+        </div>
         <span class="p-sm">
-            <input id="updateDescription" name="updateDescription" type="text" required>
+            <input id="updateDescription" type="text" required>
             <label>Description</label>
         </span>
         <div class="part p-sm">

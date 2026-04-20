@@ -13,6 +13,7 @@
 }
 
 @media ( max-height: 1200px ) and ( orientation: portrait ){
+    .fw,
     main {
         padding-bottom: 6em;
     }
@@ -52,6 +53,7 @@
         align-items: center;
     }
 
+    #care #diagnose #info label,
     #sidebar div,
     #sidebar header{
         display: none;

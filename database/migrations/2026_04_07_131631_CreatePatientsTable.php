@@ -15,9 +15,10 @@ class CreatePatientsTable extends Migration {
                         address TEXT NOT NULL,
                         contact VARCHAR(20),
                         extra_contact VARCHAR(100),
+                        status VARCHAR(100) NOT NULL,
                         referred_by VARCHAR(100),
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-                )';
+                     )';
         $this->createTable($query);
     }
 

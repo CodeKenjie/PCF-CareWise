@@ -1,17 +1,21 @@
-let id = null;
-let order = 'id';
-let direction = 'ASC';
-const months = [ `January`, `February`, `March`, `April`, `May`, `June`, `July`, `August`, `September`, `Octover`, `November`, `December` ];
-const date = document.getElementById(`date`);
-const daysContainer = document.getElementById(`days`);
+const state = {
+    patient: { id: null },
+    medicine: { id: null },
+    item: { id: null },
+    schedule:{ id: null },
+    condition: { id: null },
+    calendar: { selected: null },
+    sort: { order: 'id', direction: 'ASC' }
+};
+const months = [ `January`, `February`, `March`, `April`, `May`, `June`, `July`, `August`, `September`, `October`, `November`, `December` ];
 let today = new Date();
 let month = today.getMonth();
 let year = today.getFullYear();
-let selected = null;
-
 let occupiedDate = [];
 
 function initCalendar(){ 
+    const date = document.getElementById(`date`);
+    const daysContainer = document.getElementById(`days`);
     const firstDay = new Date(year, month, 1).getDay();
     const lastDate = new Date(year, month + 1, 0).getDate();
     const prevLastDate = new Date(year, month, 0).getDate();
@@ -36,7 +40,7 @@ function initCalendar(){
                 day.classList.add(`set`);
             }
 
-            if(formattedDate === selected){
+            if(formattedDate === state.calendar.selected){
                 day.classList.add(`selected`);
             }
 
@@ -51,10 +55,10 @@ function initCalendar(){
 
         day.addEventListener(`click`, async (e) => {
             e.preventDefault();
-            selected = formattedDate;
+            state.calendar.selected = formattedDate;
 
             if(day.classList.contains(`selected`)){
-                selected = null;
+                state.calendar.selected = null;
                 loadList(`schedule`, renderSchedulesData);
                 document.getElementById(`addSchedBtn`).classList.add(`hidden`);
                 return;
@@ -124,6 +128,17 @@ function renderPatientsData(data){
     data.collection.forEach( patient => {
         const [year, month, day] = patient.birthdate.split('-');
         const clone = template.content.cloneNode(true);
+
+        const statusMark = clone.querySelector(`.status`);
+        if(patient.status === `Active` || patient.status === `Complete`){
+            statusMark.style.backgroundColor = `var(--good)`;
+        } else if (patient.status === `Deceased` || patient.status === `Inactive`) {
+            statusMark.style.backgroundColor = `var(--critical)`;
+        } else {
+            statusMark.style.backgroundColor = `var(--moderate)`;
+        }
+
+        statusMark.textContent = patient.status;
         clone.querySelector(`.id`).textContent = patient.id;
         clone.querySelector(`.name`).textContent = patient.last_name + ", " + patient.first_name;
         clone.querySelector(`.address`).textContent = patient.address;
@@ -136,6 +151,7 @@ function renderPatientsData(data){
             document.getElementById(`patientPreview`).classList.add(`active`);
             document.getElementById(`pId`).textContent = patient.id;
             document.getElementById(`pName`).textContent = `${patient.last_name}, ${patient.first_name}`;
+            document.getElementById(`pStatus`).textContent = patient.status;
             document.getElementById(`pAge`).textContent = patient.age;
             document.getElementById(`pSex`).textContent = patient.sex;
             document.getElementById(`pBirthdate`).textContent = `${months[month - 1]} ${day}, ${year}`;
@@ -145,7 +161,7 @@ function renderPatientsData(data){
         });
         
         clone.querySelector(`.editPatientBtn`).addEventListener(`click`, () => {
-            id = patient.id;
+            state.patient.id = patient.id;
             document.getElementById(`editPatient`).classList.add(`active`);
             document.getElementById(`updateFirstName`).value = patient.first_name;
             document.getElementById(`updateLastName`).value = patient.last_name;
@@ -154,11 +170,12 @@ function renderPatientsData(data){
             document.getElementById(`updateAddress`).value = patient.address;
             document.getElementById(`updateContact`).value = patient.contact;
             document.getElementById(`updateExContact`).value = patient.extra_contact ? patient.extra_contact : `N/A`;
+            document.getElementById(`updateStatus`).value = patient.status;
             document.getElementById(`updateReferredBy`).value = patient.referred_by ? patient.referred_by : `N/A`;
         });
 
         clone.querySelector(`.deletePatientBtn`).addEventListener(`click`, () => {
-            id = patient.id;
+            state.patient.id = patient.id;
             document.getElementById(`name`).textContent = patient.last_name + ", " + patient.first_name;
             document.getElementById(`id`).textContent = patient.id;
             document.getElementById(`deletePatient`).classList.add(`active`);
@@ -197,16 +214,76 @@ function renderPatientsDataForCare(data){
     data.collection.forEach(patient => {
         const [year, month, day] = patient.birthdate.split('-');
         const clone = template.content.cloneNode(true);
-        clone.querySelector(`.patient`).addEventListener(`click`, () => {
+        clone.querySelector(`.patient`).addEventListener(`click`, (e) => {
+            state.patient.id = patient.id;
+            const isSelected = e.currentTarget.classList.contains(`selected`);
+            document.querySelectorAll(`.patient`).forEach(li => {
+                li.classList.remove(`selected`)
+            });
+
+            if(isSelected){
+                document.getElementById(`diagnose`).classList.remove(`active`);
+                return;
+            }
+
+            e.currentTarget.classList.add(`selected`);
+            document.getElementById(`diagnosisForm`).action = `/care/patient/${patient.id}`;
             document.getElementById(`diagnose`).classList.add(`active`);
             document.getElementById(`patientId`).textContent = patient.id;
             document.getElementById(`patientName`).textContent = `${patient.last_name}, ${patient.first_name}`;
             document.getElementById(`patientAge`).textContent = patient.age;
             document.getElementById(`patientBirthdate`).textContent =  `${months[month - 1]} ${day}, ${year}`;
+            loadPatientDiagnosis();
         });
         clone.querySelector(`.name`).textContent = `${patient.last_name}, ${patient.first_name}`;
         clone.querySelector(`.age`).textContent = patient.age;
 
+        container.appendChild(clone);
+    });
+}
+
+function renderMedicineData(data){
+    const container = document.getElementById(`collection`);
+    const template = document.getElementById(`medicineCard`);
+
+    container.innerHTML = ``;
+
+    data.collection.forEach(medicine => {
+        const clone = template.content.cloneNode(true);
+        clone.querySelector(`.genericName`).textContent = medicine.generic_name;
+        clone.querySelector(`.brandName`).textContent = medicine.brand_name;
+        clone.querySelector(`.dosage`).textContent = medicine.dosage;
+        clone.querySelector(`.form`).textContent = medicine.form;
+        clone.querySelector(`.quantity`).textContent = medicine.quantity ? medicine.quantity + ' / ': `No stocks`;
+        clone.querySelector(`.minQuant`).textContent = medicine.minimum_quantity ? `${medicine.minimum_quantity} ${medicine.quantity_type}`: ``;
+        clone.querySelector(`.previewBtn`).addEventListener(`click`, () => {
+            document.getElementById(`medsPreview`).classList.add(`active`);
+            document.getElementById(`mId`).textContent = medicine.id;
+            document.getElementById(`mGenericName`).textContent = medicine.generic_name;
+            document.getElementById(`mBrandName`).textContent = medicine.brand_name ? medicine.brand_name : `N/A`;
+            document.getElementById(`mDosage`).textContent = medicine.dosage;
+            document.getElementById(`mForm`).textContent = medicine.form;
+            document.getElementById(`mDescription`).textContent = medicine.description;
+            document.getElementById(`mQuantity`).textContent = medicine.quantity;
+            document.getElementById(`mMinQuant`).textContent = medicine.minimum_quantity;
+            document.getElementById(`mExpiration`).textContent = medicine.expiration_date;
+            document.getElementById(`mIsDonated`).textContent = medicine.is_donated;
+        });
+        clone.querySelector(`.editBtn`).addEventListener(`click`, () => {
+            state.medicine.id = medicine.id;
+            document.getElementById(`genericName`).value = medicine.generic_name;
+            document.getElementById(`brandName`).value = medicine.brand_name ? medicine.brandName : 'N/A';
+            document.getElementById(`dosage`).value = medicine.dosage ? medicine.dosage : 'N/A';
+            document.getElementById(`form`).value = medicine.form ? medicine.form : 'N/A';
+            document.getElementById(`editMeds`).classList.add(`active`);
+        });
+        clone.querySelector(`.deleteBtn`).addEventListener(`click`, () => {
+            state.medicine.id = medicine.id;
+            document.getElementById(`deleteMedsForm`).action = `/medicines/delete/${medicine.id}`;
+            document.getElementById(`name`).textContent = medicine.generic_name;
+            document.getElementById(`id`).textContent = medicine.id;
+            document.getElementById(`deleteMeds`).classList.add(`active`);
+        });
         container.appendChild(clone);
     });
 }
@@ -222,7 +299,7 @@ function renderItemData(data){
         const stockStatus = clone.querySelector(`.stockStatus`);
         const exprStatus = clone.querySelector(`.exprStatus`);
 
-        clone.querySelector(`.name`).textContent = item.item_name;
+        clone.querySelector(`.name`).textContent = item.name;
         if(item.is_donated){
             clone.querySelector(`.name`).classList.add(`donated`);
         }
@@ -245,20 +322,20 @@ function renderItemData(data){
             exprStatus.classList.add(`critical`);
         }
         clone.querySelector(`.adjustBtn`).addEventListener(`click`, () => {
-            id = item.id;
+            state.item.id = item.id;
             document.getElementById(`adjust`).classList.add(`active`);
-            document.getElementById(`imCurrentQuant`).textContent = item.quantity;
+            document.getElementById(`imCurrentQuant`).textContent = `${item.quantity} ${item.quantity_type}`;
             document.getElementById(`imName`).textContent = item.item_name;
         });
 
         clone.querySelector(`.previewItemBtn`).addEventListener(`click`, () => {
             document.getElementById(`itemPreview`).classList.add(`active`);
             document.getElementById(`iId`).textContent = item.id;
-            document.getElementById(`iName`).textContent = item.item_name;
+            document.getElementById(`iName`).textContent = item.name;
             document.getElementById(`iCategory`).textContent = item.category;
             document.getElementById(`iDescription`).textContent = item.description;
-            document.getElementById(`iQuantity`).textContent = item.quantity;
-            document.getElementById(`iMinQuant`).textContent = item.minimum_quantity;
+            document.getElementById(`iQuantity`).textContent = `${item.quantity} ${item.quantity_type}`;
+            document.getElementById(`iMinQuant`).textContent = `${item.minimum_quantity} ${item.quantity_type}`;
             document.getElementById(`iQuantStatus`).textContent = item.stock_status;
             document.getElementById(`iExpiration`).textContent = `${months[month - 1]} ${day}, ${year}`;
             document.getElementById(`iExpirationStatus`).textContent = item.expiration_status;
@@ -266,18 +343,19 @@ function renderItemData(data){
         });
 
         clone.querySelector(`.editItemBtn`).addEventListener(`click`, () => {
-            id = item.id;
+            state.item.id = item.id;
             document.getElementById(`editItem`).classList.add(`active`);
-            document.getElementById(`updateItemName`).value = item.item_name;
+            document.getElementById(`updateItemName`).value = item.name;
             document.getElementById(`updateCategory`).value = item.category;
             document.getElementById(`updateMinQuant`).value = item.minimum_quantity;
+            document.getElementById(`updateQuantityType`).value = item.quantity_type;
             document.getElementById(`updateDescription`).value = item.description;
             document.getElementById(`updateExpiration`).value = item.expiration_date;
         });
         clone.querySelector(`.deleteItemBtn`).addEventListener(`click`, () => {
-            id = item.id;
+            state.item.id = item.id;
             document.getElementById(`deleteItem`).classList.add(`active`);
-            document.getElementById(`name`).textContent = item.item_name;
+            document.getElementById(`name`).textContent = item.name;
             document.getElementById(`id`).textContent = item.id;
         });
 
@@ -303,7 +381,7 @@ function renderSchedulesData(data){
         clone.querySelector(`.patientName`).textContent = `${schedule.last_name}, ${schedule.first_name}`;
         clone.querySelector(`.schedFor`).textContent = schedule.scheduled_for;
         clone.querySelector(`.editBtn`).addEventListener(`click`, () => {
-            id = schedule.id;
+            state.schedule.id = schedule.id;
             document.getElementById(`sDate`).textContent = `${months[month - 1]} ${day}, ${year}`;
             document.getElementById(`patientName`).textContent = `${schedule.last_name}, ${schedule.first_name}`;
             document.getElementById(`editSched`).classList.add(`active`);
@@ -320,7 +398,7 @@ function renderSchedulesData(data){
             document.getElementById(`sExContact`).textContent = schedule.extra_contact;
         });
         clone.querySelector(`.deleteBtn`).addEventListener(`click`, () => {
-            id = schedule.id;
+            state.schedule.id = schedule.id;
             document.getElementById(`deleteSched`).classList.add(`active`);
             document.getElementById(`name`).textContent = `${schedule.last_name}, ${schedule.first_name}`;
             document.getElementById(`schedDate`).textContent = schedule.date;
@@ -329,6 +407,46 @@ function renderSchedulesData(data){
     });
 
     initCalendar();
+}
+
+async function loadPatientDiagnosis(){
+    try{
+        const res = await fetch(`/care/patient/${state.patient.id}/diagnosis`, {
+            method: 'GET'
+        });
+
+        const data = await res.json();
+
+        const container = document.getElementById(`diagnosis`);
+        const template = document.getElementById(`conditionCard`);
+
+        container.innerHTML = ``;
+
+        data.diagnosis.forEach(diagnosed => {
+            const clone = template.content.cloneNode(true);
+            clone.querySelector(`.condition`).textContent = diagnosed.condition_name;
+            clone.querySelector(`.removeCondition`).addEventListener(`click`, async (e) => {
+                try{
+                    const res = await fetch(`/care/diagnosis/delete/${diagnosed.id}`, {
+                        method: 'DELETE'
+                    });
+
+                    const data = await res.json();
+
+                    if(!data.ok){
+                        responseMessage(data, data.error);
+                        return;
+                    }
+                    loadPatientDiagnosis();
+                } catch(err){
+                    console.error(err);
+                }
+            });
+            container.appendChild(clone);
+        });
+    } catch (err){
+        console.error(err);
+    }
 }
 
 async function loadList(page, render) {
@@ -351,7 +469,7 @@ async function loadList(page, render) {
 
 async function sortList(page, render) {
     try {
-        const res = await fetch(`/${page}/sort?order=${order}&direction=${direction}`, {
+        const res = await fetch(`/${page}/sort?order=${state.sort.order}&direction=${state.sort.direction}`, {
             method: "GET"
         });
 
@@ -376,15 +494,15 @@ function sorts(page, render){
 
     sortDirection.addEventListener(`click`, (e) => {
         e.preventDefault();
-        direction = direction === 'DESC' ? 'ASC' : 'DESC';
-        sortDirection.textContent = direction;
+        state.sort.direction = state.sort.direction === 'DESC' ? 'ASC' : 'DESC';
+        sortDirection.textContent = state.sort.direction;
 
         return sortList(page, render);
     });
     
     sort1.addEventListener(`click`, (e) => {
         e.preventDefault();
-        order = sort1.value;
+        state.sort.order = sort1.value;
         sort1.classList.add(`activeSort`);
         sort2.classList.remove(`activeSort`);
         sort3.classList.remove(`activeSort`);
@@ -393,7 +511,7 @@ function sorts(page, render){
 
     sort2.addEventListener(`click`, (e) => {
         e.preventDefault();
-        order = sort2.value;
+        state.sort.order = sort2.value;
         sort1.classList.remove(`activeSort`);
         sort2.classList.add(`activeSort`);
         sort3.classList.remove(`activeSort`);
@@ -402,7 +520,7 @@ function sorts(page, render){
 
     sort3.addEventListener(`click`, (e) => {
         e.preventDefault();
-        order = sort3.value;
+        state.sort.order = sort3.value;
         sort1.classList.remove(`activeSort`);
         sort2.classList.remove(`activeSort`);
         sort3.classList.add(`activeSort`);
@@ -438,12 +556,12 @@ async function search(url, render) {
 
 async function adjustQuantity(value, type){
     try{
-        const res = await fetch(`/inventory/adjust/${id}`, {
+        const res = await fetch(`/inventory/adjust`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ id: id, value: value, type: type })
+            body: JSON.stringify({ id: state.item.id, value: value, type: type })
         });
 
         const data = await res.json();
@@ -655,6 +773,35 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         });
     }
 
+    const care = document.getElementById(`care`);
+    if(care){
+        loadList(`care`, renderPatientsDataForCare);
+        sorts(`care`, renderPatientsDataForCare);
+        search(`care/patient`, renderPatientsDataForCare);
+
+        document.getElementById(`diagnosisForm`).addEventListener(`submit`, async (e) => {
+            e.preventDefault();
+            try {
+                const formdata = new FormData(e.target);
+                const res = await fetch(`/care/patient/${state.patient.id}`, {
+                    method: 'POST',
+                    body: formdata
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    responseMessage(data, data.error);
+                    return;
+                }
+
+                loadPatientDiagnosis();
+                document.getElementById(`conditionName`).value = ``;
+            } catch (err) {
+                console.error(err);
+            }
+        });
+    }
+
     const patients = document.getElementById(`patients`);
     if(patients){
         loadList('patients', renderPatientsData);
@@ -686,6 +833,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             const updateAddress = document.getElementById(`updateAddress`).value;
             const updateContact = document.getElementById(`updateContact`).value;
             const updateExContact = document.getElementById(`updateExContact`).value;
+            const updateStatus = document.getElementById(`updateStatus`).value;
             const updateReferredBy = document.getElementById(`updateReferredBy`).value;
             const formdata = new FormData(e.target);
             try {
@@ -694,7 +842,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ id: id, firstName: updateFirstName, lastName: updateLastName, birthdate: updateBirthdate, address: updateAddress, sex: updateSex, contact: updateContact, exContact: updateExContact, referredBy: updateReferredBy })
+                    body: JSON.stringify({ id: state.patient.id, firstName: updateFirstName, lastName: updateLastName, birthdate: updateBirthdate, address: updateAddress, sex: updateSex, contact: updateContact, exContact: updateExContact, status: updateStatus, referredBy: updateReferredBy })
                 });
 
                 const data = await res.json();
@@ -745,7 +893,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         document.getElementById(`deletePatientForm`).addEventListener(`submit`, async (e) => {
             e.preventDefault();
             try {
-                const res = await fetch(`/patients/delete/${id}`, {
+                const res = await fetch(`/patients/delete/${state.patient.id}`, {
                     method: 'DELETE'
                 });
 
@@ -819,7 +967,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         deleteItemForm.addEventListener(`submit`, async (e) => {
             e.preventDefault();
             try {
-                const res = await fetch(`/inventory/delete/${id}`, {
+                const res = await fetch(`/inventory/delete/${state.item.id}`, {
                     method: 'DELETE'
                 });
 
@@ -844,6 +992,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             const updateItemName = document.getElementById(`updateItemName`).value; 
             const updateCategory = document.getElementById(`updateCategory`).value; 
             const updateMinQuant = document.getElementById(`updateMinQuant`).value; 
+            const updateQuantityType = document.getElementById(`updateQuantityType`).value; 
             const updateDescription = document.getElementById(`updateDescription`).value; 
             const updateExpiration = document.getElementById(`updateExpiration`).value; 
             try {
@@ -852,7 +1001,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ id: id, itemName: updateItemName, category:updateCategory, minQuant: updateMinQuant, description: updateDescription, expiration: updateExpiration })
+                    body: JSON.stringify({ id: state.item.id, itemName: updateItemName, category:updateCategory, minQuant: updateMinQuant, quantityType:updateQuantityType, description: updateDescription, expiration: updateExpiration })
                 });
 
                 const data = await res.json();
@@ -882,6 +1031,86 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             adjustQuantity(Number(valueInput), 'import');
         });
 
+    }
+
+    const medicines = document.getElementById(`medicines`);
+    if(medicines){
+        loadList(`medicines`, renderMedicineData);
+        sorts(`medicines`, renderMedicineData);
+        search(`medicines/medicine`, renderMedicineData);
+        document.getElementById(`addMedsBtn`).addEventListener(`click`, () => {
+            document.getElementById(`addMeds`).classList.add(`active`);
+        });
+
+        document.getElementById(`addMedsForm`).addEventListener(`submit`, async (e) => {
+            e.preventDefault();
+            try {
+                const formdata = new FormData(e.target);
+                const res = await fetch(`/medicines/add`, {
+                    method: 'POST',
+                    body: formdata
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    responseMessage(data, data.error);
+                    return
+                }
+
+                responseMessage(data, data.message);
+                loadList(`medicines`, renderMedicineData);
+                document.getElementById(`addMeds`).classList.remove(`active`);
+            } catch (err) {
+                console.error(err);
+            }
+        });
+
+        document.getElementById(`editMedsForm`).addEventListener(`submit`, async (e) => {
+            e.preventDefault(e);
+            const genericName = document.getElementById(`genericName`).value;
+            const brandName = document.getElementById(`brandName`).value;
+            const dosage = document.getElementById(`dosage`).value;
+            const form = document.getElementById(`form`).value;
+
+            const res = await fetch(`/medicines/edit`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: state.medicine.id, genericName: genericName, brandName: brandName, dosage: dosage, form: form })
+            });
+
+            const data = await res.json();
+            if(!data.ok){
+                responseMessage(data, data.error);
+                return;
+            }
+
+            responseMessage(data, data.message);
+            loadList(`medicines`, renderMedicineData);
+            document.getElementById(`editMeds`).classList.remove(`active`);
+        });
+
+        document.getElementById(`deleteMedsForm`).addEventListener(`submit`, async (e) => {
+            e.preventDefault(e);
+            try{
+                const res = await fetch(`/medicines/delete/${state.medicine.id}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    responseMessage(data, data.error);
+                    return;
+                }
+
+                responseMessage(data, data.message);
+                loadList(`medicines`, renderMedicineData);
+                document.getElementById(`deleteMeds`).classList.remove(`active`);
+            } catch(err){
+                console.error(err);
+            }
+        });
     }
 
     const schedule = document.getElementById(`schedule`);
@@ -994,7 +1223,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ id: id, schedFor: updateSchedFor, time: updateTime })
+                    body: JSON.stringify({ id: state.schedule.id, schedFor: updateSchedFor, time: updateTime })
                 });
 
                 const data = await res.json();
@@ -1014,7 +1243,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         document.getElementById(`deleteSchedForm`).addEventListener(`submit`, async (e) => {
             e.preventDefault();
             try{
-                const res = await fetch(`/schedule/delete/${id}`, {
+                const res = await fetch(`/schedule/delete/${state.schedule.id}`, {
                     method: 'DELETE'
                 });
 
@@ -1034,10 +1263,4 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         });
     }
 
-    const care = document.getElementById(`care`);
-    if(care){
-        loadList(`care`, renderPatientsDataForCare);
-        sorts(`care`, renderPatientsDataForCare);
-        search(`care/patient`, renderPatientsDataForCare);
-    }
 })

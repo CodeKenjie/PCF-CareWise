@@ -2,22 +2,23 @@
 
 use App\Core\Migration;
 
-class CreateSearchItemsIndex extends Migration {
+class CreateSearchInventoryIndex extends Migration {
     public function up(){
-        $idIndex = "CREATE INDEX IF NOT EXISTS id_idx ON items(id)";
+        $idIndex = "CREATE INDEX IF NOT EXISTS id_idx ON inventory(id)";
         $this->conn()->exec($idIndex);
         $textIndex = "CREATE INDEX IF NOT EXISTS inventory_text_idx 
-                        ON items
+                        ON inventory
                         USING GIN (
                             to_tsvector('english', 
-                                coalesce(item_name, '') || ' ' ||
+                                coalesce(name, '') || ' ' ||
                                 coalesce(category, '') || ' ' ||
+                                coalesce(quantity_type, '') || ' ' ||
                                 coalesce(description, '')
                             )
                         );";
         $this->conn()->exec($textIndex);
 
-        $expirationIndex = "CREATE INDEX IF NOT EXISTS expiration_idx ON items(expiration_date)";
+        $expirationIndex = "CREATE INDEX IF NOT EXISTS expiration_idx ON inventory(expiration_date)";
         $this->conn()->exec($expirationIndex);
     }
 

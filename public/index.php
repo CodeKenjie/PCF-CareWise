@@ -21,7 +21,11 @@ $router->get('/dashboard', 'App\Controllers\DashboardController@index');
 $router->get('/care', 'App\Controllers\CareController@index');
 $router->get('/care/all', 'App\Controllers\PatientsController@getAll');
 $router->get('/care/sort', 'App\Controllers\PatientsController@sort');
+$router->get('/care/search', 'App\Controllers\PatientsController@search');
 $router->get('/care/patient', 'App\Controllers\PatientsController@search');
+$router->get('/care/patient/{id}/diagnosis', 'App\Controllers\DiagnosisController@all');
+$router->post('/care/patient/{id}', 'App\Controllers\DiagnosisController@add');
+$router->delete('/care/diagnosis/delete/{id}', 'App\Controllers\DiagnosisController@remove');
 
 $router->get('/patients', 'App\Controllers\PatientsController@index');
 $router->get('/patients/all', 'App\Controllers\PatientsController@getAll');
@@ -38,13 +42,21 @@ $router->post('/schedule/add', 'App\Controllers\ScheduleController@add');
 $router->patch('/schedule/edit', 'App\Controllers\ScheduleController@edit');
 $router->delete('/schedule/delete/{id}', 'App\Controllers\ScheduleController@delete');
 
+$router->get('/medicines', 'App\Controllers\MedicinesController@index');
+$router->get('/medicines/all', 'App\Controllers\MedicinesController@all');
+$router->get('/medicines/sort', 'App\Controllers\MedicinesController@sort');
+$router->get('/medicines/medicine', 'App\Controllers\MedicinesController@search');
+$router->post('/medicines/add', 'App\Controllers\MedicinesController@add');
+$router->put('/medicines/edit', 'App\Controllers\MedicinesController@edit');
+$router->delete('/medicines/delete/{id}', 'App\Controllers\MedicinesController@delete');
+
 $router->get('/inventory', 'App\Controllers\InventoryController@index');
 $router->get('/inventory/all', 'App\Controllers\InventoryController@getAll');
 $router->get('/inventory/sort', 'App\Controllers\InventoryController@sort');
 $router->get('/inventory/item', 'App\Controllers\InventoryController@search');
 $router->post('/inventory/add', 'App\Controllers\InventoryController@add');
 $router->put('/inventory/edit', 'App\Controllers\InventoryController@edit');
-$router->patch('/inventory/adjust/{id}', 'App\Controllers\InventoryController@adjust');
+$router->patch('/inventory/adjust', 'App\Controllers\InventoryController@adjust');
 $router->delete('/inventory/delete/{id}', 'App\Controllers\InventoryController@delete');
 
 $router->direct($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);
