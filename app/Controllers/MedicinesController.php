@@ -91,6 +91,16 @@ class MedicinesController extends Controller  {
         echo json_encode($response);
     }
 
+    public function dropdown(){
+        header('Content-Type: application/json');
+        $keyword = $_GET['search'] ?? '';
+        $response = [];
+
+        $medicines = (new Medicine())->dropdownMedicines($keyword);
+        $response = [ 'ok' => true, 'code' => 200, 'collection' => $medicines ];
+        echo json_encode($response);
+    }
+
     public function sort(){
         header('Content-Type: application/json');
         $order = $_GET['order'] ?? 'id';

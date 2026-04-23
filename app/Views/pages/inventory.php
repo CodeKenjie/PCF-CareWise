@@ -53,9 +53,11 @@
 </div>
 <div id="addItem" class="popup">
     <form id="addItemForm" class="form-ui" action="/inventory/add" method="post">
-        <span class="p-sm">
+        <input id="medicineId" name="medicineId" type="text" required hidden>
+        <span class="rel p-sm">
             <input id="itemName" name="itemName" type="text" required>
             <label>Item Name</label>
+            <ul id="medicineOptn" class="dropdown"></ul>
         </span>
         <span class="p-sm">
             <input id="category" name="category" type="text" required>
@@ -206,6 +208,13 @@
         </div>
     </form>
 </div>
+<template id="medicineCard">
+    <li class="medicine p-sm">
+        <h4 class="genericName"></h4>
+        <h4 class="dosage"></h4>
+        <h4 class="form"></h4>
+    </li>
+</template>
 <template id="itemCard">
     <li>
         <table>

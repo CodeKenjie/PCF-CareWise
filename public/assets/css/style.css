@@ -1380,15 +1380,7 @@ select{
     position: relative;
 }
 
-#setSched #pickPatient {
-    display: flex;
-    font-size: var(--normal);
-    font-weight: var(--bold);
-    gap: 1em;
-    flex-wrap: wrap;
-}
-
-#setSched #patientOption {
+.dropdown {
     position: absolute;
     top: 90%;
     background: var(--bg);
@@ -1403,13 +1395,17 @@ select{
     z-index: 11;
 }
 
-#setSched #patientOption.active {
+.dropdown.active {
     border: var(--border);
     height: 20em;
     transition: height 300ms ease-in;
 }
 
-#setSched #patientOption li {
+.dropdown h4{
+    font-size: var(--normal);
+}
+
+.dropdown li {
     display: flex;
     align-items: center;
     gap: 1em;
@@ -1417,17 +1413,22 @@ select{
     cursor: pointer;
 }
 
-#setSched #patientOption li:hover {
+.dropdown li:hover {
     background: var(--button-highlight);
 }
+
+#setSched #pickPatient {
+    display: flex;
+    font-size: var(--normal);
+    font-weight: var(--bold);
+    gap: 1em;
+    flex-wrap: wrap;
+}
+
 
 #setSched #patientOption .profile {
     width: var(--big-header);
     height: var(--big-header);
-}
-
-#setSched #patientOption h4{
-    font-size: var(--normal);
 }
 
 #medicines #collection {

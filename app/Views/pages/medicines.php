@@ -11,7 +11,7 @@
                     <button id="sort1" class="btn-highlight" type="button" value="brand_name">Brand</button>
                     <button id="sort2" class="btn-highlight" type="button" value="generic_name">Generic</button>
                     <button id="sort3" class="btn-highlight" type="button" value="inventory.quantity">Quantity</button>
-                    <button id="direction" class="btn-highlight" type="button" value="ASC">ASC</button>
+                    <button id="direction" class="btn-highlight" type="button" value="DESC">DESC</button>
                 </span>
             </form>
             <form id="searchForm" action="/patients/patient" method="get">
@@ -81,14 +81,10 @@
                 <h3 id="mForm"></h3>
             </span>
             <span>
-                <label for="mBrandName"><strong>Category:</strong></label>
-                <h3 id="mBrandName"></h3>
+                <label for="mCategory"><strong>Category:</strong></label>
+                <h3 id="mCategory"></h3>
             </span>
         </div>
-        <span>
-            <label for="mDescription"><strong>Description:</strong></label>
-            <h3 id="mDescription"></h3>
-        </span>
         <div>
             <span>
                 <label for="mQuantity"><strong>Stock:</strong></label>
@@ -160,14 +156,16 @@
 <template id="medicineCard">
     <li>
         <span>
-            <h2 class="genericName">Generic Name</h3>
-            <h3 class="brandName" style="opacity: 75%;">Brand Name</h3>
-            <h3 class="dosage" style="opacity: 75%;">Dosage</h3>
-            <h4 class="form" style="opacity: 75%;">Form</h4>
+            <h2 class="genericName"></h3>
+            <h3 class="brandName" style="opacity: 75%;"></h3>
+            <h3 class="dosage" style="opacity: 75%;"></h3>
+            <h4 class="form" style="opacity: 75%;"></h4>
         </span>
         <span style="text-align: end;">
-            <h2 class="quantity">Quantity</h2>
-            <h4 class="minQuant" style="opacity: 75%;">Min Quantity</h4>
+            <h2 class="quantity"></h2>
+            <h4 class="minQuant" style="opacity: 75%;"></h4>
+            <h4 class="isDonated" style="opacity: 75%;"></h4>
+            <h4 class="expiration" style="opacity: 75%;"></h4>
         </span>
         <span style="display: grid; gap: 0.5em;">
             <button class="previewBtn btn-highlight">

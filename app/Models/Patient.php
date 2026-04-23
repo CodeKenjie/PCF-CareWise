@@ -124,6 +124,31 @@ class Patient extends Database {
         }
     }
 
+    public function patientDrop($keyWord){
+        try {
+            $query = "SELECT first_name, last_name, contact, extra_contact,
+                        ts_rank(
+                            to_tsvector('english', first_name || ' ' || last_name || ' ' || contact || ' ' || extra_contact),
+                            plainto_tsquery('english', COALESCE(:kw, ''))
+                        ) AS rank
+                        FROM patients
+                        WHERE (:kw IS NULL OR to_tsvector('english', first_name || ' ' || last_name || ' ' || contact || ' ' || extra_contact)
+                            @@ plainto_tsquery('english', :kw)
+                            OR first_name ILIKE '%' || :kw || '%'
+                            OR last_name ILIKE '%' || :kw || '%'
+                            OR contact ILIKE '%' || :kw || '%'
+                            OR extra_contact ILIKE '%' || :kw || '%')
+                        ORDER BY rank DESC";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindValue(':kw', $keyWord);
+
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $err) {
+            $this->logger->error($err->getMessage());
+        }
+    }
+
     public function getAllPatients(){
         try {
             $query = "SELECT *, DATE_PART('year', AGE(CURRENT_DATE, birthdate)) AS age FROM patients ORDER BY id ASC";

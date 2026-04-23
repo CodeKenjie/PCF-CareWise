@@ -37,6 +37,7 @@ $router->delete('/patients/delete/{id}', 'App\Controllers\PatientsController@del
 
 $router->get('/schedule', 'App\Controllers\ScheduleController@index');
 $router->get('/schedule/all', 'App\Controllers\ScheduleController@all');
+$router->get('/schedule/patient', 'App\Controllers\PatientsController@dropdown');
 $router->post('/schedule/filter', 'App\Controllers\ScheduleController@filter');
 $router->post('/schedule/add', 'App\Controllers\ScheduleController@add');
 $router->patch('/schedule/edit', 'App\Controllers\ScheduleController@edit');
@@ -54,6 +55,7 @@ $router->get('/inventory', 'App\Controllers\InventoryController@index');
 $router->get('/inventory/all', 'App\Controllers\InventoryController@getAll');
 $router->get('/inventory/sort', 'App\Controllers\InventoryController@sort');
 $router->get('/inventory/item', 'App\Controllers\InventoryController@search');
+$router->get('/inventory/medicine', 'App\Controllers\MedicinesController@dropdown');
 $router->post('/inventory/add', 'App\Controllers\InventoryController@add');
 $router->put('/inventory/edit', 'App\Controllers\InventoryController@edit');
 $router->patch('/inventory/adjust', 'App\Controllers\InventoryController@adjust');

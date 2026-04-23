@@ -41,11 +41,9 @@
             <h2 id="selectedDate" class="ctr-text">selecteddated</h2>
         </span>
         <span class="rel p-sm">
-            <button id="pickPatient" class="btn-square" type="button">
-                <svg class="sm-icon" viewBox="0 0 20 20" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="currentColor"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>profile [#1339]</title> <desc>Created with Sketch.</desc> <defs> </defs> <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd"> <g id="Dribbble-Light-Preview" transform="translate(-260.000000, -2159.000000)" fill="currentColor"> <g id="icons" transform="translate(56.000000, 160.000000)"> <path d="M218,2005 C218,2002.794 216.206,2001 214,2001 C211.794,2001 210,2002.794 210,2005 C210,2007.206 211.794,2009 214,2009 C216.206,2009 218,2007.206 218,2005 L218,2005 Z M224,2019 L219,2019 L219,2017 L221.784,2017 C220.958,2013.214 217.785,2011 214,2011 C210.215,2011 207.042,2013.214 206.216,2017 L209,2017 L209,2019 L204,2019 C204,2014.445 206.583,2011.048 210.242,2009.673 C208.876,2008.574 208,2006.89 208,2005 C208,2001.686 210.686,1999 214,1999 C217.314,1999 220,2001.686 220,2005 C220,2006.89 219.124,2008.574 217.758,2009.673 C221.417,2011.048 224,2014.445 224,2019 L224,2019 Z M216.414,2013.757 L217.828,2015.172 L214,2019 L211.172,2016.172 L212.586,2014.757 L214,2016.172 L216.414,2013.757 Z"> </path> </g> </g> </g> </g></svg>
-                <span>Patients List</span>
-            </button>
-            <ul id="patientOption"></ul>
+            <input id="find" class="btn-square" type="text">
+            <label for="find">Find Patient</label>
+            <ul id="patientOption" class="dropdown"></ul>
         </span>
         <div class="part p-sm">
             <span>

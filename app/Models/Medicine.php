@@ -51,7 +51,7 @@ class Medicine extends Database {
             $id = is_numeric($keyWord) ? (int)$keyWord : null;
             $keyword = ($id === null) ? $keyWord : null;
             $query = "SELECT 
-                        inventory.quantity, inventory.quantity_type, inventory.minimum_quantity, inventory.description, inventory.expiration_date, inventory.is_donated,
+                        inventory.quantity, inventory.quantity_type, inventory.minimum_quantity, inventory.category, inventory.expiration_date, inventory.is_donated,
                         medicines.id AS id, medicines.generic_name, medicines.brand_name, medicines.dosage, medicines.form,
                         ts_rank(
                             to_tsvector('english', generic_name || ' ' || brand_name || ' ' || dosage || ' ' || form ),
@@ -78,13 +78,37 @@ class Medicine extends Database {
         }
     }
 
+    public function dropdownMedicines($keyWord){
+        try {
+            $query = "SELECT *,
+                        ts_rank(
+                            to_tsvector('english', generic_name || ' ' || dosage || ' ' || form ),
+                            plainto_tsquery('english', :kw)
+                        ) AS rank
+                        FROM medicines
+                        WHERE (:kw IS NULL OR to_tsvector('english', generic_name || ' ' || dosage || ' ' || form)
+                            @@ plainto_tsquery('english', :kw)
+                            OR generic_name ILIKE '%' || :kw || '%'
+                            OR dosage ILIKE '%' || :kw || '%'
+                            OR form ILIKE '%' || :kw || '%')
+                        ORDER BY rank DESC";
+            $stmt = $this->db->prepare($query);
+            $stmt->bindValue(':kw', $keyWord);
+
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch(PDOException $err) {
+            $this->logger->error($err->getMessage());
+        }
+    }
+
     public function sort($order, $direction){
         try {
             $query = "SELECT 
                         inventory.quantity,
                         inventory.quantity_type,
                         inventory.minimum_quantity,
-                        inventory.description,
+                        inventory.category,
                         inventory.expiration_date,
                         inventory.is_donated,
                         medicines.id AS id,
@@ -110,9 +134,9 @@ class Medicine extends Database {
                         inventory.quantity,
                         inventory.quantity_type,
                         inventory.minimum_quantity,
-                        inventory.description,
+                        inventory.category,
                         inventory.expiration_date,
-                        inventory.created_at AS added_at,
+                        inventory.is_donated,
                         medicines.id AS id,
                         medicines.generic_name,
                         medicines.brand_name,
@@ -121,7 +145,7 @@ class Medicine extends Database {
                       FROM medicines 
                       LEFT JOIN inventory 
                       ON inventory.medicine_id = medicines.id
-                      ORDER BY id ASC";
+                      ORDER BY id DESC";
             $stmt = $this->db->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -134,8 +158,7 @@ class Medicine extends Database {
         try {
             $query = 'DELETE FROM medicines WHERE id = ? ';
             $stmt = $this->db->prepare($query);
-            $stmt->execute([$id]);
-        } catch(PDOException $err){
+            $stmt->execute([$id]); } catch(PDOException $err){
             $this->logger->error($err->getMessage());
         }
     }

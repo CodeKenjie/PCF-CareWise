@@ -209,6 +209,15 @@ class PatientsController extends Controller {
         echo json_encode($response);
     }
 
+    public function dropdown(){
+        $input = $_GET['search'] ?? '';
+        $response = [];
+
+        $results = (new Patient())->searchPatient($input);
+        $response = [ 'ok' => true, 'code' => 200, 'collection' => $results ];
+        echo json_encode($response);
+    }
+
     public function getAll(){
         $response = [];
         header('Content-Type: application/json');
