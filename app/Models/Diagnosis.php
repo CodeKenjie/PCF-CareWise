@@ -39,11 +39,14 @@ class Diagnosis extends Database {
         }
     }
 
-    public function delete($id){
+    public function delete(array $data){
         try {
-            $query = 'DELETE FROM diagnosis WHERE id = ?';
+            $query = 'DELETE FROM diagnosis WHERE id = :id AND patient_id = :patient_id';
             $stmt = $this->db->prepare($query);
-            $stmt->execute([$id]);
+            $stmt->execute([
+                ':id' => $data['id'],
+                ':patient_id' => $data['patientId'],
+            ]);
         } catch(PDOException $err) {
             $this->logger->error($err->getMessage());
         }

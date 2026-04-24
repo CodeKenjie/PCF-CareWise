@@ -14,7 +14,7 @@ class CreateSchedulesTable extends Migration {
                         date DATE NOT NULL,
                         time TIME,
                         scheduled_for TEXT NOT NULL,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
                     )';
 
         $this->createTable($query);

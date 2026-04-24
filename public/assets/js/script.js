@@ -4,8 +4,9 @@ const state = {
     item: { id: null },
     schedule:{ id: null },
     condition: { id: null },
+    prescription: { id: null },
     calendar: { selected: null },
-    sort: { order: 'id', direction: 'DESC' }
+    sort: { order: 'id', direction: 'ASC' }
 };
 const months = [ `January`, `February`, `March`, `April`, `May`, `June`, `July`, `August`, `September`, `October`, `November`, `December` ];
 let today = new Date();
@@ -110,9 +111,10 @@ function responseMessage(res, message){
 function closePopup(){
     const activePopup = document.querySelector(`.active`);
     const selected = document.querySelector(`.selected`);
+    const schedule = document.getElementById(`schedule`);
     if(activePopup){ 
         activePopup.classList.remove(`active`);
-        if(selected){
+        if(schedule && selected){
             selected.classList.remove(`selected`);
             document.getElementById(`addSchedBtn`).classList.add(`hidden`);
         }
@@ -222,18 +224,21 @@ function renderPatientsDataForCare(data){
             });
 
             if(isSelected){
-                document.getElementById(`diagnose`).classList.remove(`active`);
+                document.getElementById(`diagnose`).classList.remove(`open`);
                 return;
             }
 
             e.currentTarget.classList.add(`selected`);
-            document.getElementById(`diagnosisForm`).action = `/care/patient/${patient.id}`;
-            document.getElementById(`diagnose`).classList.add(`active`);
+
+            document.getElementById(`prescriptionForm`).action = `/care/prescription/${patient.id}`;
+            document.getElementById(`diagnosisForm`).action = `/care/patient/${patient.id}/diagnosis`;
+            document.getElementById(`diagnose`).classList.add(`open`);
             document.getElementById(`patientId`).textContent = patient.id;
             document.getElementById(`patientName`).textContent = `${patient.last_name}, ${patient.first_name}`;
             document.getElementById(`patientAge`).textContent = patient.age;
             document.getElementById(`patientBirthdate`).textContent = `${months[month - 1]} ${day}, ${year}`;
             loadPatientDiagnosis();
+            loadPatientPrescriptions();
         });
         clone.querySelector(`.name`).textContent = `${patient.last_name}, ${patient.first_name}`;
         clone.querySelector(`.age`).textContent = patient.age;
@@ -256,7 +261,7 @@ function renderMedicineData(data){
         clone.querySelector(`.form`).textContent = medicine.form;
         clone.querySelector(`.quantity`).textContent = medicine.quantity ? medicine.quantity + ' /': `No stocks`;
         clone.querySelector(`.minQuant`).textContent = medicine.minimum_quantity ? `${medicine.minimum_quantity} ${medicine.quantity_type}`: ``;
-        clone.querySelector(`.isDonated`).textContent = medicine.is_donated ? `Donated` : ``;
+        clone.querySelector(`.isDonated`).textContent = medicine.is_donated ? `Donated` : `not Donated`;
         clone.querySelector(`.previewBtn`).addEventListener(`click`, () => {
             document.getElementById(`medsPreview`).classList.add(`active`);
             document.getElementById(`mId`).textContent = medicine.id;
@@ -268,7 +273,7 @@ function renderMedicineData(data){
             document.getElementById(`mQuantity`).textContent = medicine.quantity ? medicine.quantity : `N/A`;
             document.getElementById(`mMinQuant`).textContent = medicine.minimum_quantity ? medicine.minimum_quantity : `N/A`;
             document.getElementById(`mExpiration`).textContent = medicine.expiration_date;
-            document.getElementById(`mIsDonated`).textContent = medicine.is_donated ? medicine.is_donated : `N/A`;
+            document.getElementById(`mIsDonated`).textContent = medicine.is_donated ? `Donated` : `not Donated`;
         });
         clone.querySelector(`.editBtn`).addEventListener(`click`, () => {
             state.medicine.id = medicine.id;
@@ -291,6 +296,7 @@ function renderMedicineData(data){
 function renderMedsDrop(data){
     const container = document.getElementById(`medicineOptn`);
     const template = document.getElementById(`medicineCard`);
+    const inventory = document.getElementById(`inventory`);
 
     container.innerHTML = ``;
 
@@ -303,10 +309,14 @@ function renderMedsDrop(data){
 
         clone.querySelector(`.medicine`).addEventListener(`click`, () => {
             document.getElementById(`medicineOptn`).classList.remove(`active`);
+            if(inventory){
+                document.getElementById(`medicineId`).value = medicine.id;
+                document.getElementById(`itemName`).value = medicine.generic_name;
+                document.getElementById(`category`).value = `Medicine`;
+                document.getElementById(`description`).value = `${medicine.brand_name} ${medicine.dosage} ${medicine.form}`;
+            }
             document.getElementById(`medicineId`).value = medicine.id;
-            document.getElementById(`itemName`).value = medicine.generic_name;
-            document.getElementById(`category`).value = `Medicine`;
-            document.getElementById(`description`).value = `${medicine.brand_name} ${medicine.dosage} ${medicine.form}`;
+            document.getElementById(`medicineName`).value = medicine.generic_name;
         });
         container.appendChild(clone);
     });
@@ -425,7 +435,7 @@ function renderSchedulesData(data){
             document.getElementById(`deleteSched`).classList.add(`active`);
             document.getElementById(`name`).textContent = `${schedule.last_name}, ${schedule.first_name}`;
             document.getElementById(`schedDate`).textContent = schedule.date;
-        });;
+        });
         container.appendChild(clone);
     });
 
@@ -447,10 +457,36 @@ async function loadPatientDiagnosis(){
 
         data.diagnosis.forEach(diagnosed => {
             const clone = template.content.cloneNode(true);
+            const created = new Date(diagnosed.created_at).toLocaleString(`en-PH`, { timeZone: 'Asia/Manila', month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
             clone.querySelector(`.condition`).textContent = diagnosed.condition_name;
+            clone.querySelector(`.date`).textContent = created;
+            clone.querySelector(`div`).addEventListener(`click`, async (e) => {
+                e.preventDefault();
+                try{
+                    const res = await fetch(`/care/prescription/${state.patient.id}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ diagnosisId: diagnosed.id })
+                    });
+
+                    const data = await res.json();
+
+                    if(!data.ok){
+                        responseMessage(data, data.error);
+                        return;
+                    }
+
+                    loadPatientPrescriptions();
+                } catch(err) {
+                    console.error(err);
+                }
+            });
+
             clone.querySelector(`.removeCondition`).addEventListener(`click`, async (e) => {
                 try{
-                    const res = await fetch(`/care/diagnosis/delete/${diagnosed.id}`, {
+                    const res = await fetch(`/care/patient/${state.patient.id}/diagnosis/${diagnosed.id}/delete`, {
                         method: 'DELETE'
                     });
 
@@ -461,6 +497,7 @@ async function loadPatientDiagnosis(){
                         return;
                     }
                     loadPatientDiagnosis();
+                    loadPatientPrescriptions();
                 } catch(err){
                     console.error(err);
                 }
@@ -468,6 +505,43 @@ async function loadPatientDiagnosis(){
             container.appendChild(clone);
         });
     } catch (err){
+        console.error(err);
+    }
+}
+
+async function loadPatientPrescriptions() {
+    try{
+        const res = await fetch(`/care/patient/${state.patient.id}/prescriptions`, {
+            method: 'GET'
+        });
+
+        const data = await res.json();
+
+        if(!data.ok){
+            responseMessage(data, data.error);
+            return;
+        }
+
+        const container = document.getElementById(`prescription`);
+        const template = document.getElementById(`prescriptionCard`);
+
+        container.innerHTML = ``;
+        data.collection.forEach(prescription => {
+            const clone = template.content.cloneNode(true);
+            const created = new Date(prescription.created_at).toLocaleString(`en-PH`, { timeZone: 'Asia/Manila', month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+            clone.querySelector(`.createdAt`).textContent = created;
+            clone.querySelector(`.conditionName`).textContent = prescription.condition_name;
+            clone.querySelector(`.deletePrescription`).addEventListener(`click`, () => {
+                state.prescription.id = prescription.id;
+                document.getElementById(`deletePrescriptionForm`).action = `/care/patient/${state.patient.id}/prescription/${prescription.id}/delete`;
+                document.getElementById(`deletePrescription`).classList.add(`active`);
+                document.getElementById(`name`).textContent = created;
+                document.getElementById(`id`).textContent = prescription.id;
+            });
+
+            container.appendChild(clone);
+        });
+    } catch(err){
         console.error(err);
     }
 }
@@ -517,7 +591,7 @@ function sorts(page, render){
 
     sortDirection.addEventListener(`click`, (e) => {
         e.preventDefault();
-        state.sort.direction = state.sort.direction === 'ASC' ? 'DESC' : 'ASC';
+        state.sort.direction = state.sort.direction === 'DESC' ? 'ASC' : 'DESC';
         sortDirection.textContent = state.sort.direction;
 
         return sortList(page, render);
@@ -619,6 +693,24 @@ async function filter(page, render, by) {
 
         render(data);
     } catch(err) {
+        console.error(err);
+    }
+}
+
+async function dropdown(url, render, input){
+    try {
+        const res = await fetch(`${url}?search=${input}`, {
+            method: 'GET'
+        });
+
+        const data = await res.json();
+
+        if(data.collection.length === 0){
+            document.querySelector(`.dropdown`).classList.remove(`active`);
+        }
+
+        return render(data);
+    } catch (err){
         console.error(err);
     }
 }
@@ -806,7 +898,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             e.preventDefault();
             try {
                 const formdata = new FormData(e.target);
-                const res = await fetch(`/care/patient/${state.patient.id}`, {
+                const res = await fetch(`/care/patient/${state.patient.id}/diagnosis`, {
                     method: 'POST',
                     body: formdata
                 });
@@ -823,6 +915,61 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 console.error(err);
             }
         });
+
+        let timeout;
+        document.getElementById(`medicineName`).addEventListener(`input`, (e) => {
+            e.preventDefault();
+            const input = document.getElementById(`medicineName`);
+            clearTimeout(timeout);
+            document.getElementById(`medicineOptn`).classList.add(`active`);
+            timeout = setTimeout(() => {
+                dropdown(`care/medicine`, renderMedsDrop, input.value);
+            }, 300);
+            if(input.value === ''){
+                document.getElementById(`medicineOptn`).classList.remove(`active`);
+            }
+        });
+
+        document.getElementById(`prescriptionForm`).addEventListener(`submit`, async (e) => {
+            e.preventDefault();
+            try{
+                const formdata = new FormData(e.target);
+                const res = await fetch(`/care/prescription/${state.patient.id}`, {
+                    method: 'POST',
+                    body: formdata
+                });
+
+                const data = await res.json();
+
+                if(!data.ok){
+                    responseMessage(data, data.error);
+                    return;
+                }
+
+                loadPatientPrescriptions();
+            } catch(err) {
+                console.error(err);
+            }
+        });
+
+        document.getElementById(`deletePrescriptionForm`).addEventListener(`submit`, async (e) => {
+            e.preventDefault();
+            try{
+                const res = await fetch(`/care/patient/${state.patient.id}/prescription/${state.prescription.id}/delete`, {
+                    method: 'DELETE'
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    responseMessage(data, data.error);
+                    return;
+                }
+                loadPatientPrescriptions();
+                document.getElementById(`deletePrescription`).classList.remove(`active`);
+            } catch(err){
+                console.error(err);
+            }
+        });
     }
 
     const patients = document.getElementById(`patients`);
@@ -830,14 +977,6 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         loadList('patients', renderPatientsData);
         sorts(`patients`, renderPatientsData);
         search(`patients/patient`, renderPatientsData);
-        const firstName = document.getElementById(`firstName`);
-        const lastName = document.getElementById(`lastName`);
-        const birthdate = document.getElementById(`birthdate`);
-        const address = document.getElementById(`address`);
-        const sex = document.getElementById(`sex`);
-        const contact = document.getElementById(`contact`);
-        const exContact = document.getElementById(`exContact`);
-        const referredBy = document.getElementById(`referredBy`);
 
         const registerPatientBtn = document.getElementById(`registerPatientBtn`);
         registerPatientBtn.addEventListener(`click`, () => {
@@ -899,14 +1038,6 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
 
                 responseMessage(data, data.message);
                 registerPatient.classList.remove('active');
-                firstName.value = '';
-                lastName.value = '';
-                birthdate.value = '';
-                sex.value = '';
-                address.value = '';
-                contact.value = '';
-                exContact.value = '';
-                referredBy.value = '';
                 loadList('patients', renderPatientsData);
             } catch (err) {
                 console.error(err);
@@ -974,6 +1105,13 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 responseMessage(data, data.message);
                 loadList('inventory', renderItemData);
                 addItem.classList.remove(`active`);
+                itemName.value = ``;
+                category.value = ``;
+                quantity.value = ``;
+                minQuant.value = ``;
+                descrition.value = ``;
+                expiration.value = ``;
+                isDonated.value = ``;
             } catch (err) {
                 console.error(err);
             }
@@ -1052,24 +1190,13 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             e.preventDefault();
             clearTimeout(timeout);
 
-            timeout = setTimeout(async () => {
+            timeout = setTimeout(() => {
                 const value = itemName.value;
-                const dropdown = document.getElementById(`medicineOptn`);
-                dropdown.classList.add(`active`);
-                try {
-                    const res = await fetch(`/inventory/medicine?search=${value}`, {
-                        method: 'GET'
-                    });
-
-                    const data = await res.json();
-
-                    if(data.collection.length === 0 || itemName.value === ''){
-                        dropdown.classList.remove(`active`);
-                    }
-
-                    renderMedsDrop(data);
-                } catch (err){
-                    console.error(err);
+                const medsOptn = document.getElementById(`medicineOptn`);
+                medsOptn.classList.add(`active`);
+                dropdown(`inventory/medicine`, renderMedsDrop, value);
+                if(value === ''){
+                    medsOptn.classList.remove(`active`);
                 }
             }, 300);
         });
@@ -1086,6 +1213,10 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         });
 
         document.getElementById(`addMedsForm`).addEventListener(`submit`, async (e) => {
+            const genName = document.getElementById(`genName`);
+            const brndName = document.getElementById(`brndName`);
+            const dosage = document.getElementById(`dosage`);
+            const form = document.getElementById(`form`);
             e.preventDefault();
             try {
                 const formdata = new FormData(e.target);
@@ -1103,6 +1234,10 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 responseMessage(data, data.message);
                 loadList(`medicines`, renderMedicineData);
                 document.getElementById(`addMeds`).classList.remove(`active`);
+                genName.value = '';
+                brndName.value = '';
+                dosage.value = '';
+                form.value = '';
             } catch (err) {
                 console.error(err);
             }
@@ -1225,25 +1360,14 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         const findPatient = document.getElementById(`find`);
         findPatient.addEventListener(`input`, (e) => {
             e.preventDefault();
-            const dropdown = document.getElementById(`patientOption`); 
+            const patientOptn = document.getElementById(`patientOption`); 
             clearTimeout(timeout);
-            timeout = setTimeout(async () => {
-                dropdown.classList.add(`active`);
-                try {
-                    const res = await fetch(`/schedule/patient?search=${findPatient.value}`, {
-                        method: 'GET'
-                    });
+            timeout = setTimeout(() => {
+                patientOptn.classList.add(`active`);
+                dropdown(`schedule/patient`, renderPatientsDrop, findPatient.value);
 
-                    const data = await res.json();
-
-                    if(data.collection.length === 0 || findPatient.value === ''){
-                        dropdown.classList.remove(`active`);
-                        return;
-                    }
-
-                    renderPatientsDrop(data);
-                } catch (err) {
-                    console.error(err);
+                if(findPatient.value === ``){
+                    patientOptn.classList.remove(`active`);
                 }
             }, 300);
         });

@@ -190,7 +190,7 @@
         </span>
         <div class="part p-sm">
             <span>
-                <input id="updateContact" type="text" required>
+                <input id="updateContact" type="text" maxlength="11" required>
                 <label for="updateContact">Contact</label>
             </span>
             <span>

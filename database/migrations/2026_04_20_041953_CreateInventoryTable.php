@@ -16,9 +16,9 @@ class CreateInventoryTable extends Migration{
                         minimum_quantity INTEGER,
                         expiration_date DATE NOT NULL,
                         is_donated BOOLEAN NOT NULL,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
 
-                        FOREIGN KEY (medicine_id) REFERENCES medicines(id)
+                        FOREIGN KEY (medicine_id) REFERENCES medicines(id) ON DELETE CASCADE
                 )';
         $this->conn()->exec($query);
     }

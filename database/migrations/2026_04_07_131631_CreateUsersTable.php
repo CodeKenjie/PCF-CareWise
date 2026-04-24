@@ -18,7 +18,8 @@ class CreateUsersTable extends Migration {
                         email VARCHAR(200) UNIQUE NOT NULL, 
                         password VARCHAR(255) NOT NULL,
                         verified BOOLEAN NOT NULL DEFAULT FALSE,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+
                 )';
         $this->createTable($query);
     }

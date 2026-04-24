@@ -16,8 +16,9 @@ class CreatePrescriptionItemsTable extends Migration {
                         duration INTEGER,
                         expiration_date DATE,
                         instructions TEXT,
+                        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
 
-                        FOREIGN KEY (prescription_id) REFERENCES prescriptions(id),
+                        FOREIGN KEY (prescription_id) REFERENCES prescriptions(id) ON DELETE CASCADE,
                         FOREIGN KEY (medicine_id) REFERENCES medicines(id)
                     )';
         $this->createTable($query);

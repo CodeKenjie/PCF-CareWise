@@ -19,7 +19,7 @@ class Item extends Database {
             $query = 'INSERT INTO inventory (medicine_id, name, category, description, quantity, quantity_type, minimum_quantity, expiration_date, is_donated) VALUES(:medicine_id, :name, :category, :description, :quantity, :quantity_type, :minimum_quantity, :expiration_date, :is_donated)';
             $stmt = $this->db->prepare($query);
             $stmt->execute([
-                ':medicine_id' => $data['medicineId'],
+                ':medicine_id' => $data['medicineId'] ?? null,
                 ':name' => $data['itemName'],
                 ':category' => $data['category'],
                 ':description' => $data['description'],

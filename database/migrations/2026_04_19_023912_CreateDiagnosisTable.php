@@ -9,9 +9,9 @@ class CreateDiagnosisTable extends Migration {
                         id SERIAL PRIMARY KEY,
                         patient_id INTEGER NOT NULL,
                         condition_name VARCHAR(200) NOT NULL,
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
 
-                        FOREIGN KEY (patient_id) REFERENCES patients(id)
+                        FOREIGN KEY (patient_id) REFERENCES patients(id) ON DELETE CASCADE
                     )';
         $this->createTable($query);
     }

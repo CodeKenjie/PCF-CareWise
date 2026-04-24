@@ -53,7 +53,7 @@
 </div>
 <div id="addItem" class="popup">
     <form id="addItemForm" class="form-ui" action="/inventory/add" method="post">
-        <input id="medicineId" name="medicineId" type="text" required hidden>
+        <input id="medicineId" name="medicineId" type="text" hidden>
         <span class="rel p-sm">
             <input id="itemName" name="itemName" type="text" required>
             <label>Item Name</label>

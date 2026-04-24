@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Models;
-
 use App\Core\Database;
 use App\Core\Logger;
 use PDO;

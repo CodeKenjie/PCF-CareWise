@@ -137,15 +137,14 @@ class Medicine extends Database {
                         inventory.category,
                         inventory.expiration_date,
                         inventory.is_donated,
-                        medicines.id AS id,
+                        medicines.id,
                         medicines.generic_name,
                         medicines.brand_name,
                         medicines.dosage,
                         medicines.form
                       FROM medicines 
-                      LEFT JOIN inventory 
-                      ON inventory.medicine_id = medicines.id
-                      ORDER BY id DESC";
+                      LEFT JOIN inventory ON inventory.medicine_id = medicines.id
+                      ORDER BY id ASC";
             $stmt = $this->db->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);

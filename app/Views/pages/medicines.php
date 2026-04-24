@@ -11,7 +11,7 @@
                     <button id="sort1" class="btn-highlight" type="button" value="brand_name">Brand</button>
                     <button id="sort2" class="btn-highlight" type="button" value="generic_name">Generic</button>
                     <button id="sort3" class="btn-highlight" type="button" value="inventory.quantity">Quantity</button>
-                    <button id="direction" class="btn-highlight" type="button" value="DESC">DESC</button>
+                    <button id="direction" class="btn-highlight" type="button" value="ASC">ASC</button>
                 </span>
             </form>
             <form id="searchForm" action="/patients/patient" method="get">
@@ -31,20 +31,20 @@
 <div id="addMeds" class="popup">
     <form id="addMedsForm" class="form-ui" action="/medicines/add" method="post">
         <span class="p-sm">
-            <input name="genericName" type="text" required>
+            <input id="genName" name="genericName" type="text" required>
             <label for="">Generic Name</label>
         </span>
         <span class="p-sm">
-            <input name="brandName" type="text" placeholder="N/A" required>
+            <input id="brndName" name="brandName" type="text" placeholder="N/A" required>
             <label for="">Brand Name</label>
         </span>
         <div class="part p-sm">
             <span>
-                <input name="dosage" type="text" placeholder="N/A" required>
+                <input id="dosage" name="dosage" type="text" placeholder="N/A" required>
                 <label for="">Dosage</label>
             </span>
             <span>
-                <input name="form" type="text" placeholder="N/A" required>
+                <input id="form" name="form" type="text" placeholder="N/A" required>
                 <label for="">Form</label>
             </span>
         </div>
@@ -143,7 +143,7 @@
         <span class="p-md">
             <p>Are you sure that you want to delete 
                 Medicine: <strong style="color:var(--critical)" id="name"></strong> 
-                id: <strong style="color: var(--critical);" id="id"></strong> from patients?
+                id: <strong style="color: var(--critical);" id="id"></strong> from Medicines?
             </p>
             <p>Reminder: You will not be able to recover deleted data.</p>
         </span>

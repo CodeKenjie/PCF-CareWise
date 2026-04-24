@@ -23,9 +23,13 @@ $router->get('/care/all', 'App\Controllers\PatientsController@getAll');
 $router->get('/care/sort', 'App\Controllers\PatientsController@sort');
 $router->get('/care/search', 'App\Controllers\PatientsController@search');
 $router->get('/care/patient', 'App\Controllers\PatientsController@search');
+$router->get('/care/medicine', 'App\Controllers\MedicinesController@dropdown');
 $router->get('/care/patient/{id}/diagnosis', 'App\Controllers\DiagnosisController@all');
-$router->post('/care/patient/{id}', 'App\Controllers\DiagnosisController@add');
-$router->delete('/care/diagnosis/delete/{id}', 'App\Controllers\DiagnosisController@remove');
+$router->get('/care/patient/{id}/prescriptions', 'App\Controllers\PrescriptionsController@all');
+$router->post('/care/patient/{id}/diagnosis', 'App\Controllers\DiagnosisController@add');
+$router->post('/care/prescription/{id}', 'App\Controllers\PrescriptionsController@create');
+$router->delete('/care/patient/{patientId}/diagnosis/{id}/delete', 'App\Controllers\DiagnosisController@delete');
+$router->delete('/care/patient/{patientId}/prescription/{id}/delete', 'App\Controllers\PrescriptionsController@delete');
 
 $router->get('/patients', 'App\Controllers\PatientsController@index');
 $router->get('/patients/all', 'App\Controllers\PatientsController@getAll');

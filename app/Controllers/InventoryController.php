@@ -67,7 +67,8 @@ class InventoryController extends Controller {
     public function add(){
         header('Content-Type: application/json');
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
-            $medicineId = $_POST['medicineId'] ?? null;
+            $medicineId = $_POST['medicineId'] ?? '';
+            $medicine = $medicineId === '' ? null : $medicineId;
             $itemName = $_POST['itemName'] ?? '';
             $category = $_POST['category'] ?? '';
             $quantity = $_POST['quantity'] ?? '';
@@ -85,7 +86,7 @@ class InventoryController extends Controller {
             }
 
             $data = [
-                'medicineId' => $medicineId,
+                'medicineId' => $medicine,
                 'itemName' => ucwords($itemName),
                 'category' => ucwords($category),
                 'quantity' => $quantity,

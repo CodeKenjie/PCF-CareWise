@@ -1,6 +1,8 @@
 <?php
 namespace App\Core;
 
+use Exception;
+
 class Router {
     protected $routes = [];
 
@@ -34,16 +36,44 @@ class Router {
         }
 
         foreach($this->routes[$method] as $route => $controllerAction) {
-            $pattern = preg_replace('#\{[^/]+\}#', '([^/]+)', $route);
-            $pattern = '#^' . $pattern . '$#';
-            if (preg_match($pattern, $uri, $matches)) {
-                array_shift($matches);
-                [ $controller, $action ] = explode('@', $controllerAction);
-                return (new $controller)->$action(...$matches);
+            preg_match_all('#\{([^}]+)\?\}#', $route, $optionalMatch);
+
+            $routesToTry = [$route];
+
+            foreach($optionalMatch[0] as $opt){
+                $new = [];
+
+                foreach($routesToTry as $r){
+                    $new[] = preg_replace('#/' . preg_quote($opt, '#') . '#', '', $r);
+                    $new[] = preg_replace('#/' . preg_quote($opt, '#') . '#', '/([^/]+)', $r);
+                }
+
+                $routesToTry = $new;
+            }
+
+            foreach($routesToTry as $finalRoute){
+                preg_match_all('#\{([^}]+)\}#', $finalRoute, $paramNamesRaw);
+
+                $paramNames = array_map(fn($name) => rtrim($name, '?'), $paramNamesRaw[1]);
+                $pattern = preg_replace('#\{[^}]+\}#', '([^/]+)', $finalRoute);
+                $pattern = '#^' . $pattern . '$#';
+
+                if (preg_match($pattern, $uri, $matches)) {
+                    array_shift($matches);
+
+                    $params = [];
+
+                    foreach($paramNames as $index => $name){
+                        $params[$name] = $matches[$index] ?? null;
+                    }
+
+                    [ $controller, $action ] = explode('@', $controllerAction);
+                    return (new $controller)->$action($params);
+                }
             }
         }
 
-        $this->abort(404);
+        return $this->abort(404);
     }
  
     protected function abort($code) {

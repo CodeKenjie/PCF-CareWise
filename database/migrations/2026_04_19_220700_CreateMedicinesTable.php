@@ -11,7 +11,7 @@ class CreateMedicinesTable extends Migration {
                         brand_name VARCHAR(200),
                         dosage VARCHAR(50),
                         form VARCHAR(100),
-                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
                     )';
 
         $this->createTable($query);
