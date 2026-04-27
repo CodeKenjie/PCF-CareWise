@@ -14,7 +14,8 @@ class CreatePrescriptionItemsTable extends Migration {
                         dose_unit VARCHAR(20),
                         frequency_per_day INTEGER NOT NULL,
                         duration INTEGER,
-                        expiration_date DATE,
+                        duration_unit VARCHAR(50),
+                        valid_until DATE,
                         instructions TEXT,
                         created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
 

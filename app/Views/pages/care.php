@@ -20,7 +20,7 @@
             </form>
         </div>
     </section>
-    <div class="fw">
+    <div>
         <section class="acrylic-bg">
             <ul id="collection"></ul>
         </section>
@@ -58,39 +58,65 @@
                 </button>
             </form>
             <ul id="diagnosis"></ul>
-            <div class="p-sm" style="flex: 1 1 0; display:flex; flex-direction: column; justify-content: space-between; gap: 0.5em">
-                <form id="prescriptionForm" action="/care/prescription" method="post" style="display: flex; justify-content: space-between; padding: 0;">
-                    <h5>Prescriptions:</h3>
-                    <button class="btn-borderless btn-highlight" type="submit">
-                        <svg class="sm-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="Edit / Add_Plus_Square"> <path id="Vector" d="M8 12H12M12 12H16M12 12V16M12 12V8M4 16.8002V7.2002C4 6.08009 4 5.51962 4.21799 5.0918C4.40973 4.71547 4.71547 4.40973 5.0918 4.21799C5.51962 4 6.08009 4 7.2002 4H16.8002C17.9203 4 18.4801 4 18.9079 4.21799C19.2842 4.40973 19.5905 4.71547 19.7822 5.0918C20.0002 5.51962 20.0002 6.07967 20.0002 7.19978V16.7998C20.0002 17.9199 20.0002 18.48 19.7822 18.9078C19.5905 19.2841 19.2842 19.5905 18.9079 19.7822C18.4805 20 17.9215 20 16.8036 20H7.19691C6.07899 20 5.5192 20 5.0918 19.7822C4.71547 19.5905 4.40973 19.2842 4.21799 18.9079C4 18.4801 4 17.9203 4 16.8002Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g></svg>
-                    </button>
-                </form>
-                <ul id="prescription"></ul>
-            </div>
+            <form class="p-sm" id="prescriptionForm" action="/care/prescription" method="post" style="display: flex; justify-content: space-between;">
+                <h5>Prescriptions:</h3>
+                <button class="btn-borderless btn-highlight" type="submit">
+                    <svg class="sm-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="Edit / Add_Plus_Square"> <path id="Vector" d="M8 12H12M12 12H16M12 12V16M12 12V8M4 16.8002V7.2002C4 6.08009 4 5.51962 4.21799 5.0918C4.40973 4.71547 4.71547 4.40973 5.0918 4.21799C5.51962 4 6.08009 4 7.2002 4H16.8002C17.9203 4 18.4801 4 18.9079 4.21799C19.2842 4.40973 19.5905 4.71547 19.7822 5.0918C20.0002 5.51962 20.0002 6.07967 20.0002 7.19978V16.7998C20.0002 17.9199 20.0002 18.48 19.7822 18.9078C19.5905 19.2841 19.2842 19.5905 18.9079 19.7822C18.4805 20 17.9215 20 16.8036 20H7.19691C6.07899 20 5.5192 20 5.0918 19.7822C4.71547 19.5905 4.40973 19.2842 4.21799 18.9079C4 18.4801 4 17.9203 4 16.8002Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g></svg>
+                </button>
+            </form>
+            <ul id="prescription"></ul>
         </section>
     </div>
 </main>
 <div id="prescribeMed" class="popup">
-    <form class="form-ui" action="/care/prescribe/" method="post">
-        <span class="btn-close" onclick="closePopup()"></span>
+    <form id="prescribeMedForm" class="form-ui" action="/care/prescribe/" method="post">
+        <span class="btn-close btn-circle" onclick="closePopup()"></span>
         <input id="medicineId" name="medicineId" type="text" readonly hidden>
         <span class="rel p-sm">
-            <input id="medicineName" name="medicineName" type="text">
+            <input id="medicineName" type="text" required>
             <label>Medicine</label>
             <ul id="medicineOptn" class="dropdown"></ul>
         </span>
+        <div class="flx p-sm">
+            <span>
+                <input id="doseAmount" name="doseAmount" type="number" style="max-width: 12rem" required>
+                <label>Dose amount</label>
+            </span>
+            <span>
+                <input id="doseUnit" name="doseUnit" type="text" style="max-width: 7rem" required>
+
+                <label>Unit</label>
+            </span>
+            <span>
+                <input id="frequencyPerDay" name="frequencyPerDay" type="number" style="max-width: 12rem" required>
+                <label>Frequency</label>
+            </span>
+        </div>
+        <div class="flx p-sm">
+            <span>
+                <input id="duration" name="duration" type="number" style="max-width: 12rem" required>
+                <label>Duration</label>
+            </span>
+            <span>
+                <input id="durationUnit" name="durationUnit" type="text" style="max-width: 7rem" required>
+                <label>Unit</label>
+            </span>
+            <span>
+                <input id="validUntil" name="validUntil" type="date" required>
+                <label>Until</label>
+            </span>
+        </div>
         <span class="p-sm">
-            <input id="prescribedDosage" name="prescribedDosage" type="text">
-            <label>Dosage</label>
+            <input id="instructions" name="instructions" type="text" required>
+            <label>Instruction</label>
         </span>
-        <span class="p-sm">
-            <input id="prescribed" name="medicineName" type="text">
-            <label>Dosage</label>
+        <span class="p-lg">
+            <button class="btn-square btn-accent" type="submit">Prescribe</button>
         </span>
     </form>
 </div>
 <div id="deletePrescription" class="delete popup">
-    <form id="deletePrescriptionForm" class="form-ui" action="/medicines/delete">
+    <form id="deletePrescriptionForm" class="form-ui">
         <header>
             <svg class="svg icon" viewBox="-5.5 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>warning</title> <path d="M10.16 25.92c-2.6 0-8.72-0.24-9.88-2.24-1.28-2.28 2.040-8.24 3.080-10.040 1.040-1.76 4.64-7.56 7.12-7.56 2.8 0 7.24 7.48 8.56 10.12 1.92 3.84 2.48 6.4 1.56 7.6-1.52 2.040-8.96 2.12-10.44 2.12zM10.48 7.72c-0.72 0-3.080 2.36-5.64 6.76-2.76 4.68-3.48 7.72-3.080 8.4 0.32 0.56 3.2 1.4 8.4 1.4 5.44 0 8.64-0.88 9.080-1.48 0.28-0.36 0.040-2.28-1.72-5.84-2.64-5.28-6.12-9.24-7.040-9.24zM10.52 19.2c-0.48 0-0.84-0.36-0.84-0.84v-6.36c0-0.48 0.36-0.84 0.84-0.84s0.84 0.36 0.84 0.84v6.32c0 0.48-0.4 0.88-0.84 0.88zM11.36 21.36c0 0.464-0.376 0.84-0.84 0.84s-0.84-0.376-0.84-0.84c0-0.464 0.376-0.84 0.84-0.84s0.84 0.376 0.84 0.84z"></path> </g></svg>
             <h4>Delete Prescription</h4>
@@ -99,7 +125,27 @@
         <span class="p-md">
             <p>Are you sure that you want to delete 
                 Prescription: <strong style="color:var(--critical)" id="name"></strong> 
-                id: <strong style="color: var(--critical);" id="id"></strong> from Medicines?
+                id: <strong style="color: var(--critical);" id="id"></strong> from Prescriptions?
+            </p>
+            <p>Reminder: You will not be able to recover deleted data.</p>
+        </span>
+        <div>
+            <button class="btn-square btn-critical" type="submit">Delete</button>
+            <button class="btn-square btn-highlight" type="button" onclick="closePopup()">Cancel</button>
+        </div>
+    </form>
+</div>
+<div id="deletePrescribedMed" class="delete popup">
+    <form id="deletePrescribedMedForm" class="form-ui">
+        <header>
+            <svg class="svg icon" viewBox="-5.5 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <title>warning</title> <path d="M10.16 25.92c-2.6 0-8.72-0.24-9.88-2.24-1.28-2.28 2.040-8.24 3.080-10.040 1.040-1.76 4.64-7.56 7.12-7.56 2.8 0 7.24 7.48 8.56 10.12 1.92 3.84 2.48 6.4 1.56 7.6-1.52 2.040-8.96 2.12-10.44 2.12zM10.48 7.72c-0.72 0-3.080 2.36-5.64 6.76-2.76 4.68-3.48 7.72-3.080 8.4 0.32 0.56 3.2 1.4 8.4 1.4 5.44 0 8.64-0.88 9.080-1.48 0.28-0.36 0.040-2.28-1.72-5.84-2.64-5.28-6.12-9.24-7.040-9.24zM10.52 19.2c-0.48 0-0.84-0.36-0.84-0.84v-6.36c0-0.48 0.36-0.84 0.84-0.84s0.84 0.36 0.84 0.84v6.32c0 0.48-0.4 0.88-0.84 0.88zM11.36 21.36c0 0.464-0.376 0.84-0.84 0.84s-0.84-0.376-0.84-0.84c0-0.464 0.376-0.84 0.84-0.84s0.84 0.376 0.84 0.84z"></path> </g></svg>
+            <h4>Delete Prescribed Medicine</h4>
+        </header>
+        <hr style="height: 1px; color: var(--border-color);">
+        <span class="p-md">
+            <p>Are you sure that you want to delete 
+                Prescription: <strong style="color:var(--critical)" id="medName"></strong> 
+                id: <strong style="color: var(--critical);" id="medId"></strong> from Prescribed Medicines?
             </p>
             <p>Reminder: You will not be able to recover deleted data.</p>
         </span>
@@ -111,11 +157,38 @@
 </div>
 <template id="prescriptionCard">
     <li>
-        <div style="flex: 1 1 0; display: flex;">
-            <h3 class="createdAt" style="flex: 1 1 0;"></h3>
-            <h3 class="conditionName" style="flex: 1 1 0;"></h3>
+        <div>
+            <span style="display: flex; align-items: center; padding: 0 1em;">
+                <svg class="svg sm-icon"viewBox="0 0 256 256" id="Flat" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M188.9707,188l19.51465-19.51465a12.0001,12.0001,0,0,0-16.9707-16.9707L172,171.0293l-34.01074-34.01062A55.99228,55.99228,0,0,0,120,28H72A12,12,0,0,0,60,40V192a12,12,0,0,0,24,0V140h23.0293l48,48-19.51465,19.51465a12.0001,12.0001,0,0,0,16.9707,16.9707L172,204.9707l19.51465,19.51465a12.0001,12.0001,0,0,0,16.9707-16.9707ZM84,52h36a32,32,0,0,1,0,64H84Z"></path> </g></svg>
+            </span>
+            <div class="expand" style="flex: 1 1 0; display: flex;">
+                <h4 class="createdAt" style="flex: 1 1 0;"></h4>
+                <h4 class="conditionName" style="flex: 1 1 0;"></h4>
+                <span>
+                    <svg class="btn-expand icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M7 10L12 15L17 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                </span>
+            </div>
+            <button class="prescribeBtn btn-borderless btn-highlight">
+                <svg class="sm-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="Edit / Add_Plus_Square"> <path id="Vector" d="M8 12H12M12 12H16M12 12V16M12 12V8M4 16.8002V7.2002C4 6.08009 4 5.51962 4.21799 5.0918C4.40973 4.71547 4.71547 4.40973 5.0918 4.21799C5.51962 4 6.08009 4 7.2002 4H16.8002C17.9203 4 18.4801 4 18.9079 4.21799C19.2842 4.40973 19.5905 4.71547 19.7822 5.0918C20.0002 5.51962 20.0002 6.07967 20.0002 7.19978V16.7998C20.0002 17.9199 20.0002 18.48 19.7822 18.9078C19.5905 19.2841 19.2842 19.5905 18.9079 19.7822C18.4805 20 17.9215 20 16.8036 20H7.19691C6.07899 20 5.5192 20 5.0918 19.7822C4.71547 19.5905 4.40973 19.2842 4.21799 18.9079C4 18.4801 4 17.9203 4 16.8002Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g></svg>
+            </button>
+            <button class="deletePrescription btn-borderless btn-critical" style="flex: 0 0 fit-content">
+                <svg class="sm-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="Edit / Add_Minus_Square"> <path id="Vector" d="M8 12H16M4 16.8002V7.2002C4 6.08009 4 5.51962 4.21799 5.0918C4.40973 4.71547 4.71547 4.40973 5.0918 4.21799C5.51962 4 6.08009 4 7.2002 4H16.8002C17.9203 4 18.4801 4 18.9079 4.21799C19.2842 4.40973 19.5905 4.71547 19.7822 5.0918C20.0002 5.51962 20.0002 6.07967 20.0002 7.19978V16.7998C20.0002 17.9199 20.0002 18.48 19.7822 18.9078C19.5905 19.2841 19.2842 19.5905 18.9079 19.7822C18.4805 20 17.9215 20 16.8036 20H7.19691C6.07899 20 5.5192 20 5.0918 19.7822C4.71547 19.5905 4.40973 19.2842 4.21799 18.9079C4 18.4801 4 17.9203 4 16.8002Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g></svg>
+            </button>
         </div>
-        <button class="deletePrescription btn-borderless btn-critical" style="padding: 0.2em; flex: 0 0 fit-content">
+        <ul id="prescribedMeds" class="prescribedMeds"></ul>
+    </li>
+</template>
+<template id="prescribedCard">
+    <li>
+        <svg class="sm-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <defs> <style>.cls-1{fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.5px;}</style> </defs> <g id="ic-medicine-pill"> <rect class="cls-1" x="7" y="2" width="10" height="20" rx="5" transform="translate(12 -4.97) rotate(45)"></rect> <line class="cls-1" x1="8.46" y1="8.46" x2="15.54" y2="15.54"></line> </g> </g></svg>
+        <h3 class="medicineName"></h3>
+        <h3 class="doseAmount"></h3>
+        <h3 style="opacity: 50%"><span class="frequency"></span>x a day</h3>
+        <h3 class="duration"></h3>
+        <button class="info btn-borderless btn-highlight">
+            <svg class="svg sm-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g fill="currentColor"> <path d="M8 16a8 8 0 0 1-8-8 8 8 0 0 1 8-8 8 8 0 0 1 8 8 8 8 0 0 1-8 8zm0-1a7 7 0 0 0 7-7 7 7 0 0 0-7-7 7 7 0 0 0-7 7 7 7 0 0 0 7 7z"></path> <path d="M8 3.75c-.386 0-.69.124-.914.373A1.269 1.269 0 0 0 6.75 5c0 .336.112.628.336.877.224.249.528.373.914.373s.69-.124.914-.373c.224-.249.336-.541.336-.877 0-.336-.112-.628-.336-.877C8.69 3.874 8.386 3.75 8 3.75zM7 7v5h2V7z" font-family="Ubuntu" font-weight="400" letter-spacing="0" style="line-height:1000%;-inkscape-font-specification:Ubuntu" word-spacing="0"></path> </g> </g></svg>
+        </button>
+        <button class="deletePrescribedMed btn-borderless btn-critical">
             <svg class="sm-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="Edit / Add_Minus_Square"> <path id="Vector" d="M8 12H16M4 16.8002V7.2002C4 6.08009 4 5.51962 4.21799 5.0918C4.40973 4.71547 4.71547 4.40973 5.0918 4.21799C5.51962 4 6.08009 4 7.2002 4H16.8002C17.9203 4 18.4801 4 18.9079 4.21799C19.2842 4.40973 19.5905 4.71547 19.7822 5.0918C20.0002 5.51962 20.0002 6.07967 20.0002 7.19978V16.7998C20.0002 17.9199 20.0002 18.48 19.7822 18.9078C19.5905 19.2841 19.2842 19.5905 18.9079 19.7822C18.4805 20 17.9215 20 16.8036 20H7.19691C6.07899 20 5.5192 20 5.0918 19.7822C4.71547 19.5905 4.40973 19.2842 4.21799 18.9079C4 18.4801 4 17.9203 4 16.8002Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g></svg>
         </button>
     </li>
@@ -137,12 +210,18 @@
     </li>
 </template>
 <template id="conditionCard">
-    <li>
-        <div style="flex: 1 1 0; display: flex; align-items: center; padding: 1em">
+    <li class="p-sm">
+        <span style="padding: 0 1em">
+            <svg class="sm-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M5 4H4C3.44772 4 3 4.44772 3 5V9C3 11.7614 5.23858 14 8 14V14C10.7614 14 13 11.7614 13 9V5C13 4.44772 12.5523 4 12 4H11" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M8 14V15.5C8 18.5376 10.4624 21 13.5 21V21C16.5376 21 19 18.5376 19 15.5V14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M10 3V5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M6 3V5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <circle cx="19" cy="12" r="2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></circle> </g></svg>
+        </span>
+        <div style="flex: 1 1 0; display: flex; align-items: center;">
             <span class="condition" style="flex: 1 1 0"></span>
             <span class="date" style="flex: 1 1 0;"></span>
         </div>
-        <button class="removeCondition btn-borderless btn-critical" style="padding: 0.2em">
+        <button class="prescribe btn-borderless btn-highlight">
+            <svg class="svg sm-icon"viewBox="0 0 256 256" id="Flat" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M188.9707,188l19.51465-19.51465a12.0001,12.0001,0,0,0-16.9707-16.9707L172,171.0293l-34.01074-34.01062A55.99228,55.99228,0,0,0,120,28H72A12,12,0,0,0,60,40V192a12,12,0,0,0,24,0V140h23.0293l48,48-19.51465,19.51465a12.0001,12.0001,0,0,0,16.9707,16.9707L172,204.9707l19.51465,19.51465a12.0001,12.0001,0,0,0,16.9707-16.9707ZM84,52h36a32,32,0,0,1,0,64H84Z"></path> </g></svg>
+        </button>
+        <button class="removeCondition btn-borderless btn-critical">
             <svg class="sm-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="Edit / Add_Minus_Square"> <path id="Vector" d="M8 12H16M4 16.8002V7.2002C4 6.08009 4 5.51962 4.21799 5.0918C4.40973 4.71547 4.71547 4.40973 5.0918 4.21799C5.51962 4 6.08009 4 7.2002 4H16.8002C17.9203 4 18.4801 4 18.9079 4.21799C19.2842 4.40973 19.5905 4.71547 19.7822 5.0918C20.0002 5.51962 20.0002 6.07967 20.0002 7.19978V16.7998C20.0002 17.9199 20.0002 18.48 19.7822 18.9078C19.5905 19.2841 19.2842 19.5905 18.9079 19.7822C18.4805 20 17.9215 20 16.8036 20H7.19691C6.07899 20 5.5192 20 5.0918 19.7822C4.71547 19.5905 4.40973 19.2842 4.21799 18.9079C4 18.4801 4 17.9203 4 16.8002Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g></svg>
         </button>
     </li>

@@ -28,6 +28,9 @@ $router->get('/care/patient/{id}/diagnosis', 'App\Controllers\DiagnosisControlle
 $router->get('/care/patient/{id}/prescriptions', 'App\Controllers\PrescriptionsController@all');
 $router->post('/care/patient/{id}/diagnosis', 'App\Controllers\DiagnosisController@add');
 $router->post('/care/prescription/{id}', 'App\Controllers\PrescriptionsController@create');
+$router->post('/care/prescribe/{id}', 'App\Controllers\PrescriptionItemsController@prescribe');
+$router->get('/care/prescription/{id}/all', 'App\Controllers\PrescriptionItemsController@all');
+$router->delete('/care/prescription/{prescriptionId}/prescribed/{id}/delete', 'App\Controllers\PrescriptionItemsController@delete');
 $router->delete('/care/patient/{patientId}/diagnosis/{id}/delete', 'App\Controllers\DiagnosisController@delete');
 $router->delete('/care/patient/{patientId}/prescription/{id}/delete', 'App\Controllers\PrescriptionsController@delete');
 

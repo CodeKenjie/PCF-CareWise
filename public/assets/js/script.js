@@ -4,7 +4,7 @@ const state = {
     item: { id: null },
     schedule:{ id: null },
     condition: { id: null },
-    prescription: { id: null },
+    prescription: { id: null, item: null },
     calendar: { selected: null },
     sort: { order: 'id', direction: 'ASC' }
 };
@@ -237,8 +237,8 @@ function renderPatientsDataForCare(data){
             document.getElementById(`patientName`).textContent = `${patient.last_name}, ${patient.first_name}`;
             document.getElementById(`patientAge`).textContent = patient.age;
             document.getElementById(`patientBirthdate`).textContent = `${months[month - 1]} ${day}, ${year}`;
-            loadPatientDiagnosis();
-            loadPatientPrescriptions();
+            loadPatientDiagnosis(patient.id);
+            loadPatientPrescriptions(patient.id);
         });
         clone.querySelector(`.name`).textContent = `${patient.last_name}, ${patient.first_name}`;
         clone.querySelector(`.age`).textContent = patient.age;
@@ -297,6 +297,7 @@ function renderMedsDrop(data){
     const container = document.getElementById(`medicineOptn`);
     const template = document.getElementById(`medicineCard`);
     const inventory = document.getElementById(`inventory`);
+    const care = document.getElementById(`care`);
 
     container.innerHTML = ``;
 
@@ -315,12 +316,17 @@ function renderMedsDrop(data){
                 document.getElementById(`category`).value = `Medicine`;
                 document.getElementById(`description`).value = `${medicine.brand_name} ${medicine.dosage} ${medicine.form}`;
             }
-            document.getElementById(`medicineId`).value = medicine.id;
-            document.getElementById(`medicineName`).value = medicine.generic_name;
+
+            if(care) {
+                document.getElementById(`medicineId`).value = medicine.id;
+                document.getElementById(`medicineName`).value = medicine.generic_name;
+                document.getElementById(`doseUnit`).value = medicine.form;
+            }
         });
         container.appendChild(clone);
     });
 }
+
 function renderItemData(data){
     const container = document.getElementById(`collection`);
     const template = document.getElementById(`itemCard`);
@@ -442,9 +448,9 @@ function renderSchedulesData(data){
     initCalendar();
 }
 
-async function loadPatientDiagnosis(){
+async function loadPatientDiagnosis(id){
     try{
-        const res = await fetch(`/care/patient/${state.patient.id}/diagnosis`, {
+        const res = await fetch(`/care/patient/${id}/diagnosis`, {
             method: 'GET'
         });
 
@@ -460,10 +466,10 @@ async function loadPatientDiagnosis(){
             const created = new Date(diagnosed.created_at).toLocaleString(`en-PH`, { timeZone: 'Asia/Manila', month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
             clone.querySelector(`.condition`).textContent = diagnosed.condition_name;
             clone.querySelector(`.date`).textContent = created;
-            clone.querySelector(`div`).addEventListener(`click`, async (e) => {
+            clone.querySelector(`.prescribe`).addEventListener(`click`, async (e) => {
                 e.preventDefault();
                 try{
-                    const res = await fetch(`/care/prescription/${state.patient.id}`, {
+                    const res = await fetch(`/care/prescription/${id}`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -478,7 +484,7 @@ async function loadPatientDiagnosis(){
                         return;
                     }
 
-                    loadPatientPrescriptions();
+                    loadPatientPrescriptions(id);
                 } catch(err) {
                     console.error(err);
                 }
@@ -496,8 +502,8 @@ async function loadPatientDiagnosis(){
                         responseMessage(data, data.error);
                         return;
                     }
-                    loadPatientDiagnosis();
-                    loadPatientPrescriptions();
+                    loadPatientDiagnosis(id);
+                    loadPatientPrescriptions(id);
                 } catch(err){
                     console.error(err);
                 }
@@ -509,9 +515,9 @@ async function loadPatientDiagnosis(){
     }
 }
 
-async function loadPatientPrescriptions() {
+async function loadPatientPrescriptions(id) {
     try{
-        const res = await fetch(`/care/patient/${state.patient.id}/prescriptions`, {
+        const res = await fetch(`/care/patient/${id}/prescriptions`, {
             method: 'GET'
         });
 
@@ -528,9 +534,24 @@ async function loadPatientPrescriptions() {
         container.innerHTML = ``;
         data.collection.forEach(prescription => {
             const clone = template.content.cloneNode(true);
+            const expand = clone.querySelector(`.btn-expand`);
+            const prescribedMeds = clone.querySelector(`.prescribedMeds`);
             const created = new Date(prescription.created_at).toLocaleString(`en-PH`, { timeZone: 'Asia/Manila', month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
             clone.querySelector(`.createdAt`).textContent = created;
             clone.querySelector(`.conditionName`).textContent = prescription.condition_name;
+            clone.querySelector(`.expand`).addEventListener(`click`, () => {
+                expand.classList.toggle(`hide`);
+                prescribedMeds.classList.toggle(`expand`);
+                loadPrescriptionItems(prescription.id, prescribedMeds);
+            });
+            clone.querySelector(`.prescribeBtn`).addEventListener(`click`, () => {
+                state.prescription.id = prescription.id;
+                loadPrescriptionItems(prescription.id, prescribedMeds);
+                expand.classList.add(`hide`);
+                prescribedMeds.classList.add(`expand`);
+                document.getElementById(`prescribeMed`).classList.add(`active`);
+                document.getElementById(`prescribeMedForm`).action = `/care/prescribe/${prescription.id}`;
+            });
             clone.querySelector(`.deletePrescription`).addEventListener(`click`, () => {
                 state.prescription.id = prescription.id;
                 document.getElementById(`deletePrescriptionForm`).action = `/care/patient/${state.patient.id}/prescription/${prescription.id}/delete`;
@@ -542,6 +563,44 @@ async function loadPatientPrescriptions() {
             container.appendChild(clone);
         });
     } catch(err){
+        console.error(err);
+    }
+}
+
+async function loadPrescriptionItems(id){
+    try {
+        const res = await fetch(`/care/prescription/${id}/all`, {
+            method: 'GET'
+        });
+
+        const data = await res.json();
+        if(!data.ok){
+            responseMessage(data, data.error);
+            return;
+        }
+
+        const container = document.getElementById(`prescribedMeds`);
+        const template = document.getElementById(`prescribedCard`);
+        container.innerHTML = ``;
+
+        data.collection.forEach(medication => {
+            const clone = template.content.cloneNode(true);
+            clone.querySelector(`.medicineName`).innerHTML = `${medication.generic_name} <span>(${medication.brand_name})</span>`;
+            clone.querySelector(`.doseAmount`).innerHTML =`${medication.dose_amount} <span>${medication.dose_unit}</span>`;
+            clone.querySelector(`.frequency`).textContent = medication.frequency_per_day;
+            clone.querySelector(`.duration`).innerHTML = `for: ${medication.duration} ${medication.duration_unit}`;
+            clone.querySelector(`.deletePrescribedMed`).addEventListener(`click`, async (e) => {
+                state.prescription.id = id;
+                state.prescription.item = medication.id;
+                e.preventDefault();
+                document.getElementById(`deletePrescribedMed`).classList.add(`active`);
+                document.getElementById(`deletePrescribedMedForm`).action = `/care/prescription/${id}/prescribed/${medication.id}/delete`;
+                document.getElementById(`medName`).innerHTML = `${medication.generic_name} <span>(${medication.brand_name})</span>`;
+                document.getElementById(`medId`).textContent = medication.id;
+            });
+            container.appendChild(clone);
+        });
+    } catch (err) {
         console.error(err);
     }
 }
@@ -576,7 +635,6 @@ async function sortList(page, render) {
             return;
         }
         
-        responseMessage(data, data.message);
         return render(data);
     } catch (err) {
         console.error(err);
@@ -909,7 +967,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                     return;
                 }
 
-                loadPatientDiagnosis();
+                loadPatientDiagnosis(state.patient.id);
                 document.getElementById(`conditionName`).value = ``;
             } catch (err) {
                 console.error(err);
@@ -946,7 +1004,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                     return;
                 }
 
-                loadPatientPrescriptions();
+                loadPatientPrescriptions(state.patient.id);
             } catch(err) {
                 console.error(err);
             }
@@ -964,8 +1022,49 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                     responseMessage(data, data.error);
                     return;
                 }
-                loadPatientPrescriptions();
+                loadPatientPrescriptions(state.patient.id);
                 document.getElementById(`deletePrescription`).classList.remove(`active`);
+            } catch(err){
+                console.error(err);
+            }
+        });
+
+        document.getElementById(`deletePrescribedMedForm`).addEventListener(`submit`, async (e) => {
+            e.preventDefault();
+            try{
+                const res = await fetch(`/care/prescription/${state.prescription.id}/prescribed/${state.prescription.item}/delete`, {
+                    method: 'DELETE'
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    responseMessage(data, data.error);
+                    return;
+                }
+                loadPrescriptionItems(state.patient.id);
+                document.getElementById(`deletePrescribedMed`).classList.remove(`active`);
+            } catch(err){
+                console.error(err);
+            }
+        });
+
+        document.getElementById(`prescribeMedForm`).addEventListener(`submit`, async (e) => {
+            e.preventDefault();
+            try{
+                const formdata = new FormData(e.target);
+                const res = await fetch(`/care/prescribe/${state.prescription.id}`, {
+                    method: 'POST',
+                    body: formdata
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    responseMessage(data, data.error);
+                }
+
+                responseMessage(data, data.message);
+                document.getElementById(`prescribeMed`).classList.remove(`active`);
+                loadPrescriptionItems(state.patient.id);
             } catch(err){
                 console.error(err);
             }
@@ -1016,6 +1115,15 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 responseMessage(data, data.message);
                 editPanel.classList.remove('active');
                 loadList('patients', renderPatientsData);
+                updateFirstName = ``;
+                updateLastName = ``;
+                updateSex = ``;
+                updateBirthdate = ``;
+                updateAddress = ``;
+                updateContact = ``;
+                updateExContact = ``;
+                updateStatus = ``;
+                updateReferredBy = ``;
             } catch (err) {
                 console.error(err);
             }
@@ -1267,6 +1375,10 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             responseMessage(data, data.message);
             loadList(`medicines`, renderMedicineData);
             document.getElementById(`editMeds`).classList.remove(`active`);
+            genericName = ``;
+            brandName = ``;
+            dosage = ``;
+            form = ``;
         });
 
         document.getElementById(`deleteMedsForm`).addEventListener(`submit`, async (e) => {

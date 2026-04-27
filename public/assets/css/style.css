@@ -140,13 +140,6 @@ section {
     z-index: 1;
 }
 
-.fw {
-    flex: 1 1 0;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1em;
-}
-
 *, *::before, *::after {
     box-sizing: inherit;
     margin: 0;
@@ -411,6 +404,12 @@ select{
     flex: 1 1 0;
     display: flex;
     flex-direction: column;
+}
+
+.flx {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1em;
 }
 
 .site {
@@ -738,6 +737,16 @@ select{
     border: none;
 }
 
+.btn-expand {
+    rotate: 0deg;
+    transition: rotate 300ms ease;
+}
+
+.btn-expand.hide {
+    rotate: 180deg;
+    transition: rotate 300ms ease;
+}
+
 .acrylic-bg {
     position: relative;
     border-radius: var(--radius);
@@ -813,6 +822,7 @@ select{
     gap: 0.5em;
     padding: 1em 0.5em;
     cursor: pointer;
+    margin-bottom: 2em;
 }
 
 #sidebar section:hover {
@@ -840,6 +850,7 @@ select{
 }
 
 #sidebar ul{
+    flex: 1 1 0;
     display: flex;
     flex-direction: column;
     font-size: var(--super-small-header);
@@ -895,7 +906,7 @@ select{
 
 #sidebar .additional {
     position: absolute;
-    top: 30%;
+    bottom: 100%;
     left: 100%;
     display: grid;
     background: var(--bg);
@@ -928,12 +939,19 @@ select{
     width: 15rem;
     height: fit-content;
     padding: 0.5em;
+    border: var(--border);
     transition: width 300ms ease;
 }
 
 #sidebar.close .additional {
-    top: 32%;
+    bottom: 100%;
     left: 110%;
+}
+
+#care > div {
+    flex: 1 1 0;
+    display: flex;
+    gap: 1em;
 }
 
 #care section:not(.actions) {
@@ -982,7 +1000,6 @@ select{
 
 #care #collection li h3 {
     flex: 1 1 0;
-    min-width: 10rem;
 }
 
 #care #diagnose{
@@ -991,6 +1008,7 @@ select{
 }
 
 #care #diagnose.open {
+    flex: 1 1 0;
     display: flex;
     flex-direction: column;
 }
@@ -1055,8 +1073,6 @@ select{
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 0.2em;
-    cursor: pointer;
     border-radius: var(--radius);
 }
 
@@ -1071,14 +1087,63 @@ select{
     scrollbar-width: none;
 }
 
-#care #prescription li {
+#care #prescription > li {
     flex: 1 1 0;
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    border-radius: 0  0 var(--radius) var(--radius);
+    border-left: var(--border);
+    border-right: var(--border);
     border-bottom: var(--border);
-    border-radius: var(--radius);
-    padding: 0.5em;
     cursor: pointer;
+}
+
+#prescription > li div {
+    flex: 1 1 0;
+    display: flex;
+    font-size: var(--normal);
+    align-items: center;
+    vertical-align: middle;
+}
+
+.prescribedMeds {
+    background: var(--bg-dim);
+    height: 0rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+    border-radius: var(--radius);
+    transition: height 300ms ease;
+}
+
+.prescribedMeds.expand {
+    height: 10rem;
+    padding: 0.1em;
+    transition: height 300ms ease;
+}
+
+.prescribedMeds > li {
+    flex: 1 1 0;
+    background: var(--bg);
+    border-radius: var(--radius);
+    border: var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0.5em;
+    gap: 0.5em;
+}
+
+.prescribedMeds > li > h3 {
+    text-align: center;
+    flex: 1 1 0;
+    font-size: var(--small);
+}
+
+.prescribedMeds > li > h3 > span {
+    opacity: 75%;
+}
+
+.prescribedMeds > li > button {
+    background-color: transparent;
 }
 
 #patients #collection {
