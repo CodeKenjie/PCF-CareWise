@@ -213,7 +213,7 @@ class PatientsController extends Controller {
         $input = $_GET['search'] ?? '';
         $response = [];
 
-        $results = (new Patient())->searchPatient($input);
+        $results = (new Patient())->patientDrop($input);
         $response = [ 'ok' => true, 'code' => 200, 'collection' => $results ];
         echo json_encode($response);
     }

@@ -37,9 +37,19 @@
 </main>
 <div id="setSched" class="popup">
     <form id="setSchedForm" class="form-ui" action="/schedule/add" method="post">
-        <span class="p-sm">
-            <h2 id="selectedDate" class="ctr-text">selecteddated</h2>
-        </span>
+        <div style="display:flex; justify-content: space-between; align-items: center; gap: 1em;">
+            <h2 id="selectedDate" class="ctr-text"></h2>
+            <span>
+                <select id="frequency" name="frequency" required>
+                    <option value="" hidden></option>
+                    <option value="Once">Once</option>
+                    <option value="Everyday">Everyday</option>
+                    <option value="Every week">Every week</option>
+                    <option value="Every 30 days">Every 30 days</option>
+                </select>
+                <label for="frequency">Frequency</label>
+            </span>
+        </div>
         <span class="rel p-sm">
             <input id="find" class="btn-square" type="text">
             <label for="find">Find Patient</label>
@@ -48,14 +58,12 @@
         <div class="part p-sm">
             <span>
                 <input id="getDate" name="getDate" type="date" required>
-                <label for="firstName">Date</label>
+                <label for="getDate">Date</label>
             </span>
             <span>
                 <input id="getTime" name="getTime" type="time" required>
-                <label for="firstName">Time</label>
+                <label for="getTime">Time</label>
             </span>
-        </div>
-        <div class="part p-sm">
             <span>
                 <input id="firstName" name="firstName" type="text" required>
                 <label for="firstName">First Name</label>
@@ -64,8 +72,6 @@
                 <input id="lastName" name="lastName" type="text" required>
                 <label for="lastName">Last Name</label>
             </span>
-        </div>
-        <div class="part p-sm">
             <span>
                 <input id="contact" name="contact" type="text" required>
                 <label for="contact">Contact</label>
@@ -75,9 +81,9 @@
                 <label for="exContact">Additional Contact</label>
             </span>
         </div>
-        <span class="p-sm">
-            <input id="scheduledFor" name="scheduledFor" type="text" required>
-            <label for="scheduledFor">For</label>
+        <span class="text-area p-sm">
+            <textarea id="scheduledFor" name="scheduledFor" placeholder="Scheduled for" required></textarea>
+            <label>For</label>
         </span>
         <div class="part p-sm">
             <button class="btn-pill btn-accent" type="submit">Set</button>
@@ -89,13 +95,25 @@
     <form id="editSchedForm" class="form-ui">
         <h3 id="sDate" class="p-sm"></h3>
         <h3 id="patientName" class="p-sm"></h3>
-        <span class="p-sm">
-            <input id="updateTime" type="time" required>
-            <label for="updateTime">Time</label>
-        </span>
-        <span class="p-sm">
-            <input id="updateSchedFor" type="text" required>
-            <label for="updateSchedFor">For</label>
+        <div class="part">
+            <span class="p-sm">
+                <input id="updateTime" type="time" required>
+                <label for="updateTime">Time</label>
+            </span>
+            <span class="p-sm">
+                <select id="updateFrequency" required>
+                    <option value="" hidden></option>
+                    <option value="Once">Once</option>
+                    <option value="Everyday">Everyday</option>
+                    <option value="Every week">Every week</option>
+                    <option value="Every 30 days">Every 30 days</option>
+                </select>
+                <label for="updateStatus">Frequency</label>
+            </span>
+        </div>
+        <span class="text-area p-sm">
+            <textarea id="updateSchedFor" type="text" placeholder="Scheduled for" required></textarea>
+            <label>For</label>
         </span>
         <div class="part p-sm">
             <button class="btn-pill btn-accent" type="submit">Set</button>
@@ -178,6 +196,9 @@
             <h3 class="schedFor" style="background: var(--bg-dim); padding: 0.5em; border-radius: var(--radius)"></h3>
         </span>
         <div>
+            <button class="reSched btn-accent hidden">
+                <svg class="sm-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M19.7341 16.0598C18.8808 17.778 17.5087 19.1725 15.8192 20.0384C14.1297 20.9043 12.212 21.1959 10.3476 20.8705C8.48325 20.545 6.77057 19.6196 5.46115 18.2302C4.15172 16.8407 3.31456 15.0606 3.07263 13.1511C2.8307 11.2416 3.19676 9.30348 4.11703 7.6214C5.0373 5.93933 6.46329 4.60195 8.18552 3.80573C9.90776 3.0095 11.8355 2.79638 13.6855 3.19769C15.5355 3.59899 17.0517 4.51138 18.3053 5.95312C18.4571 6.11323 19.0407 6.75937 19.5258 7.73437" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> <path d="M15.0687 7.81298L20.109 8.71974L21 3.58952" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+            </button>
             <button class="editBtn btn-highlight">
                 <svg class="sm-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M7 3V5M17 3V5M6.2 21H17.8C18.9201 21 19.4802 21 19.908 20.782C20.2843 20.5903 20.5903 20.2843 20.782 19.908C21 19.4802 21 18.9201 21 17.8V8.2C21 7.07989 21 6.51984 20.782 6.09202C20.5903 5.71569 20.2843 5.40973 19.908 5.21799C19.4802 5 18.9201 5 17.8 5H6.2C5.0799 5 4.51984 5 4.09202 5.21799C3.71569 5.40973 3.40973 5.71569 3.21799 6.09202C3 6.51984 3 7.07989 3 8.2V17.8C3 18.9201 3 19.4802 3.21799 19.908C3.40973 20.2843 3.71569 20.5903 4.09202 20.782C4.51984 21 5.07989 21 6.2 21ZM8 16.5L10.025 16.095C10.2015 16.0597 10.2898 16.042 10.3721 16.0097C10.4452 15.9811 10.5147 15.9439 10.579 15.899C10.6516 15.8484 10.7152 15.7848 10.8426 15.6574L15 11.5C15.5523 10.9477 15.5523 10.0523 15 9.5C14.4477 8.94772 13.5523 8.94772 13 9.5L8.84255 13.6574C8.71523 13.7848 8.65157 13.8484 8.60098 13.921C8.55608 13.9853 8.51891 14.0548 8.49025 14.1279C8.45796 14.2102 8.44031 14.2985 8.40499 14.475L8 16.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
             </button>

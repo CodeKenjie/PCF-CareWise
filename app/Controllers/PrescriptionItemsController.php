@@ -79,6 +79,79 @@ class PrescriptionItemsController extends Controller {
         }
     }
 
+    public function edit($params){
+        header('Content-Type: application/json');
+        if($_SERVER['REQUEST_METHOD'] === 'PUT'){
+            $input = json_decode(file_get_contents('php://input'), true);
+            $id = $params['id'] ?? null;
+            $prescriptionId = $params['prescriptionId'] ?? null;
+            $doseAmount = $input['doseAmount'] ?? '';
+            $doseUnit = $this->notApplicable($input['doseUnit'] ?? '');
+            $frequencyPerDay = $input['frequencyPerDay'] ?? '';
+            $duration = $this->notApplicable($input['duration'] ?? '');
+            $durationUnit = $this->notApplicable($input['durationUnit'] ?? '');
+            $validUntil = $input['validUntil'] ?? '';
+            $instructions = $this->notApplicable($input['instructions'] ?? '');
+            $response = [];
+
+            if($id === null){
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'Error: No prescribed Medicine Selected'];
+                echo json_encode($response);
+                exit;
+            }
+
+            if($prescriptionId === null){
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'Error: No prescription Selected'];
+                echo json_encode($response);
+                exit;
+            }
+
+            if($doseAmount === null){
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'Error: no dose amount entered'];
+                echo json_encode($response);
+                exit;
+            } else if(!is_numeric($doseAmount)){
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'Error: Please enter a numeric value for Dose Amount'];
+                echo json_encode($response);
+                exit;
+            }
+            
+            if($frequencyPerDay === null){
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'Error: no frequency per day amount entered'];
+                echo json_encode($response);
+                exit;
+            } else if(!is_numeric($frequencyPerDay)) {
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'Error: Please enter a numeric value for frequency per day'];
+                echo json_encode($response);
+                exit;
+            }
+
+            if(!is_numeric($duration)){
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'Error: Please enter a numeric value for duration'];
+                echo json_encode($response);
+                exit;
+            }
+            
+            $data = [
+                'id' => $id,
+                'prescriptionId' => $prescriptionId,
+                'doseAmount' => $doseAmount,
+                'doseUnit' => strtolower($doseUnit),
+                'frequencyPerDay' => $frequencyPerDay,
+                'duration' => $duration,
+                'durationUnit' => strtolower($durationUnit),
+                'validUntil' => $validUntil,
+                'instructions' => $instructions,
+            ];
+
+            $prescribe = new PrescriptionItem();
+            $prescribe->update($data);
+
+            $response = [ 'ok' => true, 'code' => 200, 'message' => 'prescribed Medicine updated successfully' ];
+            echo json_encode($response);
+        }
+    }
+
     public function all($params){
         header('Content-Type: application/json');
         $id = $params['id'] ?? null;

@@ -131,6 +131,9 @@ main {
     overflow: auto;
     scrollbar-width: none;
     z-index: 1;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+    scroll-padding: 1em;
 }
 
 section {
@@ -138,6 +141,7 @@ section {
     padding: 1em;
     gap: 1em;
     z-index: 1;
+    scroll-snap-align: start;
 }
 
 *, *::before, *::after {
@@ -157,6 +161,13 @@ h1, h2, h3, p {
     padding: 0;
 }
 
+textarea{
+    resize: none;
+    overflow-x: auto;
+    overflow-wrap: break-word;
+}
+
+textarea,
 input {
     color: transparent;
     background: transparent;
@@ -166,6 +177,7 @@ input {
     border-radius: var(--radius);
 }
 
+textarea:focus, textarea:valid,
 input:focus, input:valid {
     outline: none;
     color: var(--font-color)
@@ -433,6 +445,10 @@ select{
     z-index: 1;
 }
 
+.fit {
+    flex: 0 0 fit-content;
+}
+
 .sortsSpan {
     flex: 1 1 0;
     flex-wrap: wrap;
@@ -579,6 +595,15 @@ select{
     border-radius: var(--radius);
     opacity: 100%;
     z-index: 2;
+}
+
+.form-ui .text-area:has(textarea:valid) label,
+.form-ui .text-area:focus-within label,
+.form-ui .text-area label{
+    background: var(--bg);
+    transform: translate(0.5em, -3.6em) scale(0.88);
+    transition: transform 300ms ease-in;
+    padding: 0 0.5em;
 }
 
 .popup{
@@ -913,7 +938,7 @@ select{
     width: 0;
     height: 0;
     font-size: var(--bigger);
-    border-radius: 0 var(--radius) var(--radius) var(--radius);
+    border-radius: var(--radius) var(--radius) var(--radius) 0;
     overflow: hidden;
     z-index: 10;
 }
@@ -931,7 +956,7 @@ select{
     width: 100%;
     padding: 0.5em;
     gap: 0.5em;
-    border-radius: 0 var(--radius) var(--radius) var(--radius);
+    border-radius: var(--radius) var(--radius) var(--radius) 0;
     transition: width 300ms ease;
 }
 
@@ -948,15 +973,43 @@ select{
     left: 110%;
 }
 
-#care > div {
+#care{
     flex: 1 1 0;
     display: flex;
+    justify-content: center;
+    flex-direction: column;
     gap: 1em;
 }
+#care > section:nth-of-type(1){
+    width: 100%;
+    align-self: last baseline;
+}
 
-#care section:not(.actions) {
+#care section:nth-of-type(2),
+#care section:nth-of-type(3){
+    width: 100%;
+}
+
+#care #diagnose{
+    display: none;
+    gap: 0;
+}
+
+#care.open {
     flex: 1 1 0;
-    height: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+#care.open section:nth-of-type(2),
+#care.open section:nth-of-type(3){
+    flex: 1 1 0;
+    min-width: 25rem;
+}
+
+#care.open #diagnose {
+    display: flex;
+    flex-direction: column;
 }
 
 #care #collection {
@@ -972,8 +1025,8 @@ select{
 #care #collection li {
     display: flex;
     flex-wrap: wrap;
-    text-align: center;
     justify-content: center;
+    align-items: center;
     padding: 0.5em;
     border: var(--border);
     border-radius: var(--radius);
@@ -1000,22 +1053,19 @@ select{
 
 #care #collection li h3 {
     flex: 1 1 0;
+    font-size: var(--normal);
+    padding: 0.5em;
 }
 
-#care #diagnose{
-    display: none;
-    gap: 0;
-}
-
-#care #diagnose.open {
-    flex: 1 1 0;
-    display: flex;
-    flex-direction: column;
+#care .pstatus {
+    color: var(--alt-font-color);
+    border-radius: var(--radius);
 }
 
 #care #diagnose #info {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
     height: fit-content;
     width: 100%;
     gap: 1em;
@@ -1034,7 +1084,8 @@ select{
     width: 5rem;
 }
 
-#care #diagnose #info div:nth-of-type(1) {
+#care #diagnose #info .avatar {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1085,6 +1136,9 @@ select{
     list-style-type: none;
     overflow-x: auto;
     scrollbar-width: none;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+    scroll-padding: 0.5em;
 }
 
 #care #prescription > li {
@@ -1096,6 +1150,7 @@ select{
     border-right: var(--border);
     border-bottom: var(--border);
     cursor: pointer;
+    scroll-snap-align: start;
 }
 
 #prescription > li div {
@@ -1113,33 +1168,47 @@ select{
     scrollbar-width: none;
     border-radius: var(--radius);
     transition: height 300ms ease;
+    scroll-snap-type: y mandatory;
+    scroll-padding: 0.5em;
+    scroll-behavior: smooth;
 }
 
 .prescribedMeds.expand {
-    height: 10rem;
-    padding: 0.1em;
+    height: 8rem;
+    padding: 0.3em;
     transition: height 300ms ease;
+    gap: 1em;
 }
 
 .prescribedMeds > li {
     flex: 1 1 0;
+    display: flex;
+    flex-wrap: wrap;
     background: var(--bg);
     border-radius: var(--radius);
     border: var(--border);
     display: flex;
     align-items: center;
-    padding: 0.5em;
     gap: 0.5em;
+    scroll-snap-align: start;
 }
 
-.prescribedMeds > li > h3 {
-    text-align: center;
+.prescribedMeds > li:hover {
+    scale: 1.01;
+}
+
+.prescribedMeds > li.null{
+    opacity: 50%;
+}
+
+.prescribedMeds > li > div {
+    padding: 0.5em;
+    gap: 1em;
+}
+.prescribedMeds > li > div > h3 {
     flex: 1 1 0;
+    text-align: center;
     font-size: var(--small);
-}
-
-.prescribedMeds > li > h3 > span {
-    opacity: 75%;
 }
 
 .prescribedMeds > li > button {
@@ -1425,6 +1494,23 @@ select{
     align-items: center;
 }
 
+#schedule #collection li.expired{
+    position: relative;
+    background: var(--button-active);
+    opacity: 75%;
+}
+
+.expired::before {
+    position: absolute;
+    content: '';
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(138, 138, 138, 0.1);
+    border-radius: var(--radius);
+    pointer-events: none;
+}
+
 #schedule #collection span {
     flex: 1 1 0;
     display: grid;
@@ -1444,6 +1530,10 @@ select{
 
 .rel{
     position: relative;
+}
+
+.abs {
+    position: absolute;
 }
 
 .dropdown {
@@ -1511,7 +1601,7 @@ select{
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    padding: 1em;
+    padding: 1em 1.5em 1em 1em;
     border: var(--border);
     border-radius: var(--radius);
 }

@@ -13,6 +13,7 @@ class CreateSchedulesTable extends Migration {
                         extra_contact VARCHAR(100),
                         date DATE NOT NULL,
                         time TIME,
+                        frequency VARCHAR(100),
                         scheduled_for TEXT NOT NULL,
                         created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
                     )';

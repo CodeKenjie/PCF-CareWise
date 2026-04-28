@@ -53,7 +53,6 @@
         align-items: center;
     }
 
-    #care #diagnose #info label,
     #sidebar div,
     #sidebar header{
         display: none;
@@ -131,6 +130,7 @@
         top: 52%;
     }
 
+    #care #diagnose #info .avatar,
     #inventory #listHeader,
     .site {
         display: none;
@@ -169,10 +169,6 @@
 
     .actions div {
         flex: 1 1 0;
-        flex-direction: column;
-    }
-
-    #care > div {
         flex-direction: column;
     }
 }

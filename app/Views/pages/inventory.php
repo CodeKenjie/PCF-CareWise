@@ -77,8 +77,8 @@
                 <label>Min Stock</label>
             </span>
         </div>
-        <span class="p-sm">
-            <input id="description" name="description" type="text" required>
+        <span class="text-area p-sm">
+            <textarea id="description" name="description" type="text" required></textarea>
             <label>Description</label>
         </span>
         <div class="part p-sm">
@@ -178,8 +178,8 @@
                 <label>per</label>
             </span>
         </div>
-        <span class="p-sm">
-            <input id="updateDescription" type="text" required>
+        <span class="text-area p-sm">
+            <textarea id="updateDescription" type="text" required></textarea>
             <label>Description</label>
         </span>
         <div class="part p-sm">

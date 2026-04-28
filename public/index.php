@@ -24,12 +24,13 @@ $router->get('/care/sort', 'App\Controllers\PatientsController@sort');
 $router->get('/care/search', 'App\Controllers\PatientsController@search');
 $router->get('/care/patient', 'App\Controllers\PatientsController@search');
 $router->get('/care/medicine', 'App\Controllers\MedicinesController@dropdown');
+$router->get('/care/prescription/{id}/all', 'App\Controllers\PrescriptionItemsController@all');
 $router->get('/care/patient/{id}/diagnosis', 'App\Controllers\DiagnosisController@all');
 $router->get('/care/patient/{id}/prescriptions', 'App\Controllers\PrescriptionsController@all');
 $router->post('/care/patient/{id}/diagnosis', 'App\Controllers\DiagnosisController@add');
 $router->post('/care/prescription/{id}', 'App\Controllers\PrescriptionsController@create');
 $router->post('/care/prescribe/{id}', 'App\Controllers\PrescriptionItemsController@prescribe');
-$router->get('/care/prescription/{id}/all', 'App\Controllers\PrescriptionItemsController@all');
+$router->put('/care/prescription/{prescriptionId}/prescribed/{id}/edit', 'App\Controllers\PrescriptionItemsController@edit');
 $router->delete('/care/prescription/{prescriptionId}/prescribed/{id}/delete', 'App\Controllers\PrescriptionItemsController@delete');
 $router->delete('/care/patient/{patientId}/diagnosis/{id}/delete', 'App\Controllers\DiagnosisController@delete');
 $router->delete('/care/patient/{patientId}/prescription/{id}/delete', 'App\Controllers\PrescriptionsController@delete');
@@ -48,6 +49,7 @@ $router->get('/schedule/patient', 'App\Controllers\PatientsController@dropdown')
 $router->post('/schedule/filter', 'App\Controllers\ScheduleController@filter');
 $router->post('/schedule/add', 'App\Controllers\ScheduleController@add');
 $router->patch('/schedule/edit', 'App\Controllers\ScheduleController@edit');
+$router->patch('/schedule/{id}/reschedule', 'App\Controllers\ScheduleController@reschedule');
 $router->delete('/schedule/delete/{id}', 'App\Controllers\ScheduleController@delete');
 
 $router->get('/medicines', 'App\Controllers\MedicinesController@index');

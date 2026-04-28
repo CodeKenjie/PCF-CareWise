@@ -48,8 +48,25 @@ class Medicine extends Database {
 
     public function searchMedicine($keyWord){
         try {
+            $normalized = strtolower(trim($keyWord));
+            switch(true) {
+                case str_contains($normalized, 'not donated'):
+                case str_contains($normalized, 'undonated'):
+                case str_contains($normalized, 'no donations'):
+                    $isDonated = false;
+                    break;
+
+                case str_contains($normalized, 'donated'):
+                case str_contains($normalized, 'donations'):
+                    $isDonated = true;
+                    break;
+
+                default:
+                    $isDonated = null;
+            }
             $id = is_numeric($keyWord) ? (int)$keyWord : null;
-            $keyword = ($id === null) ? $keyWord : null;
+            $expiration = preg_match('/^\d{4}-\d{2}-\d{2}$/', $keyWord) ? $keyWord : null;
+            $keyword = ($id === null && $expiration === null && $isDonated === null) ? $keyWord : null;
             $query = "SELECT 
                         inventory.quantity, inventory.quantity_type, inventory.minimum_quantity, inventory.category, inventory.expiration_date, inventory.is_donated,
                         medicines.id AS id, medicines.generic_name, medicines.brand_name, medicines.dosage, medicines.form,
@@ -66,10 +83,18 @@ class Medicine extends Database {
                             OR dosage ILIKE '%' || :kw || '%'
                             OR form ILIKE '%' || :kw || '%')
                         AND (medicines.id = :id OR :id IS NULL)
+                        AND (inventory.is_donated = :is_donated OR :is_donated IS NULL)
+                        AND (inventory.expiration_date <= :expiration_date OR :expiration_date IS NULL)
                         ORDER BY rank DESC";
             $stmt = $this->db->prepare($query);
             $stmt->bindValue(':kw', $keyword);
             $stmt->bindValue(':id', $id);
+            $stmt->bindValue(':expiration_date', $expiration);
+            if($isDonated === null){
+                $stmt->bindValue(':is_donated', null, PDO::PARAM_NULL);
+            } else {
+                $stmt->bindValue(':is_donated', $isDonated, PDO::PARAM_BOOL);
+            }
 
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);

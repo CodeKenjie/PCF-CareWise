@@ -54,12 +54,13 @@ class Item extends Database {
 
     public function adjustItemQuantity(array $data){
         try{
-            $query = 'UPDATE inventory SET quantity = quantity + :change WHERE id = :id';
+            $query = 'UPDATE inventory SET quantity = quantity + :change WHERE id = :id AND quantity + :change >= 0 RETURNING quantity';
             $stmt = $this->db->prepare($query);
             $stmt->execute([
                 ':id' => $data['id'],
                 ':change' => $data['value']
             ]);
+            return $stmt->fetch();
         } catch(PDOException $err) {
             $this->logger->error($err->getMessage());
         }

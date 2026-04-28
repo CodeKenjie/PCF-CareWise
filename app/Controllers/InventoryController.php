@@ -149,7 +149,7 @@ class InventoryController extends Controller {
             $message = null;
 
             if (!is_numeric($value)) {
-                $response = [ 'ok' => false, 'code' => 400, 'error' => 'Invalid value please enter an amout '];
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'Invalid value please enter an amount '];
                 echo json_encode($response);
                 exit;
             }
@@ -167,7 +167,14 @@ class InventoryController extends Controller {
             ];
 
             $item = new Item();
-            $item->adjustItemQuantity($data);
+            $adjust = $item->adjustItemQuantity($data);
+
+            if(!$adjust){
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'Insufficient stock'];
+                echo json_encode($response);
+                exit;
+            }
+
             $response = [ 'ok' => true, 'code' => 200, 'message' => $message ];
             echo json_encode($response);
         }

@@ -139,7 +139,6 @@ function renderPatientsData(data){
         } else {
             statusMark.style.backgroundColor = `var(--moderate)`;
         }
-
         statusMark.textContent = patient.status;
         clone.querySelector(`.id`).textContent = patient.id;
         clone.querySelector(`.name`).textContent = patient.last_name + ", " + patient.first_name;
@@ -216,6 +215,7 @@ function renderPatientsDataForCare(data){
     data.collection.forEach(patient => {
         const [year, month, day] = patient.birthdate.split('-');
         const clone = template.content.cloneNode(true);
+        const statusMark = clone.querySelector(`.pstatus`);
         clone.querySelector(`.patient`).addEventListener(`click`, (e) => {
             state.patient.id = patient.id;
             const isSelected = e.currentTarget.classList.contains(`selected`);
@@ -224,26 +224,43 @@ function renderPatientsDataForCare(data){
             });
 
             if(isSelected){
-                document.getElementById(`diagnose`).classList.remove(`open`);
+                document.getElementById(`care`).classList.remove(`open`);
                 return;
             }
 
             e.currentTarget.classList.add(`selected`);
 
+            document.getElementById(`care`).classList.add(`open`);
             document.getElementById(`prescriptionForm`).action = `/care/prescription/${patient.id}`;
             document.getElementById(`diagnosisForm`).action = `/care/patient/${patient.id}/diagnosis`;
-            document.getElementById(`diagnose`).classList.add(`open`);
             document.getElementById(`patientId`).textContent = patient.id;
             document.getElementById(`patientName`).textContent = `${patient.last_name}, ${patient.first_name}`;
             document.getElementById(`patientAge`).textContent = patient.age;
             document.getElementById(`patientBirthdate`).textContent = `${months[month - 1]} ${day}, ${year}`;
+            document.getElementById(`patientStatus`).textContent = patient.status;
             loadPatientDiagnosis(patient.id);
             loadPatientPrescriptions(patient.id);
         });
         clone.querySelector(`.name`).textContent = `${patient.last_name}, ${patient.first_name}`;
         clone.querySelector(`.age`).textContent = patient.age;
-
+        statusMark.textContent = patient.status;
+        if(patient.status === `Active` || patient.status === `Complete`){
+            statusMark.style.backgroundColor = `var(--good)`;
+        } else if (patient.status === `Deceased` || patient.status === `Inactive`) {
+            statusMark.style.backgroundColor = `var(--critical)`;
+        } else {
+            statusMark.style.backgroundColor = `var(--moderate)`;
+        }
         container.appendChild(clone);
+
+        document.getElementById(`setSchedBtn`).addEventListener(`click`, () => {
+            document.getElementById(`setSched`).classList.add(`active`);
+            document.getElementById(`firstName`).value = patient.first_name;
+            document.getElementById(`lastName`).value = patient.last_name;
+            document.getElementById(`contact`).value = patient.contact;
+            document.getElementById(`exContact`).value = patient.extra_contact;
+            document.getElementById(`scheduledFor`).value = `Taking medicines`;
+        });
     });
 }
 
@@ -262,6 +279,13 @@ function renderMedicineData(data){
         clone.querySelector(`.quantity`).textContent = medicine.quantity ? medicine.quantity + ' /': `No stocks`;
         clone.querySelector(`.minQuant`).textContent = medicine.minimum_quantity ? `${medicine.minimum_quantity} ${medicine.quantity_type}`: ``;
         clone.querySelector(`.isDonated`).textContent = medicine.is_donated ? `Donated` : `not Donated`;
+        clone.querySelector(`.copyBtn`).addEventListener(`click`, () => {
+            document.getElementById(`addMeds`).classList.add(`active`);
+            document.getElementById(`genName`).value = medicine.generic_name;
+            document.getElementById(`brndName`).value = medicine.brand_name;
+            document.getElementById(`dosage`).value = medicine.dosage;
+            document.getElementById(`form`).value = medicine.form;
+        });
         clone.querySelector(`.previewBtn`).addEventListener(`click`, () => {
             document.getElementById(`medsPreview`).classList.add(`active`);
             document.getElementById(`mId`).textContent = medicine.id;
@@ -364,7 +388,7 @@ function renderItemData(data){
             state.item.id = item.id;
             document.getElementById(`adjust`).classList.add(`active`);
             document.getElementById(`imCurrentQuant`).textContent = `${item.quantity} ${item.quantity_type}`;
-            document.getElementById(`imName`).textContent = item.item_name;
+            document.getElementById(`imName`).textContent = item.name;
         });
 
         clone.querySelector(`.previewItemBtn`).addEventListener(`click`, () => {
@@ -409,23 +433,55 @@ function renderSchedulesData(data){
     container.innerHTML = ``;
 
     data.collection.forEach(schedule => {
+        const clone = template.content.cloneNode(true);
+        const [year, month, day] = schedule.date.split('-');
+        const timeFormat = new Date(`1972-12-01T${schedule.time}`).toLocaleTimeString('en-PH', { hour: 'numeric', minute: '2-digit', hour12: true });
+        const schedNotify = new Date(`${schedule.date}T${schedule.time}`).getTime();
+        const date = new Date(schedule.date);
+
         if(!occupiedDate.includes(schedule.date)){
             occupiedDate.push(schedule.date);
         }
-        const clone = template.content.cloneNode(true);
-        const [year, month, day] = schedule.date.split('-');
-        const timeFormat = new Date(`1972-12-01T${schedule.time}`).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+
+        if(schedNotify <= today.getTime()){
+            clone.querySelector(`li`).classList.add(`expired`);
+            clone.querySelector(`.reSched`).classList.remove(`hidden`);
+            clone.querySelector(`.editBtn`).classList.add(`hidden`);
+            clone.querySelector(`.viewBtn`).classList.add(`hidden`);
+
+            if(schedule.frequency === `Everyday`){
+                date.setDate(date.getDate() + 1);
+                const newDate = date.toISOString().split('T')[0];
+                reschedule(schedule.id, newDate);
+            } else if(schedule.frequency === `Every week`) {
+                date.setDate(date.getDate() + 7);
+                const newDate = date.toISOString().split('T')[0];
+                reschedule(schedule.id, newDate);
+            } else if(schedule.frequency === `Every 30 days`){
+                date.setDate(date.getDate() + 30);
+                const newDate = date.toISOString().split('T')[0];
+                reschedule(schedule.id, newDate);
+            }
+        }
+
         clone.querySelector(`.schedDate`).textContent = `${months[month - 1]} ${day}, ${year}`;
-        clone.querySelector(`.schedTime`).textContent = timeFormat;
+        clone.querySelector(`.schedTime`).textContent = `${timeFormat} (${schedule.frequency})`;
         clone.querySelector(`.patientName`).textContent = `${schedule.last_name}, ${schedule.first_name}`;
         clone.querySelector(`.schedFor`).textContent = schedule.scheduled_for;
+        clone.querySelector(`.reSched`).addEventListener(`click`, async (e) => {
+            e.preventDefault();
+            date.setMonth(date.getMonth() + 1);
+            const newDate = date.toISOString().split('T')[0];
+            reschedule(schedule.id, newDate);
+        });
         clone.querySelector(`.editBtn`).addEventListener(`click`, () => {
             state.schedule.id = schedule.id;
             document.getElementById(`sDate`).textContent = `${months[month - 1]} ${day}, ${year}`;
             document.getElementById(`patientName`).textContent = `${schedule.last_name}, ${schedule.first_name}`;
             document.getElementById(`editSched`).classList.add(`active`);
-            document.getElementById(`updateSchedFor`).value = schedule.scheduled_for;
             document.getElementById(`updateTime`).value = schedule.time;
+            document.getElementById(`updateFrequency`).value = schedule.frequency;
+            document.getElementById(`updateSchedFor`).value = schedule.scheduled_for;
         });
         clone.querySelector(`.viewBtn`).addEventListener(`click`, () => {
             document.getElementById(`schedInfo`).classList.add(`active`);
@@ -448,6 +504,29 @@ function renderSchedulesData(data){
     initCalendar();
 }
 
+async function reschedule(id, date) {
+    try{
+        const res = await fetch(`schedule/${id}/reschedule`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ newDate: date })
+        });
+
+        const data = await res.json();
+        if(!data.ok){
+            responseMessage(data, data.error);
+            return;
+        }
+
+        responseMessage(data, data.message);
+        loadList(`schedule`, renderSchedulesData);
+    } catch(err){
+        console.error(err);
+    }
+}
+
 async function loadPatientDiagnosis(id){
     try{
         const res = await fetch(`/care/patient/${id}/diagnosis`, {
@@ -460,7 +539,6 @@ async function loadPatientDiagnosis(id){
         const template = document.getElementById(`conditionCard`);
 
         container.innerHTML = ``;
-
         data.diagnosis.forEach(diagnosed => {
             const clone = template.content.cloneNode(true);
             const created = new Date(diagnosed.created_at).toLocaleString(`en-PH`, { timeZone: 'Asia/Manila', month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
@@ -509,6 +587,7 @@ async function loadPatientDiagnosis(id){
                 }
             });
             container.appendChild(clone);
+
         });
     } catch (err){
         console.error(err);
@@ -528,6 +607,14 @@ async function loadPatientPrescriptions(id) {
             return;
         }
 
+        document.getElementById(`setSchedBtn`).addEventListener(`click`, () => {
+            document.getElementById(`scheduledFor`).value = `Taking ${data.collection.map(p => {
+                const [ month, day, year ] = new Date(p.created_at).toLocaleString(`en-PH`, { timeZone: 'Asia/Manila', month: '2-digit', day: '2-digit', year: 'numeric'}).split(`/`)
+
+                return `${months[month - 1]} ${day}, ${year}`
+            }).join(', ')} prescription/s`;
+        });
+
         const container = document.getElementById(`prescription`);
         const template = document.getElementById(`prescriptionCard`);
 
@@ -546,11 +633,11 @@ async function loadPatientPrescriptions(id) {
             });
             clone.querySelector(`.prescribeBtn`).addEventListener(`click`, () => {
                 state.prescription.id = prescription.id;
-                loadPrescriptionItems(prescription.id, prescribedMeds);
                 expand.classList.add(`hide`);
                 prescribedMeds.classList.add(`expand`);
                 document.getElementById(`prescribeMed`).classList.add(`active`);
                 document.getElementById(`prescribeMedForm`).action = `/care/prescribe/${prescription.id}`;
+                loadPrescriptionItems(prescription.id, prescribedMeds);
             });
             clone.querySelector(`.deletePrescription`).addEventListener(`click`, () => {
                 state.prescription.id = prescription.id;
@@ -559,7 +646,6 @@ async function loadPatientPrescriptions(id) {
                 document.getElementById(`name`).textContent = created;
                 document.getElementById(`id`).textContent = prescription.id;
             });
-
             container.appendChild(clone);
         });
     } catch(err){
@@ -567,7 +653,7 @@ async function loadPatientPrescriptions(id) {
     }
 }
 
-async function loadPrescriptionItems(id){
+async function loadPrescriptionItems(id, container){
     try {
         const res = await fetch(`/care/prescription/${id}/all`, {
             method: 'GET'
@@ -579,16 +665,61 @@ async function loadPrescriptionItems(id){
             return;
         }
 
-        const container = document.getElementById(`prescribedMeds`);
         const template = document.getElementById(`prescribedCard`);
         container.innerHTML = ``;
 
         data.collection.forEach(medication => {
             const clone = template.content.cloneNode(true);
+            const [ createdMonth, createdDay, createdYear ] = new Date(medication.created_at).toLocaleString(`en-PH`, { timeZone: 'Asia/Manila', month: '2-digit', day: '2-digit', year: 'numeric' }).split(`/`);
+            const [ exMonth, exDay, exYear ] = new Date(medication.valid_until).toLocaleString(`en-PH`, { timeZone: 'Asia/Manila', month: '2-digit', day: '2-digit', year: 'numeric' }).split(`/`);
+            if(!medication.quantity){
+                clone.querySelector(`li`).classList.add(`null`);
+            }
             clone.querySelector(`.medicineName`).innerHTML = `${medication.generic_name} <span>(${medication.brand_name})</span>`;
             clone.querySelector(`.doseAmount`).innerHTML =`${medication.dose_amount} <span>${medication.dose_unit}</span>`;
             clone.querySelector(`.frequency`).textContent = medication.frequency_per_day;
             clone.querySelector(`.duration`).innerHTML = `for: ${medication.duration} ${medication.duration_unit}`;
+            clone.querySelector(`.setSched`).addEventListener(`click`, () => {
+                if(!medication.quantity){
+                    responseMessage(false, `${medication.generic_name}(${medication.brand_name}) has no quantity or stock`);
+                    return;
+                }
+                document.getElementById(`setSched`).classList.add(`active`);
+                document.getElementById(`firstName`).value = medication.first_name;
+                document.getElementById(`lastName`).value = medication.last_name;
+                document.getElementById(`contact`).value = medication.contact;
+                document.getElementById(`exContact`).value = medication.extra_contact;
+                document.getElementById(`scheduledFor`).value = `${medication.generic_name}(${medication.brand_name}) - ${medication.dosage}(${medication.form}) ${medication.dose_amount} ${medication.dose_unit}`;
+            });
+            clone.querySelector(`.info`).addEventListener(`click`, () => {
+                document.getElementById(`prescribedInfo`).classList.add(`active`);
+                document.getElementById(`presCreatedAt`).textContent = `${months[createdMonth - 1]} ${createdDay}, ${createdYear}`;
+                document.getElementById(`presValidUntil`).textContent = `${months[exMonth - 1]} ${exDay}, ${exYear}`;
+                document.getElementById(`pmId`).textContent = medication.id;
+                document.getElementById(`genericName`).textContent = medication.generic_name;
+                document.getElementById(`brandName`).textContent = medication.brand_name ? medication.brand_name : `N.A`;
+                document.getElementById(`quantity`).textContent = `${medication.quantity ? medication.quantity : `No stock`} ${medication.quantity_type ? medication.quantity_type : ``}`;
+                document.getElementById(`medDosage`).textContent = medication.dosage ? medication.dosage : `N.A`;
+                document.getElementById(`medForm`).textContent = medication.form ? medication.form : `N.A`;
+                document.getElementById(`presDose`).textContent = `${medication.dose_amount} ${medication.dose_unit}`;
+                document.getElementById(`presFrequency`).textContent = `${medication.frequency_per_day}x a day`;
+                document.getElementById(`presDuration`).textContent = `for ${medication.duration} ${medication.duration_unit}`;
+                document.getElementById(`presInstructions`).textContent = medication.instructions;
+            });
+            clone.querySelector(`.edit`).addEventListener(`click`, async (e) => {
+                state.prescription.id = id;
+                state.prescription.item = medication.id;
+                document.getElementById(`editMed`).classList.add(`active`);
+                document.getElementById(`editMedForm`).action = `/care/prescription/${id}/prescribed/${medication.id}/edit`;
+                document.getElementById(`otherInfo`).textContent = `${medication.generic_name}(${medication.brand_name}) - ${months[createdMonth - 1]} ${createdDay}, ${createdYear}`;
+                document.getElementById(`updateDoseAmount`).value = medication.dose_amount ? medication.dose_amount : `N/A`;
+                document.getElementById(`updateDoseUnit`).value = medication.dose_unit ? medication.dose_unit : `N/A`;
+                document.getElementById(`updateFrequencyPerDay`).value = medication.frequency_per_day ? medication.frequency_per_day : `N/A`;
+                document.getElementById(`updateDuration`).value = medication.duration ? medication.duration : `N/A`;
+                document.getElementById(`updateDurationUnit`).value = medication.duration_unit ? medication.duration_unit : `N/A`;
+                document.getElementById(`updateValidUntil`).value = medication.valid_until ? medication.valid_until : `N/A`;
+                document.getElementById(`updateInstructions`).value = medication.instructions ? medication.instructions : `N/A`;
+            });
             clone.querySelector(`.deletePrescribedMed`).addEventListener(`click`, async (e) => {
                 state.prescription.id = id;
                 state.prescription.item = medication.id;
@@ -1041,7 +1172,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                     responseMessage(data, data.error);
                     return;
                 }
-                loadPrescriptionItems(state.patient.id);
+                loadPatientPrescriptions(state.patient.id);
                 document.getElementById(`deletePrescribedMed`).classList.remove(`active`);
             } catch(err){
                 console.error(err);
@@ -1050,6 +1181,14 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
 
         document.getElementById(`prescribeMedForm`).addEventListener(`submit`, async (e) => {
             e.preventDefault();
+            const medName = document.getElementById(`medicineName`);
+            const doseAmount = document.getElementById(`doseAmount`);
+            const doseUnit = document.getElementById(`doseUnit`);
+            const frequencyPerDay = document.getElementById(`frequencyPerDay`);
+            const duration = document.getElementById(`duration`);
+            const durationUnit = document.getElementById(`durationUnit`);
+            const validUntil = document.getElementById(`validUntil`);
+            const instructions = document.getElementById(`instructions`);
             try{
                 const formdata = new FormData(e.target);
                 const res = await fetch(`/care/prescribe/${state.prescription.id}`, {
@@ -1062,13 +1201,76 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                     responseMessage(data, data.error);
                 }
 
+                loadPatientPrescriptions(state.patient.id);
                 responseMessage(data, data.message);
                 document.getElementById(`prescribeMed`).classList.remove(`active`);
-                loadPrescriptionItems(state.patient.id);
+                medName.value = ``;
+                doseAmount.value = ``;
+                doseUnit.value = ``;
+                frequencyPerDay.value = ``;
+                duration.value = ``;
+                durationUnit.value = ``;
+                validUntil.value = ``;
+                instructions.value = ``;
             } catch(err){
                 console.error(err);
             }
         });
+
+        document.getElementById(`editMedForm`).addEventListener(`submit`, async (e) => {
+            e.preventDefault();
+            try {
+                const updateDoseAmount = document.getElementById(`updateDoseAmount`);
+                const updateDoseUnit = document.getElementById(`updateDoseUnit`);
+                const updateFrequencyPerDay = document.getElementById(`updateFrequencyPerDay`);
+                const updateDuration = document.getElementById(`updateDuration`);
+                const updateDurationUnit = document.getElementById(`updateDurationUnit`);
+                const updateValidUntil = document.getElementById(`updateValidUntil`);
+                const updateInstructions = document.getElementById(`updateInstructions`);
+                const res = await fetch(`/care/prescription/${state.prescription.id}/prescribed/${state.prescription.item}/edit`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ doseAmount: updateDoseAmount.value, doseUnit: updateDoseUnit.value, frequencyPerDay: updateFrequencyPerDay.value, duration: updateDuration.value, durationUnit: updateDurationUnit.value, validUntil: updateValidUntil.value, instructions: updateInstructions.value })
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    responseMessage(data, data.error);
+                    return;
+                }
+
+                responseMessage(data, data.message);
+                loadPatientPrescriptions(state.patient.id);
+                document.getElementById(`editMed`).classList.remove(`active`);
+            } catch (err){
+                console.error(err);
+            }
+        });
+
+        document.getElementById(`setSchedForm`).addEventListener(`submit`, async (e) => {
+            e.preventDefault();
+            try {
+                const formdata = new FormData(e.target);
+                const res = await fetch(`/schedule/add`, {
+                    method: 'POST',
+                    body: formdata
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    responseMessage(data, data.error);
+                    return;
+                }
+
+                responseMessage(data, data.message);
+                document.getElementById(`setSched`).classList.remove(`active`);
+            } catch(err) {
+                console.error(err);
+            }
+        });
+
     }
 
     const patients = document.getElementById(`patients`);
@@ -1512,13 +1714,14 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             e.preventDefault();
             const updateSchedFor = document.getElementById(`updateSchedFor`).value;
             const updateTime = document.getElementById(`updateTime`).value;
+            const updateFrequency = document.getElementById(`updateFrequency`).value;
             try {
                 const res = await fetch(`/schedule/edit`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ id: state.schedule.id, schedFor: updateSchedFor, time: updateTime })
+                    body: JSON.stringify({ id: state.schedule.id, schedFor: updateSchedFor, time: updateTime, frequency: updateFrequency })
                 });
 
                 const data = await res.json();
@@ -1550,6 +1753,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 }
 
                 responseMessage(data, data.message);
+                occupiedDate = [];
                 loadList(`schedule`, renderSchedulesData);
                 document.getElementById(`deleteSched`).classList.remove(`active`);
             } catch(err) {
