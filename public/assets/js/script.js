@@ -30,7 +30,7 @@ function initCalendar(){
         const day = document.createElement(`span`);
         const currentDate = i - firstDay + 1;
         const formattedDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(currentDate).padStart(2, '0')}`;
-
+        todayDate = formattedDate;
         if(i < firstDay) {
             day.textContent = prevLastDate - firstDay + i + 1;
             day.classList.add(`prev-days`);
@@ -258,7 +258,7 @@ function renderPatientsDataForCare(data){
             document.getElementById(`firstName`).value = patient.first_name;
             document.getElementById(`lastName`).value = patient.last_name;
             document.getElementById(`contact`).value = patient.contact;
-            document.getElementById(`exContact`).value = patient.extra_contact;
+            document.getElementById(`exContact`).value = patient.extra_contact ? patient.extra_contact : `N/A`;
             document.getElementById(`scheduledFor`).value = `Taking medicines`;
         });
     });
@@ -434,16 +434,19 @@ function renderSchedulesData(data){
 
     data.collection.forEach(schedule => {
         const clone = template.content.cloneNode(true);
-        const [year, month, day] = schedule.date.split('-');
-        const timeFormat = new Date(`1972-12-01T${schedule.time}`).toLocaleTimeString('en-PH', { hour: 'numeric', minute: '2-digit', hour12: true });
-        const schedNotify = new Date(`${schedule.date}T${schedule.time}`).getTime();
         const date = new Date(schedule.date);
+        const [year, month, day] = schedule.date.split('-');
+        const timeFormat = new Date(`${schedule.date}T${schedule.time}`).toLocaleTimeString('en-PH', { hour: 'numeric', minute: '2-digit', hour12: true });
+        const now = new Date();
+        const [y, m, d] = schedule.date.split('-');
+        const [hh, mm, ss] = schedule.time.split(':');
+        const sched = new Date(Number(y), Number(m) - 1, Number(d), Number(hh) - 8, Number(mm), Number(ss));
 
         if(!occupiedDate.includes(schedule.date)){
             occupiedDate.push(schedule.date);
         }
 
-        if(schedNotify <= today.getTime()){
+        if(sched <= now){
             clone.querySelector(`li`).classList.add(`expired`);
             clone.querySelector(`.reSched`).classList.remove(`hidden`);
             clone.querySelector(`.editBtn`).classList.add(`hidden`);
@@ -490,7 +493,7 @@ function renderSchedulesData(data){
             document.getElementById(`vTime`).textContent = timeFormat;
             document.getElementById(`sName`).textContent = `${schedule.last_name}, ${schedule.first_name}`;
             document.getElementById(`sContact`).textContent = schedule.contact;
-            document.getElementById(`sExContact`).textContent = schedule.extra_contact;
+            document.getElementById(`sExContact`).textContent = schedule.extra_contact ? schedule.extra_contact : `N/A`;
         });
         clone.querySelector(`.deleteBtn`).addEventListener(`click`, () => {
             state.schedule.id = schedule.id;
@@ -522,6 +525,7 @@ async function reschedule(id, date) {
 
         responseMessage(data, data.message);
         loadList(`schedule`, renderSchedulesData);
+        occupiedDate = [];
     } catch(err){
         console.error(err);
     }
@@ -608,11 +612,10 @@ async function loadPatientPrescriptions(id) {
         }
 
         document.getElementById(`setSchedBtn`).addEventListener(`click`, () => {
-            document.getElementById(`scheduledFor`).value = `Taking ${data.collection.map(p => {
+            document.getElementById(`scheduledFor`).value = `Take ${data.collection.map(p => {
                 const [ month, day, year ] = new Date(p.created_at).toLocaleString(`en-PH`, { timeZone: 'Asia/Manila', month: '2-digit', day: '2-digit', year: 'numeric'}).split(`/`)
-
-                return `${months[month - 1]} ${day}, ${year}`
-            }).join(', ')} prescription/s`;
+                return `${months[month - 1]} ${day}, ${year} prescription ${p.condition_name ? `for ` + p.condition_name : ``}`
+            }).join(', ')} prescribed medicine/s`;
         });
 
         const container = document.getElementById(`prescription`);
@@ -1703,8 +1706,8 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
 
                 responseMessage(data, data.message);
                 document.getElementById(`setSched`).classList.remove(`active`);
+                occupiedDate = [];
                 loadList(`schedule`, renderSchedulesData);
-                selected.classList.remove(`selected`);
             } catch(err) {
                 console.error(err);
             }

@@ -136,6 +136,7 @@ class ScheduleController extends Controller {
                 'frequency' => $frequency,
                 'scheduledFor' => $scheduledFor,
             ];
+
             $sched = new Schedule();
             $sched->editSchedule($data);
 
@@ -144,7 +145,7 @@ class ScheduleController extends Controller {
         }
     }
 
-    public function reschedule($params){
+    public function reschedule(array $params){
         header('Content-Type: application/json');
         $input = json_decode(file_get_contents('php://input'), true);
         if($_SERVER['REQUEST_METHOD'] === 'PATCH'){
@@ -175,7 +176,7 @@ class ScheduleController extends Controller {
         }
     }
 
-    public function delete($params){
+    public function delete(array $params){
         header('Content-Type: application/json');
         $id = $params['id'] ?? null;
         $response = [];

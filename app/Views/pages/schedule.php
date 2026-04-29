@@ -175,7 +175,7 @@
     </form>
 </div>
 <template id="patientOptnTemplate">
-    <li class="patient p-sm">
+    <li class="patient p-sm" tabindex="0">
         <div class="profile">
             <img src="/assets/images/profile.png" alt="">
         </div>

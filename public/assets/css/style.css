@@ -1594,6 +1594,7 @@ select{
     overflow: auto;
     scrollbar-width: none;
     list-style-type: none;
+    gap: 0.2em;
 }
 
 #medicines #collection li {
@@ -1604,6 +1605,7 @@ select{
     padding: 1em 1.5em 1em 1em;
     border: var(--border);
     border-radius: var(--radius);
+    box-shadow: var(--shadow);
 }
 
 #medicines #collection button {
