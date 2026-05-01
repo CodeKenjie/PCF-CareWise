@@ -24,7 +24,7 @@
             </form>
         </div>
     </section>
-    <section class="acrylic-bg">
+    <section class="acrylic-bg main-panel">
         <ul id="collection"></ul>
     </section>
 </main>

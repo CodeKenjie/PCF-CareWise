@@ -149,6 +149,28 @@ class Patient extends Database {
         }
     }
 
+    public function getNewPatients(){
+        try {
+            $query = 'SELECT first_name, last_name, sex, created_at FROM patients ORDER BY id DESC LIMIT 3';
+            $stmt = $this->db->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $err){
+            $this->logger->error($err->getMessage());
+        }
+    }
+
+    public function getPatientStatus(){
+        try{
+            $query = 'SELECT status FROM patients';
+            $stmt = $this->db->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch(PDOException $err){
+            $this->logger->error($err->getMessage());
+        }
+    }
+
     public function getAllPatients(){
         try {
             $query = "SELECT *, DATE_PART('year', AGE(CURRENT_DATE, birthdate)) AS age FROM patients ORDER BY id ASC";

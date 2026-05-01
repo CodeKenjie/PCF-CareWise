@@ -83,6 +83,17 @@ class Schedule extends Database {
         }
     }
 
+    public function getSchedToday(){
+        try{
+            $query = 'SELECT * FROM schedules WHERE date = CURRENT_DATE';
+            $stmt = $this->db->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch(PDOException $err){
+            $this->logger->error($err->getMessage());
+        }
+    }
+
     public function getAll(){
         try{
             $query = 'SELECT * FROM schedules ORDER BY id ASC';

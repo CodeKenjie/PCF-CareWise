@@ -20,10 +20,10 @@
             </form>
         </div>
     </section>
-    <section class="acrylic-bg">
+    <section class="acrylic-bg main-panel">
         <ul id="collection"></ul>
     </section>
-    <section id="diagnose" class="acrylic-bg">
+    <section id="diagnose" class="acrylic-bg main-panel">
         <div id="info">
             <div class="avatar">
                 <span class="profile">
@@ -78,7 +78,7 @@
         <section class="btn-highlight btn-close" onclick="closePopup()"></section>
         <div>
             <span>
-                <label for="presCreatedAt"><strong>Valid Until:</strong></label>
+                <label for="presCreatedAt"><strong>Given Date:</strong></label>
                 <h3 id="presCreatedAt"></h3>
             </span>
             <span>
@@ -105,7 +105,7 @@
             </span>
         </div>
         <div>
-            <span style="flex: 0 0 fit-content">
+            <span>
                 <label for="medDosage"><strong>Medicine Dosage:</strong></label>
                 <h3 id="medDosage" class="ctr-text"></h3>
             </span>
@@ -114,7 +114,7 @@
                 <h3 id="medForm"></h3>
             </span>
             <span>
-                <label for="presFrequency"><strong>Medicine Form:</strong></label>
+                <label for="presFrequency"><strong>Frequency:</strong></label>
                 <h3 id="presFrequency"></h3>
             </span>
         </div>
@@ -126,6 +126,10 @@
             <span>
                 <label for="presDuration"><strong>Duration:</strong></label>
                 <h3 id="presDuration"></h3>
+            </span>
+            <span>
+                <label for="presExpirationdate"><strong>Medicine Exp.:</strong></label>
+                <h3 id="presMedExp"></h3>
             </span>
         </div>
         <span>

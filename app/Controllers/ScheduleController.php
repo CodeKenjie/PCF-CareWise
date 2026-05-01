@@ -194,6 +194,17 @@ class ScheduleController extends Controller {
         echo json_encode($response);
     }
 
+    public function today(){
+        header('Content-Type: application/json');
+        $response = []; 
+
+        $sched = new Schedule();
+        $scheduleToday = $sched->getSchedToday();
+
+        $response = [ 'ok' => true, 'code' => 200, 'collection' => $scheduleToday ];
+        echo json_encode($response);
+    }
+
     public function all(){
         header('Content-Type: application/json');
         $response = []; 

@@ -180,8 +180,9 @@ class InventoryController extends Controller {
         }
     }
 
-    public function delete($id){
+    public function delete(array $params){
         header('Content-Type: application/json');
+        $id = $params['id'] ?? null;
         $response = [];
 
         if($id === 'null'){
@@ -194,6 +195,26 @@ class InventoryController extends Controller {
         $item->deleteItem($id);
 
         $response = [ 'ok' => true, 'code' => 200, 'message' => 'Item: '. $id . ' is successfully deleted!']; 
+        echo json_encode($response);
+    }
+
+    public function chart(){
+        header('Content-Type: application/json');
+        $response = [];
+        $item = new Item();
+        $items = $item->stocks();
+
+        $response = [ 'ok' => true, 'code' => 200, 'collection' => $items ];
+        echo json_encode($response);
+    }
+
+    public function low(){
+        header('Content-Type: application/json');
+        $response = [];
+        $item = new Item();
+        $itemLowStocks = $item->getItemLowStocks();
+
+        $response = [ 'ok' => true, 'code' => 200, 'collection' => $itemLowStocks ];
         echo json_encode($response);
     }
 }

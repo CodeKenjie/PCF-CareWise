@@ -130,10 +130,14 @@ main {
     height: 100dvh;
     overflow: auto;
     scrollbar-width: none;
-    z-index: 1;
     scroll-snap-type: y mandatory;
     scroll-behavior: smooth;
     scroll-padding: 1em;
+    z-index: 1;
+}
+
+.main-panel {
+    height: clamp(40rem, 80% + 5rem, 80rem);
 }
 
 section {
@@ -209,6 +213,10 @@ select{
     border: var(--border);
     border-radius: var(--radius);
     padding: 1em;
+}
+
+ul {
+    list-style-type: none;
 }
 
 .hidden {
@@ -727,6 +735,7 @@ select{
 .btn-highlight,
 .btn-critical {
     background: transparent;
+    cursor: pointer;
 }
 
 .btn-accent:hover {
@@ -778,7 +787,6 @@ select{
     background: var(--bg-gradient);
     backdrop-filter: blur(16px);
     box-shadow: var(--shadow);
-    height: clamp(40rem, 80% + 5rem, 80rem);
 }
 
 .acrylic-bg::before {
@@ -823,7 +831,7 @@ select{
 
 #sidebar.close li:has(a) span,
 #sidebar.close section:has(div) h4,
-#sidebar.close section div{
+#sidebar.close section > div{
     width: 0;
     overflow: hidden;
     margin-left: -0.5em;
@@ -864,14 +872,14 @@ select{
     object-fit: cover;
 }
 
-#sidebar section span img {
+#sidebar section > span img {
     width: 100%;
     height: 100%;
 }
 
-#sidebar section div {
-    white-space: nowrap;
+#sidebar section > div{
     overflow: hidden;
+    white-space: nowrap;
 }
 
 #sidebar ul{
@@ -880,7 +888,6 @@ select{
     flex-direction: column;
     font-size: var(--super-small-header);
     font-weight: var(--bold);
-    list-style-type: none;
     margin: 1em 0;
 }
 
@@ -973,6 +980,225 @@ select{
     left: 110%;
 }
 
+#dashboard {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+#dashboard > section {
+    flex: 1 1 100%;
+    display: flex;
+}
+
+#dashboard > section:nth-of-type(1){
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    height: fit-content;
+    padding: 0;
+    align-self: flex-end;
+}
+
+#dashboard > .sub-sec {
+    flex: 1 1 0;
+    width: 50%;
+    min-width: 25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1em;
+}
+
+.sub-sec > section{
+    flex-direction: column;
+    padding: 1em;
+}
+
+#dashboard > section:nth-of-type(2){
+    flex: 1 1 0;
+    width: 50%;
+    min-width: 25rem;
+    height: fit-content;
+    flex-wrap: wrap;
+    justify-content: center;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    scroll-padding: 0.5em;
+}
+
+#dashboard > section:nth-of-type(2) > div {
+    display: flex;
+    flex-wrap: wrap;
+    height: fit-content;
+    justify-content: center;
+    align-items: center;
+    gap: 1em;
+    scroll-snap-align: start;
+}
+
+#dashboard .mini {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2em;
+    border-radius: 2em;
+    text-align: center;
+    vertical-align: middle;
+}
+
+#dashboard #newPatients{
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2em;
+}
+
+#dashboard #newPatients > li {
+    display: flex;
+    padding: 1em;
+    box-shadow: var(--shadow);
+    border-radius: var(--radius);
+
+    h3{
+        flex: 1 1 0;
+        text-align: center;
+    }
+}
+
+#dashboard #scheduleToday{
+    display: flex;
+    flex-direction: column;
+    gap: 0.2em;
+    overflow: auto;
+    scrollbar-width: none;
+    scroll-snap-type: y mandatory;
+    scroll-behavior: smooth;
+    scroll-padding: 1em;
+}
+
+#dashboard #scheduleToday > li {
+    border: var(--border);
+    border-radius: var(--radius);
+    padding: 1em;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+    box-shadow: var(--shadow);
+    scroll-snap-align: start;
+
+    && span {
+        background: var(--bg-dim);
+        padding: 0.5em;
+        border-radius: 0 0 var(--radius) var(--radius);
+    }
+}
+
+#dashboard #inventoryRestock {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2em;
+    overflow: auto;
+    scrollbar-width: none;
+}
+
+#dashboard #inventoryRestock li {
+    display: flex;
+    padding: 0.5em;
+    border: var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    align-items: center;
+    gap: 0.5em;
+
+    h3 {
+        flex: 1 1 0;
+        text-align: center;
+        padding: 0.5em;
+    }
+
+    .quantities {
+        height: 0;
+        width: 0;
+        overflow: hidden;
+        pointer-events: none;
+    }
+
+    .quantities.up {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        bottom: 0;
+        background: var(--bg);
+        border: var(--border);
+        border-radius: var(--radius);
+        height: 100%;
+        width: 100%;
+        transition: height 300ms ease;
+        text-align: center;
+        vertical-align: middle;
+    }
+}
+
+#dashboard .donut-chart {
+    width: 20rem;
+    height: 20rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#dashboard .info {
+    display: flex;
+    flex-direction: column;
+    height: fit-content;
+    gap: 1em;
+    p {
+        display: flex;
+        gap: 1em;
+    }
+
+    p::before {
+        position: relative;
+        gap: 1em;
+        content: "";
+        background: var(--good);
+        width: 1em;
+        height: 1em;
+        border-radius: 50%;
+    }
+
+    p:nth-of-type(2)::before{
+        background: var(--moderate);
+    }
+
+    p:nth-of-type(3)::before{
+        background: var(--critical);
+    }
+}
+
+#dashboard .donut-chart > .donut {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+#dashboard .donut > .segment {
+    fill: none;
+    stroke-width: 5;
+    stroke-linecap: butt;
+    transition: all 300ms ease;
+    cursor: pointer;
+}
+
+#dashboard .donut > .high { stroke: var(--good) }
+#dashboard .donut > .medium { stroke: var(--moderate) }
+#dashboard .donut > .low { stroke: var(--critical) }
+#dashboard .donut > .good { stroke: var(--good) }
+#dashboard .donut > .soon { stroke: var(--moderate) }
+#dashboard .donut > .expired { stroke: var(--critical) }
+
 #care{
     flex: 1 1 0;
     display: flex;
@@ -1001,8 +1227,8 @@ select{
     flex-wrap: wrap;
 }
 
-#care.open section:nth-of-type(2),
-#care.open section:nth-of-type(3){
+#care.open > section:nth-of-type(2),
+#care.open > section:nth-of-type(3){
     flex: 1 1 0;
     min-width: 25rem;
 }
@@ -1016,7 +1242,6 @@ select{
     flex: 1 1 0;
     display: flex;
     flex-direction: column;
-    list-style-type: none;
     overflow: auto;
     scrollbar-width: none;
     gap: 0.1em;
@@ -1115,7 +1340,6 @@ select{
     display: flex;
     flex-direction: column;
     border-radius: var(--radius);
-    list-style-type: none;
     overflow-x: auto;
     scrollbar-width: none;
 }
@@ -1133,7 +1357,6 @@ select{
 
 #care #prescription {
     flex: 1 1 0;
-    list-style-type: none;
     overflow-x: auto;
     scrollbar-width: none;
     scroll-snap-type: y mandatory;
@@ -1220,9 +1443,9 @@ select{
     display: flex;
     flex-direction: column;
     border-radius: var(--radius);
-    list-style-type: none;
     overflow: auto;
     scrollbar-width: none;
+    gap: 0.2em;
 }
 
 #patients #collection li {
@@ -1477,7 +1700,6 @@ select{
     background: var(--bg-dim);
     display: flex;
     flex-direction: column;
-    list-style-type: none;
     padding: 0.5em;
     border-radius: var(--radius);
     gap: 1em;
@@ -1543,7 +1765,6 @@ select{
     display: flex;
     flex-direction: column;
     border-radius: var(--radius);
-    list-style-type: none;
     width: 97%;
     height: 0;
     overflow-x: auto;
@@ -1593,7 +1814,6 @@ select{
     flex-direction: column;
     overflow: auto;
     scrollbar-width: none;
-    list-style-type: none;
     gap: 0.2em;
 }
 
@@ -1640,9 +1860,9 @@ select{
     display: flex;
     flex-direction: column;
     border-radius: var(--radius);
-    list-style-type: none; 
     overflow: auto;
     scrollbar-width: none;
+    gap: 0.2em;
 }
 
 #inventory #collection li {

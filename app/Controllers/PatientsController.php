@@ -164,8 +164,9 @@ class PatientsController extends Controller {
         }
     }
 
-    public function delete($id) {
+    public function delete(array $params) {
         header('Content-Type: application/json');
+        $id = $params['id'] ?? null;
         $response = [];
 
         if($id === 'null'){
@@ -201,6 +202,7 @@ class PatientsController extends Controller {
     }
 
     public function search(){
+        header('Content-Type: application/json');
         $input = $_GET['search'] ?? '';
         $response = [];
 
@@ -210,6 +212,7 @@ class PatientsController extends Controller {
     }
 
     public function dropdown(){
+        header('Content-Type: application/json');
         $input = $_GET['search'] ?? '';
         $response = [];
 
@@ -218,9 +221,29 @@ class PatientsController extends Controller {
         echo json_encode($response);
     }
 
-    public function getAll(){
-        $response = [];
+    public function new(){
         header('Content-Type: application/json');
+        $response = [];
+        $patients = new Patient();
+        $newPatients = $patients->getNewPatients();
+
+        $response = ['ok' => true, 'code' => 200, 'collection' => $newPatients ];
+        echo json_encode($response);
+    }
+
+    public function status(){
+        header('Content-Type: application/json');
+        $response = [];
+        $patients = new Patient();
+        $status = $patients->getPatientStatus();
+
+        $response = ['ok' => true, 'code' => 200, 'collection' => $status ];
+        echo json_encode($response);
+    }
+
+    public function getAll(){
+        header('Content-Type: application/json');
+        $response = [];
         $patients = new Patient();
         $patientsList = $patients->getAllPatients();
 

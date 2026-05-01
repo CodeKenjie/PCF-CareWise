@@ -71,7 +71,7 @@ class PrescriptionItem extends Database {
     public function get($id){
         try{
             $query = 'SELECT 
-                        inventory.quantity, inventory.quantity_type,
+                        inventory.quantity, inventory.quantity_type, inventory.expiration_date,
                         medicines.generic_name, medicines.brand_name, medicines.dosage, medicines.form,
                         prescriptions.patient_id,
                         patients.first_name,

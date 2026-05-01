@@ -14,6 +14,110 @@ let month = today.getMonth();
 let year = today.getFullYear();
 let occupiedDate = [];
 
+function initChart(stockData){
+    const total = stockData.high + stockData.medium + stockData.low;
+    if (total === 0) return;
+    const percentages = { high: (stockData.high/total) * 100, medium: (stockData.medium / total) * 100, low: (stockData.low / total) * 100 };
+    const expPercentages = { good: (stockData.good/total) * 100, soon: (stockData.soon / total) * 100, expired: (stockData.expired / total) * 100 };
+    const radius = 15.915;
+    const circumference = 2 * Math.PI * radius;
+    const high = document.querySelector(`.high`);
+    const medium = document.querySelector(`.medium`);
+    const low = document.querySelector(`.low`);
+
+    const good = document.querySelector(`.good`);
+    const soon = document.querySelector(`.soon`);
+    const expired = document.querySelector(`.expired`);
+
+    const totalItems = document.getElementById(`totalItems`);
+    const expStatus = document.getElementById(`exp-status`);
+    const label = document.getElementById(`label`);
+    const explabel = document.getElementById(`explabel`);
+
+    if (!high || !medium || !low || !good || !soon || !expired) return;
+
+    function setSegment(segment, percent, offset){
+        const dash = (percent / 100) * circumference;
+        segment.style.strokeDasharray = `${dash} ${circumference}`;
+        segment.style.strokeDashoffset = offset;
+    }
+
+    let offset = 0;
+
+    document.querySelectorAll(`.segment`).forEach(s => {
+        s.style.strokeDasharray  = `0 ${circumference}`
+
+        s.addEventListener(`mouseleave`, () => {
+            totalItems.textContent = total;
+            expStatus.textContent = total;
+            label.textContent = `Items`;
+            explabel.textContent = `Items`;
+        });
+    });
+
+    setTimeout(() => {
+        setSegment(high, percentages.high, offset);
+        offset -= (percentages.high / 100) * circumference;
+
+        setSegment(medium, percentages.medium, offset);
+        offset -= (percentages.medium / 100) * circumference;
+
+        setSegment(low, percentages.low, offset);
+
+        setSegment(good, expPercentages.good, offset);
+        offset -= (expPercentages.good / 100) * circumference;
+
+        setSegment(soon, expPercentages.soon, offset);
+        offset -= (expPercentages.soon / 100) * circumference;
+
+        setSegment(expired, expPercentages.expired, offset);
+    }, 100);
+
+    totalItems.textContent = total;
+    expStatus.textContent = total;
+
+    high.addEventListener(`mouseenter`, () => {
+        totalItems.textContent = percentages.high.toFixed(1) + `%`;
+        label.textContent = `High Stocks`;
+    });
+
+    medium.addEventListener(`mouseenter`, () => {
+        totalItems.textContent = percentages.medium.toFixed(1) + `%`;
+        label.textContent = `Medium Stocks`;
+    });
+
+    low.addEventListener(`mouseenter`, () => {
+        totalItems.textContent = percentages.low.toFixed(1) + `%`;
+        label.textContent = `Low Stocks`;
+    });
+
+    good.addEventListener(`mouseenter`, () => {
+        expStatus.textContent = expPercentages.good.toFixed(1) + `%`;
+        explabel.textContent = `Good`;
+    });
+
+    soon.addEventListener(`mouseenter`, () => {
+        expStatus.textContent = expPercentages.soon.toFixed(1) + `%`;
+        explabel.textContent = `Expiring Soon`;
+    });
+
+    expired.addEventListener(`mouseenter`, () => {
+        expStatus.textContent = expPercentages.expired.toFixed(1) + `%`;
+        explabel.textContent = `Expired`;
+    });
+}
+
+function calculateStocks(collection){
+    return {
+        high: collection.filter(i => i.stock_status.includes(`High Stocks`)).length,
+        medium: collection.filter(i => i.stock_status.includes(`Medium Stocks`)).length,
+        low: collection.filter(i => i.stock_status.includes(`Low Stocks`)).length,
+        good: collection.filter(i => i.expiration_status.includes(`Good`)).length,
+        soon: collection.filter(i => i.expiration_status.includes(`Expiring Soon`)).length,
+        expired: collection.filter(i => i.expiration_status.includes(`Expired`)).length,
+    }
+}
+
 function initCalendar(){ 
     const date = document.getElementById(`date`);
     const daysContainer = document.getElementById(`days`);
@@ -706,6 +810,7 @@ async function loadPrescriptionItems(id, container){
                 document.getElementById(`medForm`).textContent = medication.form ? medication.form : `N.A`;
                 document.getElementById(`presDose`).textContent = `${medication.dose_amount} ${medication.dose_unit}`;
                 document.getElementById(`presFrequency`).textContent = `${medication.frequency_per_day}x a day`;
+                document.getElementById(`presMedExp`).textContent = `${medication.expiration_date}`;
                 document.getElementById(`presDuration`).textContent = `for ${medication.duration} ${medication.duration_unit}`;
                 document.getElementById(`presInstructions`).textContent = medication.instructions;
             });
@@ -740,6 +845,7 @@ async function loadPrescriptionItems(id, container){
 }
 
 async function loadList(page, render) {
+    const dashboard = document.getElementById(`dashboard`);
     try {
         const res = await fetch(`/${page}/all`, {
             method: "GET"
@@ -750,7 +856,7 @@ async function loadList(page, render) {
             responseMessage(data, data.error);
             return;
         }
-        
+
         return render(data);
     } catch (err) {
         console.error(err);
@@ -902,6 +1008,23 @@ async function dropdown(url, render, input){
         }
 
         return render(data);
+    } catch (err){
+        console.error(err);
+    }
+}
+
+async function chart(page) {
+    try {
+        const res = await fetch(`/dashboard/${page}/chart`, {
+            method: 'GET'
+        });
+
+        const data = await res.json();
+        if(!data.ok){
+            responseMessage(data, data.error);
+            return;
+        }
+        return calculateStocks(data.collection);
     } catch (err){
         console.error(err);
     }
@@ -1075,6 +1198,231 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 responseMessage(data, data.message);
                 window.location = '/dashboard';
             } catch(err) {
+                console.error(err);
+            }
+        });
+    }
+
+    const dashboard = document.getElementById(`dashboard`);
+    if(dashboard){
+        chart(`inventory`).then(stockData => {
+            if(stockData){
+                initChart(stockData);
+            }
+        });
+
+        async function loadStatus(){
+            try {
+                const res = await fetch(`/dashboard/patients/status`, {
+                    method: 'GET'
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    return responseMessage(data, data.error);
+                }
+
+                return {
+                    active: data.collection.filter( p => p.status.includes('Active')).length,
+                    inactive: data.collection.filter( p => p.status.includes('Inactive')).length,
+                    total: data.collection.length,
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        loadStatus().then(p => {
+            document.getElementById(`activePatients`).textContent = p.active;
+            document.getElementById(`inactivePatients`).textContent = p.inactive;
+            document.getElementById(`totalPatients`).textContent = p.total;
+        });
+
+        async function loadNew() {
+            try {
+                const res = await fetch(`/dashboard/patients/new`, {
+                    method: 'GET'
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    return responseMessage(false, 'Server Error Cant get new patients');
+                }
+            
+                const container = document.getElementById(`newPatients`);
+                const template = document.getElementById(`newPatientCard`);
+
+                container.innerHTML = ``;
+                data.collection.forEach(patient => {
+                    const clone = template.content.cloneNode(true);
+                    const [ month, day, year ] = new Date(patient.created_at).toLocaleString(`en-PH`, { timeZone: 'Asia/Manila', month: '2-digit', day: '2-digit', year: 'numeric' }).split(`/`);
+                    clone.querySelector(`.patientName`).textContent = `${patient.last_name}, ${patient.first_name}`;
+                    clone.querySelector(`.patientSex`).textContent = patient.sex;
+                    clone.querySelector(`.addedDate`).textContent = `${months[month - 1]} ${day}, ${year}`;
+                    container.appendChild(clone);
+                });
+            } catch(err){
+                console.error(err);
+            }
+        } loadNew();
+
+        (async () => {
+            try {
+                const res = await fetch(`/dashboard/schedule/today`, {
+                    method: 'GET'
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    return responseMessage(false, `Server Error: cant get todays schedules`);
+                }
+
+                const container = document.getElementById(`scheduleToday`);
+                const template = document.getElementById(`todaySchedCard`);
+                data.collection.forEach(schedule => {
+                    const clone = template.content.cloneNode(true);
+                    const timeFormat = new Date(`${schedule.date}T${schedule.time}`).toLocaleTimeString('en-PH', { hour: 'numeric', minute: '2-digit', hour12: true });
+                    const [year, month, day] = schedule.date.split('-');
+
+                    clone.querySelector(`.schedDate`).textContent = `${months[month - 1]} ${day}, ${year}`;
+                    clone.querySelector(`.schedTime`).textContent = `${timeFormat} (${schedule.frequency})`;
+                    clone.querySelector(`.clientName`).textContent = `${schedule.last_name}, ${schedule.first_name}`;
+                    clone.querySelector(`.scheduledFor`).textContent = schedule.scheduled_for;
+                    container.appendChild(clone);
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        })();
+
+        async function lowStocks(){
+            try {
+                const res = await fetch(`/dashboard/inventory/low`, {
+                    method: 'GET'
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    return responseMessage(false, `Server Error: Can't get items`);
+                }
+
+                const container = document.getElementById(`inventoryRestock`);
+                const template = document.getElementById(`lowItemCard`);
+                container.innerHTML = ``;
+                data.collection.forEach(item => {
+                    const clone = template.content.cloneNode(true);
+                    const status = clone.querySelector(`.itemStatus`);
+                    const itemQuant = clone.querySelector(`.itemQuant`);
+                    const [year, month, day] = item.expiration_date.split('-');
+                    clone.querySelector(`.itemName`).textContent = item.name;
+                    clone.querySelector(`.itemCategory`).textContent = item.category;
+                    status.textContent = item.stock_status;
+                    itemQuant.textContent = `Quantity: ${item.quantity} / ${item.minimum_quantity} ${item.quantity_type}`;
+                    status.setAttribute(`stock-status`, item.stock_status);
+                    if (item.stock_status === "Medium Stocks") {
+                        status.classList.add(`moderate`);
+                    } else {
+                        status.classList.add(`critical`);
+                    }
+
+                    const quantities = clone.querySelector(`.quantities`);
+                    status.addEventListener(`mouseenter`, () => {
+                        quantities.classList.add(`up`);
+                    });
+                    status.addEventListener(`mouseleave`, () => {
+                        quantities.classList.remove(`up`);
+                    });
+
+                    status.addEventListener(`click`, () => {
+                        if(status.getAttribute(`data-showing`) === 'expiration'){
+                            status.textContent = status.getAttribute(`stock-status`);
+                            itemQuant.textContent = `Quantity: ${item.quantity} / ${item.minimum_quantity} ${item.quantity_type}`;
+                            status.classList.remove(`good`, `moderate`, `critical`);
+                            (item.stock_status === "Medium Stocks") ? status.classList.add(`moderate`) : status.classList.add(`critical`);
+                            status.setAttribute(`data-showing`, `stock`);
+                        } else {
+                            status.textContent = item.expiration_status;
+                            itemQuant.textContent = `Expiration: ${months[month - 1]} ${day}, ${year}`;
+                            status.classList.remove(`good`, `moderate`, `critical`);
+                            (item.expiration_status === "Good") ? status.classList.add(`good`) : (item.expiration_status === "Expring Soon") ? status.classList.add(`moderate`) : exprStatus.classList.add(`critical`);
+                            status.setAttribute(`data-showing`, `expiration`);
+                        }
+                    });
+                    clone.querySelector(`.adjustBtn`).addEventListener(`click`, () => {
+                        state.item.id = item.id;
+                        document.getElementById(`adjust`).classList.add(`active`);
+                        document.getElementById(`imName`).textContent = item.name;
+                        document.getElementById(`imCurrentQuant`).textContent = `${item.quantity} ${item.quantity_type}`;
+                    });
+                    clone.querySelector(`.deleteBtn`).addEventListener(`click`, () => {
+                        state.item.id = item.id;
+                        document.getElementById(`deleteItem`).classList.add(`active`);
+                        document.getElementById(`name`).textContent = item.name;
+                        document.getElementById(`id`).textContent = item.id;
+                    });
+
+                    container.appendChild(clone);
+                });
+            } catch(err){
+                console.error(err);
+            }
+        } lowStocks();
+
+        document.getElementById(`importBtn`).addEventListener(`click`, (e) => {
+            e.preventDefault();
+            const valueInput = document.getElementById(`valueInput`).value;
+            adjustQuantity(Number(valueInput), 'import');
+            lowStocks();
+        });
+
+        const deleteItemForm = document.getElementById(`deleteItemForm`);
+        deleteItemForm.addEventListener(`submit`, async (e) => {
+            e.preventDefault();
+            try {
+                const res = await fetch(`/inventory/delete/${state.item.id}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    responseMessage(data, data.error);
+                    return;
+                }
+
+                responseMessage(data, data.message);
+                document.getElementById(`deleteItem`).classList.remove(`active`);
+                loadList('inventory', renderItemData);
+            } catch (err){
+                console.error(err);
+            }
+        });
+
+        document.getElementById(`registerPatientBtn`).addEventListener(`click`, () => {
+            document.getElementById(`registerPatient`).classList.add(`active`);
+        });
+
+        document.getElementById(`registerPatientForm`).addEventListener(`submit`, async (e) => {
+            e.preventDefault();
+            const formdata = new FormData(e.target);
+            try {
+                const res = await fetch('/patients/register', {
+                    method:'POST',
+                    body: formdata
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    responseMessage(data, data.error);
+                }
+
+                responseMessage(data, data.message);
+                registerPatient.classList.remove('active');
+                loadNew();
+                loadStatus().then(p => {
+                    document.getElementById(`activePatients`).textContent = p.active;
+                    document.getElementById(`totalPatients`).textContent = p.total;
+                });
+            } catch (err) {
                 console.error(err);
             }
         });

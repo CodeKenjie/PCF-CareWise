@@ -7,7 +7,7 @@
         flex-direction: row;
     }
 
-    #sidebar section {
+    #sidebar #profile {
         padding: 1em;
     }
 }
@@ -17,7 +17,7 @@
     main {
         padding-bottom: 6em;
     }
-    #sidebar section {
+    #sidebar #profile {
         padding: 1em;
     }
 }
@@ -63,12 +63,12 @@
         height: var(--header);
     }
 
-    #sidebar section span {
+    #sidebar #profile span {
         width: 3rem;
         height: 3rem;
     }
 
-    #sidebar section{
+    #sidebar #profile{
         height: fit-content;
         margin: 0;
         justify-content: center;
@@ -157,7 +157,7 @@
         justify-content: center;
     }
 
-    #sidebar section {
+    #sidebar #profile {
         padding: 1em;
     }
 
@@ -229,12 +229,12 @@
         height: var(--header);
     }
 
-    #sidebar section span {
+    #sidebar #profile span {
         width: 3rem;
         height: 3rem;
     }
 
-    #sidebar section{
+    #sidebar #profile{
         height: fit-content;
         margin: 0;
         justify-content: center;

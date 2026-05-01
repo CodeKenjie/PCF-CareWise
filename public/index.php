@@ -17,6 +17,11 @@ $router->get('/register', 'App\Controllers\RegisterController@index');
 $router->post('/register', 'App\Controllers\UserController@register');
 
 $router->get('/dashboard', 'App\Controllers\DashboardController@index');
+$router->get('/dashboard/inventory/chart', 'App\Controllers\InventoryController@chart');
+$router->get('/dashboard/patients/status', 'App\Controllers\PatientsController@status');
+$router->get('/dashboard/patients/new', 'App\Controllers\PatientsController@new');
+$router->get('/dashboard/schedule/today', 'App\Controllers\ScheduleController@today');
+$router->get('/dashboard/inventory/low', 'App\Controllers\InventoryController@low');
 
 $router->get('/care', 'App\Controllers\CareController@index');
 $router->get('/care/all', 'App\Controllers\PatientsController@getAll');
