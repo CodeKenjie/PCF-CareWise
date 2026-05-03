@@ -63,8 +63,8 @@
             <img src="assets/images/profile.png" alt="">
         </span>
         <div>
-            <h4 class="sm-h"><?= htmlspecialchars($userDisplayName) ?></h4>
-            <h4 class="sb-h"><?= htmlspecialchars($userRole) ?></h4>
+            <h4 class="sm-h"><?= htmlspecialchars($displayName ?? '') ?></h4>
+            <h4 class="sb-h"><?= htmlspecialchars($position ?? '') ?></h4>
         </div>
     </section>
 </aside>

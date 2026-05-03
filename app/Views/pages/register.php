@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $title ?></title>
+    <title>PCF:CareWise - Register</title>
     <link rel="icon" href="assets/images/logo.png"/>
     <link rel="stylesheet" href="assets/css/style.css"/>
     <link rel="stylesheet" href="assets/css/media.css"/>
@@ -49,12 +49,12 @@
                         <label for="sex">Sex</label>
                     </span>
                     <span>
-                        <select name="role" required>
+                        <select name="position" required>
                             <option value="" hidden></option>
-                            <option value="admin">Admin</option>
+                            <option value="Doctor">Doctor</option>
                             <option value="staff">Staff</option>
                         </select>
-                        <label for="role">Role</label>
+                        <label for="role">Position</label>
                     </span>
                 </div>
                 <span class="p-sm">

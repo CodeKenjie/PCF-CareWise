@@ -8,6 +8,8 @@ use App\Models\PrescriptionItem;
 
 class PrescriptionItemsController extends Controller {
     public function prescribe($params){
+        $this->editorOnly();
+
         header('Content-Type: application/json');
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
             $id = $params['id'] ?? null;
@@ -80,6 +82,8 @@ class PrescriptionItemsController extends Controller {
     }
 
     public function edit($params){
+        $this->editorOnly();
+
         header('Content-Type: application/json');
         if($_SERVER['REQUEST_METHOD'] === 'PUT'){
             $input = json_decode(file_get_contents('php://input'), true);
@@ -171,6 +175,8 @@ class PrescriptionItemsController extends Controller {
     }
 
     public function delete($params){
+        $this->editorOnly();
+
         header('Content-Type: application/json');
         $id = $params['id'] ?? null;
         $prescriptionId = $params['prescriptionId'] ?? null;

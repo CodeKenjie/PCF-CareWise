@@ -29,6 +29,10 @@
         display: none;
     }
 
+    #me .part {
+        grid-template-columns: repeat(1, 1fr);
+    }
+
     #register header {
         flex-direction: column;
     }

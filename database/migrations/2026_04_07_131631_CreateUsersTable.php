@@ -11,16 +11,18 @@ class CreateUsersTable extends Migration {
                         display_name VARCHAR(50) NOT NULL, 
                         first_name VARCHAR(200) NOT NULL,
                         last_name VARCHAR(200) NOT NULL,
+                        position VARCHAR(200) NOT NULL,
                         birthdate DATE,
                         sex VARCHAR(10), 
                         address VARCHAR(255), 
-                        role VARCHAR(100), 
+                        contact VARCHAR(255), 
                         email VARCHAR(200) UNIQUE NOT NULL, 
                         password VARCHAR(255) NOT NULL,
-                        verified BOOLEAN NOT NULL DEFAULT FALSE,
+                        request BOOLEAN DEFAULT FALSE, 
+                        is_editor BOOLEAN DEFAULT FALSE, 
+                        is_verified BOOLEAN NOT NULL DEFAULT FALSE,
                         created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
-
-                )';
+                 )';
         $this->createTable($query);
     }
 

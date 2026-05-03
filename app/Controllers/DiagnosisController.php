@@ -7,11 +7,14 @@ use App\Models\Diagnosis;
 
 class DiagnosisController extends Controller{
     public function add($params){
+        $this->editorOnly();
+
         header('Content-Type: application/json');
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
             $id = $params['id'] ?? null;
             $conditionName = $_POST['conditionName'] ?? null;
             $response = [];
+
 
             if(empty($conditionName) || $conditionName === null){
                 $response = [ 'ok' => false, 'code' => 400, 'error' => 'Please Enter a condition name'];
@@ -29,6 +32,7 @@ class DiagnosisController extends Controller{
                 'id' => $id,
                 'conditionName' => ucwords($conditionName),
             ];
+
 
             $diagnose = new Diagnosis();
             $diagnose->create($data);
@@ -49,6 +53,7 @@ class DiagnosisController extends Controller{
             exit;
         }
 
+
         $diagnose = new Diagnosis();
         $diagnosis = $diagnose->get($id);
 
@@ -57,6 +62,8 @@ class DiagnosisController extends Controller{
     }
 
     public function delete($params){
+        $this->editorOnly();
+
         header('Content-Type: application/json');
         $id = $params['id'] ?? null;
         $patientId = $params['patientId'] ?? null;
@@ -73,6 +80,7 @@ class DiagnosisController extends Controller{
             echo json_encode($response);
             exit;
         }
+
 
         $data = [
             'id' => $id,

@@ -1,9 +1,7 @@
 <?php
 namespace App\Controllers;
 use App\Core\Controller;
-use App\Core\Database;
 use App\Models\User;
-use DateTime;
 
 class UserController extends Controller {
     public function register() {
@@ -16,7 +14,7 @@ class UserController extends Controller {
             $sex = $_POST['sex'] ?? '';
             $email = filter_var($_POST['email'], FILTER_VALIDATE_EMAIL) ?? '';
             $password = $_POST['password'] ?? '';
-            $role = $_POST['role'] ?? '';
+            $position = $_POST['position'] ?? '';
             $confPass = $_POST['confPass'] ?? '';
             $accept = isset($_POST['accept']);
 
@@ -43,15 +41,16 @@ class UserController extends Controller {
                 echo json_encode($response);
                 exit;
             }
-            
+
             $data = [
                 'displayName'=> $displayName,
                 'firstName'=> ucwords($firstName),
                 'lastName'=> ucwords($lastName),
                 'sex'=> ucwords($sex),
+                'position'=> $position,
+                'isEditor'=> ($position ?? '') === 'ADMIN' ? true : false,
                 'email'=> strtolower($email),
                 'password'=>$password,
-                'role'=> $role,
             ];
             $user = new User();
 
@@ -103,6 +102,83 @@ class UserController extends Controller {
         }
     }
 
+    public function update(){
+        header('Content-Type: application/json');
+        if($_SERVER['REQUEST_METHOD'] === 'POST'){
+            $user = $this->getLoggedUser();
+            $id = $user['id'] ?? null;
+            $displayName = $_POST['displayName'] ?? '';
+            $firstName = $_POST['firstName'] ?? '';
+            $lastName = $_POST['lastName'] ?? '';
+            $sex = $_POST['sex'] ?? '';
+            $position = $_POST['position'] ?? '';
+            $birthdate = $this->notApplicable($_POST['birthdate'] ?? '');
+            $contact = $this->notApplicable($_POST['contact'] ?? '');
+            $address = $this->notApplicable($_POST['address'] ?? '');
+            $response = [];
+
+            if($id === null){
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'No logged user detected'];
+                echo json_encode($response);
+                exit;
+            }
+
+            $data = [
+                'id' => $id,
+                'displayName' => $displayName,
+                'firstName' => ucwords($firstName),
+                'lastName' => ucwords($lastName),
+                'sex' => ucfirst($sex),
+                'position' => $position,
+                'birthdate' => $birthdate,
+                'contact' => $contact,
+                'address' => strtoupper($address)
+            ];
+
+            (new User())->updateUserInfo($data);
+            $response = [ 'ok' => true, 'code' => 200, 'message' => 'Successfully updated your info'];
+            echo json_encode($response);
+        }
+    }
+
+    public function changeRole(array $params){
+        $this->editorOnly();
+
+        header('Content-Type: application/json');
+        if($_SERVER['REQUEST_METHOD'] === 'PATCH'){
+            $id = $params['id'] ?? null;
+            $response = [];
+
+            if($id === null){
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'Error: No account selected' ];
+                echo json_encode($response);
+                exit;
+            }
+
+            (new User)->changeRole($id);
+            $response = [ 'ok' => true, 'code' => 200, 'message' => 'Role successfully changed' ];
+            echo json_encode($response);
+        }
+    }
+
+    public function request(){
+        header('Content-Type: application/json');
+        if($_SERVER['REQUEST_METHOD'] === 'PATCH'){
+            $user = $this->getLoggedUser();
+            $id = $user['id'] ?? null;
+            $response = [];
+            if($id === null){
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'Error: No account selected' ];
+                echo json_encode($response);
+                exit;
+            }
+
+            (new User)->requestAccess($id);
+            $response = [ 'ok' => true, 'code' => 200, 'message' => 'Request access sent wait for response' ];
+            echo json_encode($response);
+        }
+    }
+
     public function logout() {
         $_SESSION = [];
         session_destroy();
@@ -111,6 +187,31 @@ class UserController extends Controller {
             $params = session_get_cookie_params();
             setcookie( session_name(), '', time() - 42000, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
         }
+        $this->redirect('/login');
+        exit;
+    }
+
+    public function delete() {
+        $user = $this->getLoggedUser();
+        $id = $user['id'] ?? null;
+        $response = [];
+
+        if($id === null){
+            $response = [ 'ok' => false, 'code' => 400, 'error' => 'Can\'t find user id '];
+            echo json_encode($response);
+            exit;
+        }
+
+        (new User())->deleteAccount($id);
+
+        $_SESSION = [];
+        session_destroy();
+
+        if(ini_get("session.use_cookies")){
+            $params = session_get_cookie_params();
+            setcookie( session_name(), '', time() - 42000, $params['path'], $params['domain'], $params['secure'], $params['httponly']);
+        }
+
         $this->redirect('/login');
         exit;
     }

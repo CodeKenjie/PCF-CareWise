@@ -7,6 +7,8 @@ use App\Models\Prescription;
 
 class PrescriptionsController extends Controller {
     public function create($params){
+        $this->editorOnly();
+
         $input = json_decode(file_get_contents('php://input'), true);
         header('Content-Type: application/json');
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
@@ -51,6 +53,8 @@ class PrescriptionsController extends Controller {
     }
 
     public function delete($params){
+        $this->editorOnly();
+
         header('Content-Type: application/json');
         if($_SERVER['REQUEST_METHOD'] === 'DELETE'){
             $id = $params['id'] ?? null;

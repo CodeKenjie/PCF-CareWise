@@ -16,18 +16,59 @@ class User extends Database {
 
     public function create(array $data){
         try {
-            $query = 'INSERT INTO users (display_name, first_name, last_name, sex, role, email, password) VALUES (:display_name, :first_name, :last_name, :sex, :role, :email, :password);';
+            $query = 'INSERT INTO users (display_name, first_name, last_name, sex, position, email, is_editor, password) VALUES (:display_name, :first_name, :last_name, :sex, :position, :email, :is_editor, :password);';
             $stmt = $this->db->prepare($query);
             $stmt->execute([
                 ':display_name' => $data['displayName'] ?? '',
                 ':first_name' => $data['firstName'] ?? '',
                 ':last_name' => $data['lastName'] ?? '',
                 ':sex' => $data['sex'] ?? '',
-                ':role' => $data['role'] ?? '',
+                ':position' => $data['position'] ?? '',
                 ':email' => $data['email'] ?? '',
+                ':is_editor' => $data['isEditor'] ?? '',
                 ':password' => password_hash($data['password'] ?? '', PASSWORD_DEFAULT) ,
             ]);
         } catch (PDOException $err) {
+            $this->logger->error($err->getMessage());
+        }
+    }
+
+    public function updateUserInfo(array $data){
+        try {
+            $query = 'UPDATE users SET display_name = :display_name, first_name = :first_name, last_name = :last_name, sex = :sex, position = :position, birthdate = :birthdate, contact = :contact, address = :address WHERE id = :id';
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([
+                ':id' => $data['id'],
+                ':display_name' => $data['displayName'],
+                ':first_name' => $data['firstName'],
+                ':last_name' => $data['lastName'],
+                ':sex' => $data['sex'],
+                ':position' => $data['position'],
+                ':contact' => $data['contact'],
+                ':birthdate' => $data['birthdate'],
+                ':address' => $data['address']
+            ]);
+        } catch(PDOException $err){
+            $this->logger->error($err->getMessage());
+        }
+    }
+
+    public function requestAccess($id){
+        try {
+            $query = 'UPDATE users SET request = NOT request WHERE id = ? AND is_editor IS NOT true';
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([$id]);
+        } catch(PDOException $err) {
+            $this->logger->error($err->getMessage());
+        }
+    }
+
+    public function changeRole($id){
+        try {
+            $query = 'UPDATE users SET is_editor = NOT is_editor, request = false WHERE id = ?';
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([$id]);
+        } catch(PDOException $err) {
             $this->logger->error($err->getMessage());
         }
     }
@@ -49,6 +90,38 @@ class User extends Database {
             $stmt = $this->db->prepare($query);
             $stmt->execute([$id]);
             return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $err) {
+            $this->logger->error($err->getMessage());
+        }
+    }
+
+    public function getAllRequest(){
+        try {
+            $query = "SELECT id, first_name, last_name, position, is_editor FROM users WHERE request IS TRUE";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $err) {
+            $this->logger->error($err->getMessage());
+        }
+    }
+
+    public function getAllEditor($id){
+        try {
+            $query = "SELECT id, first_name, last_name, position, is_editor FROM users WHERE is_editor IS TRUE AND id != ?";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([$id]);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $err) {
+            $this->logger->error($err->getMessage());
+        }
+    }
+
+    public function deleteAccount($id){
+        try{
+            $query = 'DELETE FROM users WHERE id = ?';
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([$id]);
         } catch (PDOException $err) {
             $this->logger->error($err->getMessage());
         }

@@ -8,8 +8,9 @@ class DashboardController extends Controller  {
 
         $data = [
             'title' => 'PCF:CareWise - Dashboard',
-            'userDisplayName' => $user['display_name'],
-            'userRole' => $user['role']
+            'displayName' => $user['display_name'],
+            'position' => $user['position'],
+            'isEditor' => filter_var($user['is_editor'], FILTER_VALIDATE_BOOLEAN)
         ];
 
         $this->view('pages/dashboard', $data);

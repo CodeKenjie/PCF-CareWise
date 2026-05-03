@@ -2,7 +2,6 @@
 namespace App\Controllers;
 use App\Core\Controller;
 use App\Models\Patient;
-use DateTime;
 
 class PatientsController extends Controller {
     public function index() {
@@ -10,14 +9,17 @@ class PatientsController extends Controller {
 
         $data = [
             'title' => 'PCF:CareWise - Patients',
-            'userDisplayName' => $user['display_name'],
-            'userRole' => $user['role'],
+            'displayName' => $user['display_name'],
+            'position' => $user['position'],
+            'isEditor' => filter_var($user['is_editor'], FILTER_VALIDATE_BOOLEAN)
         ];
 
         $this->view('/pages/patients', $data);
     }
 
     public function register(){
+        $this->editorOnly();
+
         header('Content-Type: application/json');
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
             $firstName = $_POST['firstName'] ?? '';
@@ -72,7 +74,7 @@ class PatientsController extends Controller {
                 echo json_encode($response);
                 exit;
             }
-
+            
             $data = [
                 'firstName' => ucwords($firstName),
                 'lastName' => ucwords($lastName),
@@ -93,6 +95,8 @@ class PatientsController extends Controller {
     }
 
     public function edit(){
+        $this->editorOnly();
+
         $input = json_decode(file_get_contents('php://input'), true);
         header('Content-Type: application/json');
         if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
@@ -165,6 +169,8 @@ class PatientsController extends Controller {
     }
 
     public function delete(array $params) {
+        $this->editorOnly();
+
         header('Content-Type: application/json');
         $id = $params['id'] ?? null;
         $response = [];

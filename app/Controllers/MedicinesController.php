@@ -9,14 +9,17 @@ class MedicinesController extends Controller  {
 
         $data = [
             'title' => 'PCF:CareWise - Medicines',
-            'userDisplayName' => $user['display_name'],
-            'userRole' => $user['role']
+            'displayName' => $user['display_name'],
+            'position' => $user['position'],
+            'isEditor' => filter_var($user['is_editor'], FILTER_VALIDATE_BOOLEAN)
         ];
 
         $this->view('pages/medicines', $data);
     }
 
     public function add(){
+        $this->editorOnly();
+
         header('Content-Type: application/json');
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
             $genericName = $_POST['genericName'] ?? '';
@@ -45,6 +48,8 @@ class MedicinesController extends Controller  {
     }
 
     public function edit(){
+        $this->editorOnly();
+
         header('Content-Type: application/json');
         $input = json_decode(file_get_contents('php://input'), true);
         if($_SERVER['REQUEST_METHOD'] === 'PUT'){
@@ -127,6 +132,8 @@ class MedicinesController extends Controller  {
     }
     
     public function delete($id){
+        $this->editorOnly();
+
         header('Content-Type: application/json');
         $response = [];
         

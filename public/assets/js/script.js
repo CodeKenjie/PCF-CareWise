@@ -1,5 +1,6 @@
 const state = {
     patient: { id: null },
+    editor: { id: null },
     medicine: { id: null },
     item: { id: null },
     schedule:{ id: null },
@@ -15,10 +16,12 @@ let year = today.getFullYear();
 let occupiedDate = [];
 
 function initChart(stockData){
-    const total = stockData.high + stockData.medium + stockData.low;
-    if (total === 0) return;
-    const percentages = { high: (stockData.high/total) * 100, medium: (stockData.medium / total) * 100, low: (stockData.low / total) * 100 };
-    const expPercentages = { good: (stockData.good/total) * 100, soon: (stockData.soon / total) * 100, expired: (stockData.expired / total) * 100 };
+    const totalStock = stockData.high + stockData.medium + stockData.low;
+    const totalExp = stockData.good + stockData.soon + stockData.expired;
+    if (totalStock === 0) return;
+    if (totalExp === 0) return;
+    const percentages = { high: (stockData.high/totalStock) * 100, medium: (stockData.medium / totalStock) * 100, low: (stockData.low / totalStock) * 100 };
+    const expPercentages = { good: (stockData.good/totalExp) * 100, soon: (stockData.soon / totalExp) * 100, expired: (stockData.expired / totalExp) * 100 };
     const radius = 15.915;
     const circumference = 2 * Math.PI * radius;
     const high = document.querySelector(`.high`);
@@ -42,39 +45,40 @@ function initChart(stockData){
         segment.style.strokeDashoffset = offset;
     }
 
-    let offset = 0;
+    let quantOffset = 0;
+    let expOffset = 0;
 
     document.querySelectorAll(`.segment`).forEach(s => {
         s.style.strokeDasharray  = `0 ${circumference}`
 
         s.addEventListener(`mouseleave`, () => {
-            totalItems.textContent = total;
-            expStatus.textContent = total;
+            totalItems.textContent = totalStock;
+            expStatus.textContent = totalExp;
             label.textContent = `Items`;
             explabel.textContent = `Items`;
         });
     });
 
     setTimeout(() => {
-        setSegment(high, percentages.high, offset);
-        offset -= (percentages.high / 100) * circumference;
+        setSegment(high, percentages.high, quantOffset);
+        quantOffset -= (percentages.high / 100) * circumference;
 
-        setSegment(medium, percentages.medium, offset);
-        offset -= (percentages.medium / 100) * circumference;
+        setSegment(medium, percentages.medium, quantOffset);
+        quantOffset -= (percentages.medium / 100) * circumference;
 
-        setSegment(low, percentages.low, offset);
+        setSegment(low, percentages.low, quantOffset);
 
-        setSegment(good, expPercentages.good, offset);
-        offset -= (expPercentages.good / 100) * circumference;
+        setSegment(good, expPercentages.good, expOffset);
+        expOffset -= (expPercentages.good / 100) * circumference;
 
-        setSegment(soon, expPercentages.soon, offset);
-        offset -= (expPercentages.soon / 100) * circumference;
+        setSegment(soon, expPercentages.soon, expOffset);
+        expOffset -= (expPercentages.soon / 100) * circumference;
 
-        setSegment(expired, expPercentages.expired, offset);
+        setSegment(expired, expPercentages.expired, expOffset);
     }, 100);
 
-    totalItems.textContent = total;
-    expStatus.textContent = total;
+    totalItems.textContent = totalStock;
+    expStatus.textContent = totalExp;
 
     high.addEventListener(`mouseenter`, () => {
         totalItems.textContent = percentages.high.toFixed(1) + `%`;
@@ -406,9 +410,9 @@ function renderMedicineData(data){
         clone.querySelector(`.editBtn`).addEventListener(`click`, () => {
             state.medicine.id = medicine.id;
             document.getElementById(`genericName`).value = medicine.generic_name;
-            document.getElementById(`brandName`).value = medicine.brand_name ? medicine.brandName : 'N/A';
-            document.getElementById(`dosage`).value = medicine.dosage ? medicine.dosage : 'N/A';
-            document.getElementById(`form`).value = medicine.form ? medicine.form : 'N/A';
+            document.getElementById(`brandName`).value = medicine.brand_name ? medicine.brand_name : 'N/A';
+            document.getElementById(`updateDosage`).value = medicine.dosage ? medicine.dosage : 'N/A';
+            document.getElementById(`updateForm`).value = medicine.form ? medicine.form : 'N/A';
             document.getElementById(`editMeds`).classList.add(`active`);
         });
         clone.querySelector(`.deleteBtn`).addEventListener(`click`, () => {
@@ -1694,7 +1698,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
 
                 const data = await res.json();
                 if(!data.ok){
-                    responseMessage(data, data.error);
+                    return responseMessage(data, data.error);
                 }
 
                 responseMessage(data, data.message);
@@ -1908,8 +1912,8 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             e.preventDefault(e);
             const genericName = document.getElementById(`genericName`).value;
             const brandName = document.getElementById(`brandName`).value;
-            const dosage = document.getElementById(`dosage`).value;
-            const form = document.getElementById(`form`).value;
+            const dosage = document.getElementById(`updateDosage`).value;
+            const form = document.getElementById(`updateForm`).value;
 
             const res = await fetch(`/medicines/edit`, {
                 method: 'PUT',
@@ -2113,4 +2117,190 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         });
     }
 
+    const me = document.getElementById(`me`);
+    if(me){
+        document.getElementById(`deleteAccount`).addEventListener(`click`, async (e) => {
+            e.preventDefault();
+            try {
+                const res = await fetch(`/me/delete`, {
+                    method: 'DELETE'
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    return responseMessage(data, data.error);
+                }
+            } catch(err){
+                console.error(err);
+            }
+        });
+
+        document.getElementById(`editInfoBtn`).addEventListener(`click`, () => {
+            document.getElementById(`displayName`).classList.add(`hidden`);
+            document.getElementById(`editInfoForm`).classList.remove(`hidden`);
+            document.getElementById(`avatarBtn`).classList.remove(`hidden`);
+        });
+
+        document.getElementById(`cancelUpdateBtn`).addEventListener(`click`, () => {
+            document.getElementById(`displayName`).classList.remove(`hidden`);
+            document.getElementById(`editInfoForm`).classList.add(`hidden`);
+            document.getElementById(`avatarBtn`).classList.add(`hidden`);
+        });
+
+        const requestAccessBtn = document.getElementById(`requestAccess`);
+        requestAccessBtn.addEventListener(`click`, async (e) => {
+            e.preventDefault();
+            try {
+                const res = await fetch(`/me/requestAccess`, {
+                    method: 'PATCH'
+                });
+
+                const data = await res.json();
+
+                if(!data.ok){
+                    return responseMessage(data, data.error);
+                }
+
+                location.reload();
+            } catch(err) {
+                console.error(err);
+            }
+        });
+
+        document.getElementById(`editInfoForm`).addEventListener(`submit`, async (e) => {
+            e.preventDefault();
+            try{
+                const formdata = new FormData(e.target);
+                const res = await fetch(`/me/update`, {
+                    method: 'POST',
+                    body: formdata
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    return responseMessage(data, data.error);
+                }
+                location.reload();
+            } catch(err){
+                console.error(err);
+            }
+        });
+
+        async function loadRequests (){
+            try {
+                const res = await fetch(`/me/requests`, {
+                    method: 'GET'
+                });
+
+                const data = await res.json();
+
+                const container = document.getElementById(`collection`);
+                const template = document.getElementById(`requesterCard`);
+                container.innerHTML = ``;
+                data.collection.forEach(requester => {
+                    const clone = template.content.cloneNode(true);
+
+                    clone.querySelector(`.name`).textContent = `${requester.last_name}, ${requester.first_name}`;
+                    clone.querySelector(`.position`).textContent = requester.position;
+                    clone.querySelector(`.accept`).addEventListener(`click`, async (e) => {
+                        e.preventDefault();
+                        try {
+                            const res = await fetch(`/me/${requester.id}/accept`, {
+                                method: 'PATCH'
+                            });
+
+                            const data = await res.json();
+                            if(!data.ok){
+                                return responseMessage(data, data.error);
+                            }
+
+                            responseMessage(data, data.message);
+                            loadRequests();
+                            loadEditor();
+                        } catch(err) {
+                            console.error(err);
+                        }
+                    });
+
+                    clone.querySelector(`.decline`).addEventListener(`click`, async(e) => {
+                        e.preventDefault();
+                        try {
+                            const res = await fetch(`/me/${requester.id}/decline`, {
+                                method: 'PATCH'
+                            });
+
+                            const data = await res.json();
+                            if(!data.ok){
+                                return responseMessage(data, data.error);
+                            }
+
+                            responseMessage(true, `Successfully declined the request`);
+                        } catch(err) {
+                            console.error(err);
+                        }
+                    });
+                    container.appendChild(clone);
+                });
+            } catch (err) {
+                console.error(err);
+            }
+        } 
+
+        async function loadEditor(){
+            try {
+                const res = await fetch(`/me/editors`, {
+                    method: 'GET'
+                });
+
+                const data = await res.json();
+
+                const container = document.getElementById(`editorCollection`);
+                const template = document.getElementById(`editorCard`);
+                container.innerHTML = ``;
+                data.collection.forEach(editor => {
+                    const clone = template.content.cloneNode(true);
+
+                    clone.querySelector(`.name`).textContent = `${editor.last_name}, ${editor.first_name}`;
+                    clone.querySelector(`.position`).textContent = editor.position;
+                    clone.querySelector(`.remove`).addEventListener(`click`, () => {
+                        state.editor.id = editor.id;
+                        document.getElementById(`removeAccessForm`).action = `/me/${editor.id}/remove`;
+                        document.getElementById(`removeAccess`).classList.add(`active`);
+                        document.getElementById(`editorName`).textContent = `${editor.last_name}, ${editor.first_name}`; 
+                        document.getElementById(`editorId`).textContent = editor.id;
+                    });
+                    container.appendChild(clone);
+                });
+            } catch(err) {
+                console.error(err);
+            }
+        }
+
+        const editor = document.getElementById(`editorPanel`);
+        if(editor) {
+            loadRequests();
+            loadEditor();
+
+            document.getElementById(`removeAccessForm`).addEventListener(`submit`, async (e) => {
+                e.preventDefault();
+                try {
+                    const res = await fetch(`/me/${state.editor.id}/remove`, {
+                        method: 'PATCH'
+                    });
+
+                    const data = await res.json();
+                    if(!data.ok){
+                        return responseMessage(data, data.error);
+                    }
+
+                    document.getElementById(`removeAccess`).classList.remove(`active`);
+                    loadEditor();
+                    loadRequests();
+                } catch(err){
+                    console.error(err);
+                }
+            });
+        } 
+
+    }
 })

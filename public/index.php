@@ -75,4 +75,14 @@ $router->put('/inventory/edit', 'App\Controllers\InventoryController@edit');
 $router->patch('/inventory/adjust', 'App\Controllers\InventoryController@adjust');
 $router->delete('/inventory/delete/{id}', 'App\Controllers\InventoryController@delete');
 
+$router->get('/me', 'App\Controllers\ProfileController@index');
+$router->get('/me/requests', 'App\Controllers\ProfileController@requests');
+$router->get('/me/editors', 'App\Controllers\ProfileController@editors');
+$router->post('/me/update', 'App\Controllers\UserController@update');
+$router->delete('/me/delete', 'App\Controllers\UserController@delete');
+$router->patch('/me/{id}/accept', 'App\Controllers\UserController@changeRole');
+$router->patch('/me/{id}/decline', 'App\Controllers\UserController@request');
+$router->patch('/me/{id}/remove', 'App\Controllers\UserController@changeRole');
+$router->patch('/me/requestAccess', 'App\Controllers\UserController@request');
+
 $router->direct($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);

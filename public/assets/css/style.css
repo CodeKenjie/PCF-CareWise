@@ -130,7 +130,6 @@ main {
     height: 100dvh;
     overflow: auto;
     scrollbar-width: none;
-    scroll-snap-type: y mandatory;
     scroll-behavior: smooth;
     scroll-padding: 1em;
     z-index: 1;
@@ -145,7 +144,6 @@ section {
     padding: 1em;
     gap: 1em;
     z-index: 1;
-    scroll-snap-align: start;
 }
 
 *, *::before, *::after {
@@ -744,6 +742,12 @@ ul {
     scale: 1.05;
     transition: scale 300ms ease;
     border: none;
+}
+
+.btn-bordered{
+    padding: 1em;
+    border: var(--border);
+    border-radius: var(--radius);
 }
 
 .btn-critical:hover {
@@ -1489,8 +1493,10 @@ ul {
 }
 
 #patients #collection div {
+    flex: 1 1 0;
     display: flex;
     flex-direction: column;
+    justify-content: space-evenly;
     gap: 1em;
 }
 
@@ -1538,7 +1544,6 @@ ul {
 }
 
 #patients #collection button{
-    flex:  1 1 0;
     width: fit-content;
     height: fit-content;
     border: none;
@@ -1911,4 +1916,134 @@ ul {
     border-radius: var(--radius);
     border: none;
     padding: 0.5em 1em;
+}
+
+#me {
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+#me section{
+    flex: 1 1 0;
+    flex-direction: column;
+    align-items: center;
+    padding: 2em;
+    gap: 1em;
+    min-width: 25rem;
+}
+
+#me section:nth-of-type(1) {
+    justify-content: center;
+}
+
+#me .avatar {
+    width: fit-content;
+
+    && label {
+        right: 0;
+    }
+}
+
+#me .userInfo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 100%;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1em;
+}
+
+#me #requestAccess {
+    align-self: end;
+    color: var(--alt-font-color);
+    background: var(--button-color);
+    padding: 1em;
+    font-size: var(--normal);
+}
+
+#me #requestAccess.requested {
+    color: var(--font-color);
+    background: var(--bg);
+    border: var(--border);
+}
+
+#me .userInfo > span {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    font-size: var(--bigger);
+    padding: 1em;
+    gap: 1em;
+    vertical-align: middle;
+    strong {
+        font-size: var(--small);
+        min-width: 5rem;
+    }
+}
+
+#me #editorCollection,
+#me #collection {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding: 0.2em;
+    min-height: 30;
+    overflow: auto;
+    scrollbar-width: none;
+}
+
+#me #editorCollection li,
+#me #collection li {
+    display: flex;
+    border: var(--border);
+    align-items: center;
+    border-radius: var(--radius);
+    cursor: pointer;
+    padding:0.5em; 
+    gap:0.5em; 
+
+    h3 {
+        flex: 1 1 0;
+        text-align: center;
+    }
+}
+
+#me #collection li:hover {
+    background: var(--button-highlight);
+    box-shadow: var(--shadow);
+}
+
+#me #editInfoForm {
+    top: 0;
+    left: 0;
+    background: var(--bg);
+    width: 100%;
+    height: 100%;
+    z-index: 5;
+    overflow: auto;
+    scrollbar-width: none;
+    scroll-padding: 1em;
+}
+
+#me #deleteAccount {
+    bottom: 1em;
+    right: 1em;
+    color: var(--font-color);
+    background: var(--bg);
+    font-size: var(--normal);
+    font-weight: var(--bold);
+    padding: 1em;
+    align-self: end;
+    border: var(--border);
+    opacity: 25%;
+}
+#me #deleteAccount:hover {
+    color: var(--alt-font-color);
+    background: var(--critical);
+    opacity: 100%;
+    border: none;
+    scale: 1.1;
+    transition: scale 300ms ease;
 }

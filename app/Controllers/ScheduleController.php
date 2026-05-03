@@ -9,14 +9,17 @@ class ScheduleController extends Controller {
 
         $data = [
             'title' => 'PCF:CareWise - Schedule',
-            'userDisplayName' => $user['display_name'],
-            'userRole' => $user['role']
+            'displayName' => $user['display_name'],
+            'position' => $user['position'],
+            'isEditor' => filter_var($user['is_editor'], FILTER_VALIDATE_BOOLEAN)
         ];
 
         $this->view('pages/schedule', $data);
     }
 
     public function add(){
+        $this->editorOnly();
+
         header('Content-Type: application/json');
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
             $date = $_POST['getDate'] ?? '';
@@ -109,6 +112,8 @@ class ScheduleController extends Controller {
     }
 
     public function edit(){
+        $this->editorOnly();
+
         $input = json_decode(file_get_contents('php://input'), true);
         header('Content-Type: application/json');
         if($_SERVER['REQUEST_METHOD'] === 'PATCH'){
@@ -146,6 +151,8 @@ class ScheduleController extends Controller {
     }
 
     public function reschedule(array $params){
+        $this->editorOnly();
+
         header('Content-Type: application/json');
         $input = json_decode(file_get_contents('php://input'), true);
         if($_SERVER['REQUEST_METHOD'] === 'PATCH'){
@@ -177,6 +184,8 @@ class ScheduleController extends Controller {
     }
 
     public function delete(array $params){
+        $this->editorOnly();
+
         header('Content-Type: application/json');
         $id = $params['id'] ?? null;
         $response = [];
