@@ -24,6 +24,9 @@
 
 @media ( max-width: 1000px) and ( orientation: portrait) {
 
+    #dashboard > div:nth-of-type(2) > section:nth-of-type(1),
+    #sidebar div,
+    #sidebar header,
     .listHeader,
     .site {
         display: none;
@@ -55,11 +58,6 @@
         height: fit-content;
         justify-content: center;
         align-items: center;
-    }
-
-    #sidebar div,
-    #sidebar header{
-        display: none;
     }
 
     #sidebar .sm-icon {
@@ -175,6 +173,7 @@
         flex: 1 1 0;
         flex-direction: column;
     }
+    
 }
 
 @media (max-width: 1000px) and (orientation: landscape) {

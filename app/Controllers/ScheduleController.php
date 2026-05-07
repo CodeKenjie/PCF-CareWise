@@ -1,7 +1,9 @@
 <?php
 namespace App\Controllers;
 use App\Core\Controller;
+use App\Models\Notification;
 use App\Models\Schedule;
+use App\Services\CloudinaryService;
 
 class ScheduleController extends Controller {
     public function index(){
@@ -9,6 +11,7 @@ class ScheduleController extends Controller {
 
         $data = [
             'title' => 'PCF:CareWise - Schedule',
+            'avatar' => (new CloudinaryService())->cloudinaryURL($user['avatar']),
             'displayName' => $user['display_name'],
             'position' => $user['position'],
             'isEditor' => filter_var($user['is_editor'], FILTER_VALIDATE_BOOLEAN)
@@ -224,4 +227,37 @@ class ScheduleController extends Controller {
         $response = [ 'ok' => true, 'code' => 200, 'collection' => $schedules ];
         echo json_encode($response);
     }
+
+    public function notify(){
+        $user = $this->getLoggedUser();
+        $id = $user['id'];
+        
+        $scheduleModel = new Schedule();
+        $notificationModel = new Notification();
+        $schedules = $scheduleModel->getSchedulesToNotify();
+
+        foreach($schedules as $sched){
+            $requirements = [
+                'userId' => $id,
+                'referenceId' => $sched['id'],
+                'key' => 'scheduleToday',
+            ];
+
+            if(!$notificationModel->doesExist($requirements)) {
+                $notification = [
+                    'userId' => $id,
+                    'type' => 'reminder',
+                    'key' => 'scheduleToday',
+                    'referenceId' => $sched['id'],
+                    'title' => 'Your schedule is up!',
+                    'content' => $sched['last_name'] . ', ' . $sched['first_name'] . ' is scheduled today for ' . $sched['scheduled_for'],
+                    'link' => '/schedule'
+                ];
+
+                $notificationModel->createNotification($notification);
+            }
+
+        }
+    }
+
 }

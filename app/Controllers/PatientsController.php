@@ -2,6 +2,7 @@
 namespace App\Controllers;
 use App\Core\Controller;
 use App\Models\Patient;
+use App\Services\CloudinaryService;
 
 class PatientsController extends Controller {
     public function index() {
@@ -9,6 +10,7 @@ class PatientsController extends Controller {
 
         $data = [
             'title' => 'PCF:CareWise - Patients',
+            'avatar' => (new CloudinaryService())->cloudinaryURL($user['avatar']),
             'displayName' => $user['display_name'],
             'position' => $user['position'],
             'isEditor' => filter_var($user['is_editor'], FILTER_VALIDATE_BOOLEAN)
@@ -22,6 +24,7 @@ class PatientsController extends Controller {
 
         header('Content-Type: application/json');
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
+            $avatar = $_FILES['avatar'] ?? null;
             $firstName = $_POST['firstName'] ?? '';
             $lastName = $_POST['lastName'] ?? '';
             $sex = $_POST['sex'] ?? '';
@@ -74,8 +77,20 @@ class PatientsController extends Controller {
                 echo json_encode($response);
                 exit;
             }
+
+            if($avatar && $avatar['error'] === UPLOAD_ERR_OK){
+                $cloudinary = new CloudinaryService();
+                $result = $cloudinary->upload($avatar['tmp_name']);
+
+                if(!$result || !isset($result['secure_url'])){
+                    $response = [ 'ok' => false, 'code' => 400, 'error' => 'upload Image failed'];
+                    echo json_encode($response);
+                    exit;
+                }
+            }
             
             $data = [
+                'avatar' => $result['secure_url'],
                 'firstName' => ucwords($firstName),
                 'lastName' => ucwords($lastName),
                 'sex' => ucwords($sex),
@@ -94,22 +109,22 @@ class PatientsController extends Controller {
         }
     }
 
-    public function edit(){
+    public function edit(array $params){
         $this->editorOnly();
 
-        $input = json_decode(file_get_contents('php://input'), true);
         header('Content-Type: application/json');
-        if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-            $id = $input['id'] ?? '';
-            $firstName = $input['firstName'] ?? '';
-            $lastName = $input['lastName'] ?? '';
-            $sex = $input['sex'] ?? '';
-            $birthdate = $input['birthdate'] ?? '';
-            $address = $input['address'] ?? '';
-            $contact = $input['contact'] ?? '';
-            $exContact = $this->notApplicable($input['exContact'] ?? '');
-            $status = $input['status'] ?? '';
-            $referredBy = $this->notApplicable($input['referredBy'] ?? '');
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $id = $params['id'] ?? '';
+            $avatar = $_FILES['updateAvatar'] ?? null;
+            $firstName = $_POST['updateFirstName'] ?? '';
+            $lastName = $_POST['updateLastName'] ?? '';
+            $sex = $_POST['updateSex'] ?? '';
+            $birthdate = $_POST['updateBirthdate'] ?? '';
+            $address = $_POST['updateAddress'] ?? '';
+            $contact = $_POST['updateContact'] ?? '';
+            $exContact = $this->notApplicable($_POST['updateExContact'] ?? '');
+            $status = $_POST['updateStatus'] ?? '';
+            $referredBy = $this->notApplicable($_POST['updateReferredBy'] ?? '');
             $response = [];
  
             if(empty($firstName)){
@@ -148,8 +163,20 @@ class PatientsController extends Controller {
                 exit;
             }
 
-           $data = [
+            if($avatar && $avatar['error'] === UPLOAD_ERR_OK){
+                $cloudinary = new CloudinaryService();
+                $result = $cloudinary->upload($avatar['tmp_name']);
+
+                if(!$result || !isset($result['secure_url'])){
+                    $response = [ 'ok' => false, 'code' => 400, 'error' => 'upload Image failed'];
+                    echo json_encode($response);
+                    exit;
+                }
+            }
+
+            $data = [
                 'id' => $id,
+                'avatar' => $result['secure_url'],
                 'firstName' => ucwords($firstName),
                 'lastName' => ucwords($lastName),
                 'sex' => ucwords($sex),
@@ -160,6 +187,7 @@ class PatientsController extends Controller {
                 'status' => ucwords($status),
                 'referredBy' => ucwords($referredBy),
             ];
+
             $patient = new Patient();
             $patient->updatePatient($data);
 

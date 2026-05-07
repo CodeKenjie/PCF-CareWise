@@ -14,7 +14,7 @@
             <h3>Total patients</h3>
         </div>
     </section>
-    <div class="sub-sec">
+    <div class="sub-sec main-panel">
         <section class="acrylic-bg">
             <div style="display: flex; justify-content: space-between; align-items: center">
                 <h3>Newly added patients:</h3>
@@ -34,50 +34,52 @@
             <ul id="scheduleToday"></ul>
         </section>
     </div>
-    <section class="acrylic-bg">
-        <div>
-            <div class="rel donut-chart">
-                <svg viewbox="0 0 42 42" class="donut">
-                    <circle fill="none" stroke="var(--sub-bg)" stroke-width="3" cx="21" cy="21" r="15.915"></circle>
-                    <circle class="segment high" cx="21" cy="21" r="15.915"></circle>
-                    <circle class="segment medium" cx="21" cy="21" r="15.915"></circle>
-                    <circle class="segment low" cx="21" cy="21" r="15.915"></circle>
-                </svg>
-                <span class="abs ctr-text">
-                    <h1 class="lrg-h" id="totalItems">0</h1>
-                    <h3 id="label" style="font-size: var(--normal); font-weight: var(--bold); opacity: 50%">Items</h3>
+    <div class="sub-sec main-panel">
+        <section class="acrylic-bg" style="flex-direction: row; flex-wrap: wrap;">
+            <div style="flex: 1 1 0; display:flex; align-items:center; justify-content:center">
+                <div class="rel donut-chart">
+                    <svg viewbox="0 0 42 42" class="donut">
+                        <circle fill="none" stroke="var(--sub-bg)" stroke-width="3" cx="21" cy="21" r="15.915"></circle>
+                        <circle class="segment high" cx="21" cy="21" r="15.915"></circle>
+                        <circle class="segment medium" cx="21" cy="21" r="15.915"></circle>
+                        <circle class="segment low" cx="21" cy="21" r="15.915"></circle>
+                    </svg>
+                    <span class="abs ctr-text">
+                        <h1 class="lrg-h" id="totalItems">0</h1>
+                        <h3 id="label" style="font-size: var(--normal); font-weight: var(--bold); opacity: 50%">Items</h3>
+                    </span>
+                </div>
+                <span class="info">
+                    <p>High Stocks</p>
+                    <p>Medium Stocks</p>
+                    <p>Low Stocks</p>
                 </span>
             </div>
-            <span class="info">
-                <p>High Stocks</p>
-                <p>Medium Stocks</p>
-                <p>Low Stocks</p>
-            </span>
-        </div>
-        <div>
-            <div class="rel donut-chart">
-                <svg viewbox="0 0 42 42" class="donut">
-                    <circle fill="none" stroke="var(--sub-bg)" stroke-width="3" cx="21" cy="21" r="15.915"></circle>
-                    <circle class="segment good" cx="21" cy="21" r="15.915"></circle>
-                    <circle class="segment soon" cx="21" cy="21" r="15.915"></circle>
-                    <circle class="segment expired" cx="21" cy="21" r="15.915"></circle>
-                </svg>
-                <span class="abs ctr-text">
-                    <h1 class="lrg-h" id="exp-status">0</h1>
-                    <h3 id="explabel"style="font-size: var(--normal); font-weight: var(--bold); opacity: 50%">Items</h3>
+            <div style="flex: 1 1 0; display:flex; align-items:center; justify-content: center">
+                <div class="rel donut-chart">
+                    <svg viewbox="0 0 42 42" class="donut">
+                        <circle fill="none" stroke="var(--sub-bg)" stroke-width="3" cx="21" cy="21" r="15.915"></circle>
+                        <circle class="segment good" cx="21" cy="21" r="15.915"></circle>
+                        <circle class="segment soon" cx="21" cy="21" r="15.915"></circle>
+                        <circle class="segment expired" cx="21" cy="21" r="15.915"></circle>
+                    </svg>
+                    <span class="abs ctr-text">
+                        <h1 class="lrg-h" id="exp-status">0</h1>
+                        <h3 id="explabel"style="font-size: var(--normal); font-weight: var(--bold); opacity: 50%">Items</h3>
+                    </span>
+                </div>
+                <span class="info">
+                    <p>Good Expiration</p>
+                    <p>Expiring Soon</p>
+                    <p>Expired</p>
                 </span>
             </div>
-            <span class="info">
-                <p>Good Expiration</p>
-                <p>Expiring Soon</p>
-                <p>Expired</p>
-            </span>
-        </div>
-        <div style="flex: 1 1 0; min-width: 100%; height: 51.3rem; flex-direction:column; justify-content:unset; align-items:unset">
+        </section>
+        <section class="acrylic-bg" style="flex: 1 1 0; min-height: 20rem">
             <h3>Need to be restocked:</h3>
             <ul id="inventoryRestock"></ul>
-        </div>
-    </section>
+        </section>
+    </div>
 </main>
 <div id="adjust" class="popup">
     <form id="adjustQuantForm" class="form-ui">

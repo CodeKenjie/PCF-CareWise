@@ -2,6 +2,7 @@
 namespace App\Controllers;
 use App\Core\Controller;
 use App\Models\Medicine;
+use App\Services\CloudinaryService;
 
 class MedicinesController extends Controller  {
     public function index() {
@@ -9,6 +10,7 @@ class MedicinesController extends Controller  {
 
         $data = [
             'title' => 'PCF:CareWise - Medicines',
+            'avatar' => (new CloudinaryService())->cloudinaryURL($user['avatar']),
             'displayName' => $user['display_name'],
             'position' => $user['position'],
             'isEditor' => filter_var($user['is_editor'], FILTER_VALIDATE_BOOLEAN)

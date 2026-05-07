@@ -16,9 +16,10 @@ class Patient extends Database {
 
     public function create(array $data){
         try{
-            $query = 'INSERT INTO patients (first_name, last_name, sex, birthdate, address, contact, extra_contact, status, referred_by) VALUES(:first_name, :last_name, :sex, :birthdate, :address, :contact, :extra_contact, :status, :referred_by)';
+            $query = 'INSERT INTO patients (avatar, first_name, last_name, sex, birthdate, address, contact, extra_contact, status, referred_by) VALUES(:avatar, :first_name, :last_name, :sex, :birthdate, :address, :contact, :extra_contact, :status, :referred_by)';
             $stmt = $this->db->prepare($query);
             $stmt->execute([
+                ':avatar' => $data['avatar'] ?? '',
                 ':first_name' => $data['firstName'] ?? '',
                 ':last_name' => $data['lastName'] ?? '',
                 ':sex' => $data['sex'] ?? '',
@@ -58,10 +59,11 @@ class Patient extends Database {
 
     public function updatePatient(array $data){
         try {
-            $query = 'UPDATE patients SET first_name = :first_name, last_name = :last_name, sex = :sex, birthdate = :birthdate, address = :address, contact = :contact, extra_contact = :extra_contact, status = :status, referred_by = :referred_by WHERE id = :id';
+            $query = 'UPDATE patients SET avatar = :avatar, first_name = :first_name, last_name = :last_name, sex = :sex, birthdate = :birthdate, address = :address, contact = :contact, extra_contact = :extra_contact, status = :status, referred_by = :referred_by WHERE id = :id';
             $stmt = $this->db->prepare($query);
             $stmt->execute([
                 ':id' => $data['id'],
+                ':avatar' => $data['avatar'] ?? '',
                 ':first_name' => $data['firstName'],
                 ':last_name' => $data['lastName'],
                 ':sex' => $data['sex'],

@@ -25,7 +25,7 @@ class User extends Database {
                 ':sex' => $data['sex'] ?? '',
                 ':position' => $data['position'] ?? '',
                 ':email' => $data['email'] ?? '',
-                ':is_editor' => $data['isEditor'] ?? '',
+                ':is_editor' => $data['isEditor'] ?? false,
                 ':password' => password_hash($data['password'] ?? '', PASSWORD_DEFAULT) ,
             ]);
         } catch (PDOException $err) {
@@ -35,10 +35,11 @@ class User extends Database {
 
     public function updateUserInfo(array $data){
         try {
-            $query = 'UPDATE users SET display_name = :display_name, first_name = :first_name, last_name = :last_name, sex = :sex, position = :position, birthdate = :birthdate, contact = :contact, address = :address WHERE id = :id';
+            $query = 'UPDATE users SET avatar = :avatar, display_name = :display_name, first_name = :first_name, last_name = :last_name, sex = :sex, position = :position, birthdate = :birthdate, contact = :contact, address = :address WHERE id = :id';
             $stmt = $this->db->prepare($query);
             $stmt->execute([
                 ':id' => $data['id'],
+                ':avatar' => $data['avatar'],
                 ':display_name' => $data['displayName'],
                 ':first_name' => $data['firstName'],
                 ':last_name' => $data['lastName'],
@@ -53,7 +54,7 @@ class User extends Database {
         }
     }
 
-    public function requestAccess($id){
+    public function setRequestAccess($id){
         try {
             $query = 'UPDATE users SET request = NOT request WHERE id = ? AND is_editor IS NOT true';
             $stmt = $this->db->prepare($query);

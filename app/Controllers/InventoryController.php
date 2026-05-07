@@ -3,6 +3,8 @@
 namespace App\Controllers;
 use App\Core\Controller;
 use App\Models\Item;
+use App\Models\Notification;
+use App\Services\CloudinaryService;
 
 class InventoryController extends Controller {
     public function index() {
@@ -10,6 +12,7 @@ class InventoryController extends Controller {
         $data = [
             'title' => 'PCF:CareWise - Inventory',
             'displayName' => $user['display_name'],
+            'avatar' => (new CloudinaryService())->cloudinaryURL($user['avatar']),
             'position' => $user['position'],
             'isEditor' => filter_var($user['is_editor'], FILTER_VALIDATE_BOOLEAN)
         ];
@@ -218,4 +221,107 @@ class InventoryController extends Controller {
         $response = [ 'ok' => true, 'code' => 200, 'collection' => $itemLowStocks ];
         echo json_encode($response);
     }
+
+    public function notify(){
+        $user = $this->getLoggedUser();
+        $id = $user['id'];
+        $itemModel = new Item();
+        $notificationModel = new Notification();
+        $items = $itemModel->getItemsNotify();
+        $data = [];
+
+        foreach($items as $item){
+
+            if($item['stock_status'] === 'Medium Stocks'){
+                $data = [
+                    'userId' => $id,
+                    'type' => 'reminder',
+                    'key' => 'mediumStock',
+                    'referenceId' => $item['id'],
+                    'title' => 'Keep ' . $item['name'] . ' in mind',
+                    'content' => $item['name'] . ' is about to run out only ' . $item['quantity'] . $item['quantity_type'] . ' left',
+                    'link' => '/inventory'
+                ];
+
+                $require = [
+                    'userId' => $id,
+                    'referenceId' => $item['id'],
+                    'key' => 'mediumStock',
+                ];
+
+                if(!$notificationModel->doesExist($require)){
+                    $notificationModel->createNotification($data);
+                }
+            } 
+            
+            if ($item['stock_status'] === 'Low Stocks'){
+                $data = [
+                    'userId' => $id,
+                    'type' => 'warning',
+                    'key' => 'lowStock',
+                    'referenceId' => $item['id'],
+                    'title' => $item['name'] . ' IS ALMOST OUT!!!',
+                    'content' => $item['name'] . ' is about to run out only ' . $item['quantity'] . $item['quantity_type'] . ' out of ' . $item['minimum_quantity'] . ' left',
+                    'link' => '/inventory'
+                ];
+
+                $require = [
+                    'userId' => $id,
+                    'referenceId' => $item['id'],
+                    'key' => 'lowStock',
+                ];
+
+                if(!$notificationModel->doesExist($require)){
+                    $notificationModel->createNotification($data);
+                }
+            } 
+            
+            if ($item['expiration_status'] === 'Expiring Soon'){
+                $data = [
+                    'userId' => $id,
+                    'type' => 'reminder',
+                    'key' => 'expiringSoon',
+                    'referenceId' => $item['id'],
+                    'title' => $item['name'] . ' is expiring soon',
+                    'content' => $item['name'] . ' is about to expire in 30 days keep this in mind: ' . $item['expiration_date'],
+                    'link' => '/inventory'
+                ];
+
+                $require = [
+                    'userId' => $id,
+                    'referenceId' => $item['id'],
+                    'key' => 'expiringSoon',
+                ];
+
+                if(!$notificationModel->doesExist($require)){
+                    $notificationModel->createNotification($data);
+                }
+            }
+            
+            if ($item['expiration_status'] === 'Expired'){
+                $data = [
+                    'userId' => $id,
+                    'type' => 'warning',
+                    'key' => 'expired',
+                    'referenceId' => $item['id'],
+                    'title' => $item['name'] . ' IS EXPIRED',
+                    'content' => $item['name'] . ' is expired ' . $item['expiration_date'] . ' time to remove, and update your inventory',
+                    'link' => '/inventory'
+                ];
+
+                $require = [
+                    'userId' => $id,
+                    'referenceId' => $item['id'],
+                    'key' => 'expired',
+                ];
+
+                if(!$notificationModel->doesExist($require)){
+                    $notificationModel->createNotification($data);
+                }
+            }
+        }
+
+    }
+
+
 }

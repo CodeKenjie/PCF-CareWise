@@ -60,7 +60,7 @@
             </form>
         </div>
         <span>
-            <img src="assets/images/profile.png" alt="">
+            <img src="<?= (str_ends_with(($avatar ?? ''), '/upload//')) ? 'assets/images/profile.png' : ($avatar ?? '')?>" alt="">
         </span>
         <div>
             <h4 class="sm-h"><?= htmlspecialchars($displayName ?? '') ?></h4>

@@ -9,12 +9,37 @@ $migration = new Migration();
 $migration->migrate();
 
 $router = new Router();
+
+$router->middleware(function () {
+    $uri = $_SERVER['REQUEST_URI'];
+
+    if (!isset($_SESSION['id'])){
+        return;
+    }
+
+    if(str_starts_with($uri, '/login') && !str_starts_with($uri, '/register')){
+        return;
+    }
+
+    if (isset($_SESSION['notify_ran']) && $_SESSION['notify_ran'] === date('Y-m-d H:i')){
+        return;
+    }
+
+    $_SESSION['notify_ran'] = date('Y-m-d H:i');
+    (new App\Controllers\ScheduleController())->notify();
+    (new App\Controllers\InventoryController())->notify();
+});
+
 $router->get('/login', 'App\Controllers\LoginController@index');
 $router->post('/login', 'App\Controllers\UserController@login');
 $router->post('/logout', 'App\Controllers\UserController@logout');
 
 $router->get('/register', 'App\Controllers\RegisterController@index');
 $router->post('/register', 'App\Controllers\UserController@register');
+
+$router->get('/notifications/all', 'App\Controllers\NotificationController@all');
+$router->patch('/notifications/read', 'App\Controllers\NotificationController@read');
+$router->delete('/notifications/{id}/delete', 'App\Controllers\NotificationController@delete');
 
 $router->get('/dashboard', 'App\Controllers\DashboardController@index');
 $router->get('/dashboard/inventory/chart', 'App\Controllers\InventoryController@chart');
@@ -45,7 +70,7 @@ $router->get('/patients/all', 'App\Controllers\PatientsController@getAll');
 $router->get('/patients/sort', 'App\Controllers\PatientsController@sort');
 $router->get('/patients/patient', 'App\Controllers\PatientsController@search');
 $router->post('/patients/register', 'App\Controllers\PatientsController@register');
-$router->put('/patients/edit', 'App\Controllers\PatientsController@edit');
+$router->post('/patients/{id}/edit', 'App\Controllers\PatientsController@edit');
 $router->delete('/patients/delete/{id}', 'App\Controllers\PatientsController@delete');
 
 $router->get('/schedule', 'App\Controllers\ScheduleController@index');
@@ -56,6 +81,7 @@ $router->post('/schedule/add', 'App\Controllers\ScheduleController@add');
 $router->patch('/schedule/edit', 'App\Controllers\ScheduleController@edit');
 $router->patch('/schedule/{id}/reschedule', 'App\Controllers\ScheduleController@reschedule');
 $router->delete('/schedule/delete/{id}', 'App\Controllers\ScheduleController@delete');
+
 
 $router->get('/medicines', 'App\Controllers\MedicinesController@index');
 $router->get('/medicines/all', 'App\Controllers\MedicinesController@all');
@@ -81,7 +107,7 @@ $router->get('/me/editors', 'App\Controllers\ProfileController@editors');
 $router->post('/me/update', 'App\Controllers\UserController@update');
 $router->delete('/me/delete', 'App\Controllers\UserController@delete');
 $router->patch('/me/{id}/accept', 'App\Controllers\UserController@changeRole');
-$router->patch('/me/{id}/decline', 'App\Controllers\UserController@request');
+$router->patch('/me/{id}/decline', 'App\Controllers\UserController@decline');
 $router->patch('/me/{id}/remove', 'App\Controllers\UserController@changeRole');
 $router->patch('/me/requestAccess', 'App\Controllers\UserController@request');
 

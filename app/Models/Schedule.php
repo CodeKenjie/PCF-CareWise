@@ -3,16 +3,19 @@
 namespace App\Models;
 use App\Core\Database;
 use App\Core\Logger;
+use App\Models\Notification;
 use PDO;
 use PDOException;
 
 class Schedule extends Database {
     private $db;
     private $logger;
+    private $notify;
 
     public function __construct($database = new Database){
         $this->db = $database->conn();
         $this->logger = new Logger();
+        $this->notify = new Notification();
     }
 
     public function createSchedule(array $data){
@@ -101,6 +104,17 @@ class Schedule extends Database {
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch(PDOException $err) {
+            $this->logger->error($err->getMessage());
+        }
+    }
+
+    public function getSchedulesToNotify(){
+        try{
+            $query = "SELECT * FROM schedules WHERE date = CURRENT_DATE";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch(PDOException $err){
             $this->logger->error($err->getMessage());
         }
     }

@@ -1,10 +1,9 @@
 <?php
 namespace App\Core;
 
-use Exception;
-
 class Router {
     protected $routes = [];
+    protected $middleware = [];
 
     public function get($url, $controllerAction) {
         $this->routes['GET'][rtrim($url, '/')] = $controllerAction;
@@ -26,6 +25,10 @@ class Router {
         $this->routes['DELETE'][rtrim($url, '/')] = $controllerAction;
     }
 
+    public function middleware(callable $middleware){
+        $this->middleware[] = $middleware;
+    }
+
     public function direct($uri, $method) {
         $method = strtoupper($method);
         $uri = rtrim(parse_url($uri, PHP_URL_PATH), '/') ?: '/';
@@ -33,6 +36,10 @@ class Router {
         if(!isset($this->routes[$method])) {
             $this->abort(405);
             return;
+        }
+
+        foreach($this->middleware as $middleware){
+            $middleware();
         }
 
         foreach($this->routes[$method] as $route => $controllerAction) {

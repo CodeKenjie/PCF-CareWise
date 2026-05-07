@@ -1,6 +1,8 @@
 <?php
 namespace App\Controllers;
 use App\Core\Controller;
+use App\Models\Notification;
+use App\Services\CloudinaryService;
 use App\Models\User;
 
 class UserController extends Controller {
@@ -48,7 +50,7 @@ class UserController extends Controller {
                 'lastName'=> ucwords($lastName),
                 'sex'=> ucwords($sex),
                 'position'=> $position,
-                'isEditor'=> ($position ?? '') === 'ADMIN' ? true : false,
+                'isEditor'=> ($position ?? '') === 'ADMIN' ? 'true' : 'false',
                 'email'=> strtolower($email),
                 'password'=>$password,
             ];
@@ -63,7 +65,6 @@ class UserController extends Controller {
             $user->create($data); 
             $response = [ 'ok' => true, 'code' => 200, 'message' => 'Account successfully created!'];
             echo json_encode($response);
-            exit;
         }
     }
 
@@ -107,6 +108,7 @@ class UserController extends Controller {
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
             $user = $this->getLoggedUser();
             $id = $user['id'] ?? null;
+            $avatar = $_FILES['avatar'] ?? null;
             $displayName = $_POST['displayName'] ?? '';
             $firstName = $_POST['firstName'] ?? '';
             $lastName = $_POST['lastName'] ?? '';
@@ -116,6 +118,7 @@ class UserController extends Controller {
             $contact = $this->notApplicable($_POST['contact'] ?? '');
             $address = $this->notApplicable($_POST['address'] ?? '');
             $response = [];
+            $result = null;
 
             if($id === null){
                 $response = [ 'ok' => false, 'code' => 400, 'error' => 'No logged user detected'];
@@ -123,8 +126,20 @@ class UserController extends Controller {
                 exit;
             }
 
+            if($avatar && $avatar['error'] === UPLOAD_ERR_OK){
+                $cloudinary = new CloudinaryService();
+                $result = $cloudinary->upload($avatar['tmp_name']);
+
+                if(!$result || !isset($result['public_id'])){
+                    $response = [ 'ok' => false, 'code' => 400, 'error' => 'upload Image failed'];
+                    echo json_encode($response);
+                    exit;
+                }
+            }
+
             $data = [
                 'id' => $id,
+                'avatar' => $result['public_id'],
                 'displayName' => $displayName,
                 'firstName' => ucwords($firstName),
                 'lastName' => ucwords($lastName),
@@ -155,7 +170,7 @@ class UserController extends Controller {
                 exit;
             }
 
-            (new User)->changeRole($id);
+            (new User())->changeRole($id);
             $response = [ 'ok' => true, 'code' => 200, 'message' => 'Role successfully changed' ];
             echo json_encode($response);
         }
@@ -166,6 +181,8 @@ class UserController extends Controller {
         if($_SERVER['REQUEST_METHOD'] === 'PATCH'){
             $user = $this->getLoggedUser();
             $id = $user['id'] ?? null;
+            $notification = new Notification();
+
             $response = [];
             if($id === null){
                 $response = [ 'ok' => false, 'code' => 400, 'error' => 'Error: No account selected' ];
@@ -173,7 +190,27 @@ class UserController extends Controller {
                 exit;
             }
 
-            (new User)->requestAccess($id);
+            (new User())->setRequestAccess($id);
+            $response = [ 'ok' => true, 'code' => 200, 'message' => 'Request access sent wait for response' ];
+            echo json_encode($response);
+        }
+    }
+
+    public function decline(array $params){
+        $this->editorOnly();
+
+        header('Content-Type: application/json');
+        if($_SERVER['REQUEST_METHOD'] === 'PATCH'){
+            $id = $params['id'] ?? null;
+
+            $response = [];
+            if($id === null){
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'Error: No account selected' ];
+                echo json_encode($response);
+                exit;
+            }
+
+            (new User())->setRequestAccess($id);
             $response = [ 'ok' => true, 'code' => 200, 'message' => 'Request access sent wait for response' ];
             echo json_encode($response);
         }

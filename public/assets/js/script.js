@@ -249,6 +249,7 @@ function renderPatientsData(data){
         }
         statusMark.textContent = patient.status;
         clone.querySelector(`.id`).textContent = patient.id;
+        clone.querySelector(`.profile img`).src = patient.avatar ? patient.avatar : `assets/images/profile.png`;
         clone.querySelector(`.name`).textContent = patient.last_name + ", " + patient.first_name;
         clone.querySelector(`.address`).textContent = patient.address;
         clone.querySelector(`.birthdate`).textContent = `${months[month - 1]} ${day}, ${year}`;
@@ -257,6 +258,7 @@ function renderPatientsData(data){
         clone.querySelector(`.contact`).textContent = patient.contact + " " + patient.extra_contact;
         clone.querySelector(`.referredBy`).textContent = patient.referred_by;
         clone.querySelector(`.patientPreviewBtn`).addEventListener(`click`, () => {
+            document.getElementById(`dp`).src = patient.avatar ? patient.avatar : `assets/images/profile.png`;
             document.getElementById(`patientPreview`).classList.add(`active`);
             document.getElementById(`pId`).textContent = patient.id;
             document.getElementById(`pName`).textContent = `${patient.last_name}, ${patient.first_name}`;
@@ -272,6 +274,8 @@ function renderPatientsData(data){
         clone.querySelector(`.editPatientBtn`).addEventListener(`click`, () => {
             state.patient.id = patient.id;
             document.getElementById(`editPatient`).classList.add(`active`);
+            document.getElementById(`editPatientForm`).action = `/patients/${patient.id}/edit`
+            document.getElementById(`currentPic`).src = patient.avatar ? patient.avatar : `/assets/images/profile.png`;
             document.getElementById(`updateFirstName`).value = patient.first_name;
             document.getElementById(`updateLastName`).value = patient.last_name;
             document.querySelector(`.updateSex`).value = patient.sex;
@@ -487,7 +491,7 @@ function renderItemData(data){
         clone.querySelector(`.exprStatus`).textContent = item.expiration_status;
         if (item.expiration_status === "Good"){
             exprStatus.classList.add(`good`);
-        } else if (item.expiration_status === "Expring Soon") {
+        } else if (item.expiration_status === "Expiring Soon") {
             exprStatus.classList.add(`moderate`);
         } else {
             exprStatus.classList.add(`critical`);
@@ -548,7 +552,7 @@ function renderSchedulesData(data){
         const now = new Date();
         const [y, m, d] = schedule.date.split('-');
         const [hh, mm, ss] = schedule.time.split(':');
-        const sched = new Date(Number(y), Number(m) - 1, Number(d), Number(hh) - 8, Number(mm), Number(ss));
+        const sched = new Date(Number(y), Number(m) - 1, Number(d), Number(hh), Number(mm), Number(ss));
 
         if(!occupiedDate.includes(schedule.date)){
             occupiedDate.push(schedule.date);
@@ -614,6 +618,62 @@ function renderSchedulesData(data){
 
     initCalendar();
 }
+
+async function renderNotifications(data){
+    const container = document.getElementById(`notifications`);
+    const template = document.getElementById(`notificationCard`);
+
+    container.innerHTML = ``;
+
+    data.collection.forEach(notification => {
+        const clone = template.content.cloneNode(true);
+        if(notification.link === '/schedule') {
+            clone.querySelector(`.schedule`).classList.remove(`hidden`);
+        } else if (notification.link === '/dashboard') {
+            clone.querySelector(`.dashboard`).classList.remove(`hidden`);
+        } else if (notification.link === '/care') {
+            clone.querySelector(`.care`).classList.remove(`hidden`);
+        } else if (notification.link === '/inventory') {
+            clone.querySelector(`.inventory`).classList.remove(`hidden`);
+        } else if (notification.link === '/patients') {
+            clone.querySelector(`.patients`).classList.remove(`hidden`);
+        } else if (notification.link === '/me') {
+            clone.querySelector(`.request`).classList.remove(`hidden`);
+        } else if (notification.link === '/medicines') {
+            clone.querySelector(`.medicines`).classList.remove(`hidden`);
+        }
+
+        const newNotf = clone.querySelector(`.new`);
+        if(!notification.is_read){
+            document.querySelector(`.new`).classList.remove(`hidden`);
+            newNotf.classList.remove(`hidden`);
+        }
+
+        clone.querySelector(`.title`).textContent = notification.title;
+        clone.querySelector(`.content`).textContent = notification.content;
+        clone.querySelector(`.go`).addEventListener(`click`, () => {
+            window.location.replace(notification.link);
+        });
+
+        clone.querySelector(`.remove`).addEventListener(`click`, async (e) =>{
+            e.preventDefault();
+            try{
+                const res = await fetch(`/notifications/${notification.id}/delete`, {
+                    method: 'DELETE'
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    return responseMessage(data, data.error);
+                }
+                loadList(`notifications`, renderNotifications);
+            } catch(err){
+                console.error(err);
+            }
+        })
+        container.appendChild(clone);
+    });
+} 
 
 async function reschedule(id, date) {
     try{
@@ -1041,7 +1101,27 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         if (event.key === "Escape"){
             closePopup();
         }
-    })
+    });
+
+    const notificationBtn = document.getElementById(`notifBtn`);
+    if(notificationBtn){
+        loadList(`notifications`, renderNotifications);
+        notificationBtn.addEventListener(`click`, () => {
+            document.getElementById(`notificationPanel`).classList.toggle(`open`);
+            (async () =>{
+                try {
+                    const res = await fetch(`/notifications/read`, {
+                        method: 'PATCH'
+                    });
+
+                    loadList(`notifications`, renderNotifications);
+                    document.querySelector(`.new`).classList.add(`hidden`);
+                } catch(err){
+                    console.error(err);
+                }
+            })();
+        });
+    }
 
     const sidebar = document.querySelector(`#sidebar`);
     if(sidebar){
@@ -1149,7 +1229,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 }
 
                 responseMessage(data, data.message);
-                window.location = "/login";
+                window.location.replace(`/login`);
             } catch(err){
                 console.error(err);    
             }
@@ -1200,7 +1280,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 }
 
                 responseMessage(data, data.message);
-                window.location = '/dashboard';
+                window.location.replace(`/login`);
             } catch(err) {
                 console.error(err);
             }
@@ -1348,7 +1428,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                             status.textContent = item.expiration_status;
                             itemQuant.textContent = `Expiration: ${months[month - 1]} ${day}, ${year}`;
                             status.classList.remove(`good`, `moderate`, `critical`);
-                            (item.expiration_status === "Good") ? status.classList.add(`good`) : (item.expiration_status === "Expring Soon") ? status.classList.add(`moderate`) : exprStatus.classList.add(`critical`);
+                            (item.expiration_status === "Good") ? status.classList.add(`good`) : (item.expiration_status === "Expring Soon") ? status.classList.add(`moderate`) : status.classList.add(`critical`);
                             status.setAttribute(`data-showing`, `expiration`);
                         }
                     });
@@ -1416,7 +1496,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
 
                 const data = await res.json();
                 if(!data.ok){
-                    responseMessage(data, data.error);
+                    return responseMessage(data, data.error);
                 }
 
                 responseMessage(data, data.message);
@@ -1634,6 +1714,20 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         sorts(`patients`, renderPatientsData);
         search(`patients/patient`, renderPatientsData);
 
+        document.querySelector(`input[name="avatar"]`).onchange = function (e) {
+            const file = e.target.files[0];
+            const img = document.querySelector(`.profilePic`);
+
+            img.src = URL.createObjectURL(file);
+        };
+
+        document.querySelector(`input[id="updateAvatar"]`).onchange = function (e) {
+            const file = e.target.files[0];
+            const img = document.getElementById(`currentPic`);
+
+            img.src = URL.createObjectURL(file);
+        };
+
         const registerPatientBtn = document.getElementById(`registerPatientBtn`);
         registerPatientBtn.addEventListener(`click`, () => {
             const registerPatient = document.querySelector(`#registerPatient`);
@@ -1644,6 +1738,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         const editPatientForm = document.getElementById(`editPatientForm`);
         editPatientForm.addEventListener(`submit`, async (e) => {
             e.preventDefault();
+            const updateAvatar = document.getElementById(`updateAvatar`).value;
             const updateFirstName = document.getElementById(`updateFirstName`).value;
             const updateLastName = document.getElementById(`updateLastName`).value;
             const updateSex = document.getElementById(`updateSex`).value;
@@ -1655,12 +1750,9 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             const updateReferredBy = document.getElementById(`updateReferredBy`).value;
             const formdata = new FormData(e.target);
             try {
-                const res = await fetch(`/patients/edit`, {
-                    method:'PUT',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ id: state.patient.id, firstName: updateFirstName, lastName: updateLastName, birthdate: updateBirthdate, address: updateAddress, sex: updateSex, contact: updateContact, exContact: updateExContact, status: updateStatus, referredBy: updateReferredBy })
+                const res = await fetch(`/patients/${state.patient.id}/edit`, {
+                    method:'POST',
+                    body: formdata
                 });
 
                 const data = await res.json();
@@ -1689,6 +1781,16 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         const registerPatientForm = document.getElementById(`registerPatientForm`);
         registerPatientForm.addEventListener(`submit`, async (e) => {
             e.preventDefault();
+            const firstName = document.getElementById(`firstName`);
+            const lastName = document.getElementById(`lastName`);
+            const birthdate = document.getElementById(`birthdate`);
+            const sex = document.getElementById(`sex`);
+            const address = document.getElementById(`address`);
+            const contact = document.getElementById(`contact`);
+            const exContact = document.getElementById(`exContact`);
+            const referredBy = document.getElementById(`referredBy`);
+            const status = document.getElementById(`status`);
+
             const formdata = new FormData(e.target);
             try {
                 const res = await fetch('/patients/register', {
@@ -1704,6 +1806,15 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 responseMessage(data, data.message);
                 registerPatient.classList.remove('active');
                 loadList('patients', renderPatientsData);
+                firstName.value = ``;
+                lastName.value = ``;
+                birthdate.value = ``;
+                sex.value = ``;
+                address.value = ``;
+                contact.value = ``;
+                exContact.value = ``;
+                referredBy.value = ``;
+                status.value = ``;
             } catch (err) {
                 console.error(err);
             }
@@ -2119,6 +2230,14 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
 
     const me = document.getElementById(`me`);
     if(me){
+
+        document.querySelector(`input[name="avatar"]`).onchange = function (e) {
+            const file = e.target.files[0];
+            const img = document.querySelector(`.profilePic`);
+
+            img.src = URL.createObjectURL(file);
+        };
+
         document.getElementById(`deleteAccount`).addEventListener(`click`, async (e) => {
             e.preventDefault();
             try {
@@ -2179,8 +2298,9 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 const data = await res.json();
                 if(!data.ok){
                     return responseMessage(data, data.error);
+                } else {
+                    location.reload();
                 }
-                location.reload();
             } catch(err){
                 console.error(err);
             }
@@ -2235,6 +2355,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                             }
 
                             responseMessage(true, `Successfully declined the request`);
+                            loadRequests();
                         } catch(err) {
                             console.error(err);
                         }

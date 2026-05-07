@@ -265,4 +265,27 @@ class Item extends Database {
             $this->logger->error($err->getMessage());
         }
     }
+
+    public function getItemsNotify(){
+        try{
+            $query = "SELECT id, name, quantity, quantity_type, minimum_quantity, expiration_date,
+                        CASE 
+                            WHEN quantity <= minimum_quantity THEN 'Low Stocks' 
+                            WHEN quantity <= minimum_quantity * 2 THEN 'Medium Stocks' 
+                            ELSE 'High Stocks'
+                        END AS stock_status,
+                        CASE
+                            WHEN expiration_date < CURRENT_DATE THEN 'Expired'
+                            WHEN expiration_date <= CURRENT_DATE + INTERVAL '30 days' THEN 'Expiring Soon'
+                            ELSE 'Good'
+                        END AS expiration_status
+                        FROM inventory 
+                        WHERE (quantity <= (minimum_quantity * 2) OR expiration_date <= CURRENT_DATE + INTERVAL '30 days')";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $err){
+            $this->logger->error($err->getMessage());
+        }
+    }
 }
