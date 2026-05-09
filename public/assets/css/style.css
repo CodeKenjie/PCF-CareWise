@@ -1960,6 +1960,38 @@ ul {
     padding: 0.5em;
 }
 
+#inventory #collection .stockStatus,
+#inventory #collection .exprStatus{
+    position: relative;
+    cursor: pointer;
+}
+
+#inventory #collection .stockStatus:hover::before,
+#inventory #collection .exprStatus:hover::before{
+    height: 100%;
+    border: var(--border);
+    transition: height 300ms ease;
+}
+
+#inventory #collection .stockStatus::before,
+#inventory #collection .exprStatus::before{
+    color: var(--font-color);
+    font-size: var(--normal);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    bottom: 0;
+    content: var(--textFromJs);
+    background: var(--bg);
+    width: 100%;
+    height: 0;
+    transition: height 300ms ease-in;
+    border-radius: var(--radius);
+    cursor: pointer;
+    overflow: hidden;
+}
+
 #inventory #collection .name.donated::before {
     content: '';
     position: absolute;

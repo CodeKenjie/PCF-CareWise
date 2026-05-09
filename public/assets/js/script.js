@@ -496,6 +496,8 @@ function renderItemData(data){
         } else {
             exprStatus.classList.add(`critical`);
         }
+        stockStatus.style.setProperty(`--textFromJs`, `"${item.quantity}${item.quantity_type} min: ${item.minimum_quantity}${item.quantity_type}"`);
+        exprStatus.style.setProperty(`--textFromJs`, `"Expiration: ${item.expiration_date}"`);
         clone.querySelector(`.adjustBtn`).addEventListener(`click`, () => {
             state.item.id = item.id;
             document.getElementById(`adjust`).classList.add(`active`);
