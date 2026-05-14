@@ -44,10 +44,15 @@ class NotificationController extends Controller {
         echo json_encode($response);
     }
 
-    public function read(){
+    public function read(array $params){
         $user = $this->getLoggedUser();
+        $id = $params['id'] ?? null;
         $userId = $user['id'] ?? null;
+        $data = [
+            'id' => $id,
+            'userId' => $userId
+        ];
 
-        (new Notification())->setIsRead($userId);
+        (new Notification())->setIsRead($data);
     }
 }

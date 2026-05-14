@@ -73,7 +73,6 @@ class UserController extends Controller {
         if($_SERVER['REQUEST_METHOD'] === "POST"){
             $email = filter_var($_POST['email'] ?? '', FILTER_VALIDATE_EMAIL);
             $password = $_POST['password'] ?? '';
-
             if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
                 $response = ['ok' => false, 'code' => 400, 'error' => "Email format not valid" ];
                 echo json_encode($response);
@@ -97,7 +96,8 @@ class UserController extends Controller {
 
             session_regenerate_id(true);
             $_SESSION['id'] = $userExists['id'];
-
+            $user = (new User())->findById($userExists['id']);
+            $this->log('Logged In', $user['last_name'] . ', ' . $user['first_name'] . ' (' . $user['display_name'] . ') logged in');
             $response = ['ok' => true, 'code' => 200, 'message' => 'Logged in success!' ];
             echo json_encode($response);
         }
@@ -107,8 +107,7 @@ class UserController extends Controller {
         header('Content-Type: application/json');
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
             $user = $this->getLoggedUser();
-            $id = $user['id'] ?? null;
-            $avatar = $_FILES['avatar'] ?? null;
+            $id = (int) $user['id'] ?? null;
             $displayName = $_POST['displayName'] ?? '';
             $firstName = $_POST['firstName'] ?? '';
             $lastName = $_POST['lastName'] ?? '';
@@ -126,20 +125,8 @@ class UserController extends Controller {
                 exit;
             }
 
-            if($avatar && $avatar['error'] === UPLOAD_ERR_OK){
-                $cloudinary = new CloudinaryService();
-                $result = $cloudinary->upload($avatar['tmp_name']);
-
-                if(!$result || !isset($result['public_id'])){
-                    $response = [ 'ok' => false, 'code' => 400, 'error' => 'upload Image failed'];
-                    echo json_encode($response);
-                    exit;
-                }
-            }
-
             $data = [
                 'id' => $id,
-                'avatar' => $result['public_id'],
                 'displayName' => $displayName,
                 'firstName' => ucwords($firstName),
                 'lastName' => ucwords($lastName),
@@ -151,7 +138,50 @@ class UserController extends Controller {
             ];
 
             (new User())->updateUserInfo($data);
+            $this->log('Updated Profile', 'updated his profile');
             $response = [ 'ok' => true, 'code' => 200, 'message' => 'Successfully updated your info'];
+            echo json_encode($response);
+        }
+    }
+
+    public function avatar(){
+        if($_SERVER['REQUEST_METHOD'] === 'POST'){
+            $user = $this->getLoggedUser();
+            $id = $user['id'] ?? null;
+            $avatar = $_FILES['avatar'] ?? null;
+            $result = null;
+            $response = [];
+
+            if(is_null($id)){
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'No patient Identified'];
+                echo json_encode($response);
+                exit;
+            }
+
+            if(is_null($avatar)){
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'No image is identified'];
+                echo json_encode($response);
+                exit;
+            }
+
+            if($avatar && $avatar['error'] === UPLOAD_ERR_OK){
+                $cloudinary = new CloudinaryService();
+                $result = $cloudinary->upload($avatar['tmp_name']);
+
+                if(!$result || !isset($result['secure_url'])){
+                    $response = [ 'ok' => false, 'code' => 400, 'error' => 'upload Image failed'];
+                    echo json_encode($response);
+                    exit;
+                }
+            }
+
+            $data = [
+                'id' => $id,
+                'avatar' => $result['secure_url']
+            ];
+
+            (new User())->uploadUserAvatar($data);
+            $response = [ 'ok' => true, 'code' => 200, 'message' => 'Successfully changed avatar'];
             echo json_encode($response);
         }
     }
@@ -171,6 +201,9 @@ class UserController extends Controller {
             }
 
             (new User())->changeRole($id);
+            $user = $this->getLoggedUser();
+            $selected = (new User())->findById($id);
+            $this->log('User Role Change', $user['last_name'] . ', ' . $user['first_name'] . ' (' . $user['display_name'] . ') changed ' . $selected['last_name'] . ', ' . $selected['first_name'] . ' role');
             $response = [ 'ok' => true, 'code' => 200, 'message' => 'Role successfully changed' ];
             echo json_encode($response);
         }
@@ -211,12 +244,18 @@ class UserController extends Controller {
             }
 
             (new User())->setRequestAccess($id);
+            $user = $this->getLoggedUser();
+            $selected = (new User())->findById($id);
+            $this->log('Decline Request', $user['last_name'] . ', ' . $user['first_name'] . ' (' . $user['display_name'] . ') declined ' . $selected['last_name'] . ', ' . $selected['first_name'] . ' request for editor role');
             $response = [ 'ok' => true, 'code' => 200, 'message' => 'Request access sent wait for response' ];
             echo json_encode($response);
         }
     }
 
     public function logout() {
+        $user = $this->getLoggedUser();
+        $this->log('Logged Out', $user['last_name'] . ', ' . $user['first_name'] . ' (' . $user['display_name'] . ') logged in');
+
         $_SESSION = [];
         session_destroy();
 

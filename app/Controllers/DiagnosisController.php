@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Models\Diagnosis;
+use App\Models\Patient;
 
 class DiagnosisController extends Controller{
     public function add($params){
@@ -36,7 +37,8 @@ class DiagnosisController extends Controller{
 
             $diagnose = new Diagnosis();
             $diagnose->create($data);
-
+            $patient = (new Patient())->getPatientById($id);
+            $this->log('Diagnosed Patient', $patient['last_name'] . ', ' . $patient['first_name'] . ' was diagnosed with ' . ucwords($conditionName));
             $response = [ 'ok' => true, 'code' => 200, 'message' => $conditionName . ' added to patient ' . $id ];
             echo json_encode($response);
         }
@@ -89,7 +91,9 @@ class DiagnosisController extends Controller{
 
         $diagnose = new Diagnosis();
         $diagnose->delete($data);
-
+        $conditionName = $diagnose->getDiagnosisById($id);
+        $patient = (new Patient())->getPatientById($patientId);
+        $this->log('Deleted Diagonsis', 'deleted ' . $conditionName . ' from '. $patient['last_name'] . ', ' . $patient['first_name']);
         $response = [ 'ok' => true, 'code' => 200, 'message' => 'condition ' . $id . ' is successfully removed' ];
         echo json_encode($response);
     }

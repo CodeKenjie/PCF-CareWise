@@ -11,7 +11,7 @@ class ProfileController extends Controller{
 
         $data = [
             'title' => 'PCF:CareWise - ' . $user['last_name'] . ', ' . $user['first_name'],
-            'avatar' => (new CloudinaryService())->cloudinaryURL($user['avatar']),
+            'avatar' => $user['avatar'],
             'displayName' => $user['display_name'],
             'position' => $user['position'],
             'firstName' => $user['first_name'],

@@ -35,11 +35,10 @@ class User extends Database {
 
     public function updateUserInfo(array $data){
         try {
-            $query = 'UPDATE users SET avatar = :avatar, display_name = :display_name, first_name = :first_name, last_name = :last_name, sex = :sex, position = :position, birthdate = :birthdate, contact = :contact, address = :address WHERE id = :id';
+            $query = 'UPDATE users SET display_name = :display_name, first_name = :first_name, last_name = :last_name, sex = :sex, position = :position, birthdate = :birthdate, contact = :contact, address = :address WHERE id = :id';
             $stmt = $this->db->prepare($query);
             $stmt->execute([
                 ':id' => $data['id'],
-                ':avatar' => $data['avatar'],
                 ':display_name' => $data['displayName'],
                 ':first_name' => $data['firstName'],
                 ':last_name' => $data['lastName'],
@@ -48,6 +47,19 @@ class User extends Database {
                 ':contact' => $data['contact'],
                 ':birthdate' => $data['birthdate'],
                 ':address' => $data['address']
+            ]);
+        } catch(PDOException $err){
+            $this->logger->error($err->getMessage());
+        }
+    }
+
+    public function uploadUserAvatar(array $data){
+        try {
+            $query = 'UPDATE users SET avatar = :avatar WHERE id = :id';
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([
+                ':id' => $data['id'],
+                ':avatar' => $data['avatar']
             ]);
         } catch(PDOException $err){
             $this->logger->error($err->getMessage());

@@ -11,7 +11,7 @@ class ScheduleController extends Controller {
 
         $data = [
             'title' => 'PCF:CareWise - Schedule',
-            'avatar' => (new CloudinaryService())->cloudinaryURL($user['avatar']),
+            'avatar' => $user['avatar'],
             'displayName' => $user['display_name'],
             'position' => $user['position'],
             'isEditor' => filter_var($user['is_editor'], FILTER_VALIDATE_BOOLEAN)
@@ -90,6 +90,7 @@ class ScheduleController extends Controller {
 
             $sched = new Schedule();
             $sched->createSchedule($data);
+            $this->log('Set Schedule', 'set a schedule for ' . $schduledFor);
             $response = [ 'ok' => true, 'code' => 200, 'message' => 'Schedule successfully added ' . $date ];
             echo json_encode($response);
         }
@@ -147,7 +148,7 @@ class ScheduleController extends Controller {
 
             $sched = new Schedule();
             $sched->editSchedule($data);
-
+            $this->log('Edited Schedule');
             $response = [ 'ok' => true, 'code' => 200, 'message' => 'Schedule id:' . $id . 'is successfully updated'];
             echo json_encode($response);
         }
@@ -200,8 +201,10 @@ class ScheduleController extends Controller {
         }
 
         $sched = new Schedule();
-        $sched->deleteScheduleById($id);
+        $selected = $sched->getSchedById($id);
+        $this->log('Deleted Schedule', $selected['date'] . ' ' . $selected['time'] . ' was deleted');
 
+        $sched->deleteScheduleById($id);
         $response = [ 'ok' => true, 'code' => 200, 'message' => 'Schedule: ' . $id . ' is successfully deleted'];
         echo json_encode($response);
     }

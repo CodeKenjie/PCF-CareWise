@@ -10,7 +10,7 @@ class MedicinesController extends Controller  {
 
         $data = [
             'title' => 'PCF:CareWise - Medicines',
-            'avatar' => (new CloudinaryService())->cloudinaryURL($user['avatar']),
+            'avatar' => $user['avatar'],
             'displayName' => $user['display_name'],
             'position' => $user['position'],
             'isEditor' => filter_var($user['is_editor'], FILTER_VALIDATE_BOOLEAN)
@@ -44,6 +44,7 @@ class MedicinesController extends Controller  {
             ];
 
             (new Medicine())->create($data);
+            $this->log('Added Medicine', ucwords($genericName) . ' (' . ucwords($brandName) . ') ' . ' was added');
             $response = [ 'ok' => true, 'code' => 200, 'message' => ucwords($genericName) . ' is successfully added!' ];
             echo json_encode($response);
         }
@@ -83,6 +84,7 @@ class MedicinesController extends Controller  {
             ];
 
             (new Medicine())->edit($data);
+            $this->log('Edited Medicine', ucwords($genericName) . ' (' . ucwords($brandName) . ') ' . ' has been edited');
             $response = [ 'ok' => true, 'code' => 200, 'message' => ucwords($genericName) . ' is successfully added!' ];
             echo json_encode($response);
         }
@@ -133,18 +135,21 @@ class MedicinesController extends Controller  {
         echo json_encode($response);
     }
     
-    public function delete($id){
+    public function delete($params){
         $this->editorOnly();
 
         header('Content-Type: application/json');
+        $id = $params['id'] ?? null;
         $response = [];
         
-        if(empty($id)){
+        if($id === null){
             $response = [ 'ok' => false, 'code' => 400, 'error' => 'Please select a medicine to delete'];
             echo json_encode($response);
             exit;
         }
 
+        $medicine = (new Medicine())->getMedicineById($id);
+        $this->log('Deleted Medicine', ucwords($medicine['generic_name']) . ' (' . ucwords($medicine['brand_name']) . ') ' . ' was deleted');
         (new Medicine())->delete($id);
         $response = [ 'ok' => true, 'code' => 400, 'message' => 'Medicine with the id of ' . $id . ' has been deleted!'];
         echo json_encode($response);

@@ -37,6 +37,10 @@
     --bg-gradient-shine: linear-gradient(120deg, rgba(255, 255, 255, 0.6) 10%, rgba(255, 255, 255, 0.15) 30%, rbga(255, 255, 255, 0) 100%);
 }
 
+.no-p {
+    padding: 0;
+}
+
 .p-sm {
     padding: 0.5em;
 }
@@ -423,6 +427,15 @@ ul {
     flex-direction: column;
 }
 
+#tnc {
+    background: var(--bg);
+    padding: 1em;
+    border-radius: var(--radius);
+    max-width: 60rem;
+    max-height: 60rem;
+    overflow: auto;
+}
+
 .flx {
     display: flex;
     flex-wrap: wrap;
@@ -520,23 +533,6 @@ ul {
     align-items: center;
     justify-content: center;
     padding: 1em;
-}
-
-.avatar label {
-    background: var(--bg);
-    padding: 0.5em;
-    border: 2px solid var(--bg);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    margin-top: -2.5rem;
-    margin-left: 10rem;
-}
-
-.avatar label:hover {
-    color: var(--font-color);
-    background-color: var(--button-highlight);
-    scale: 1.05;
-    transition: scale 300ms ease;
 }
 
 .preview {
@@ -855,9 +851,13 @@ ul {
     position: relative;
     display: flex;
     gap: 0.5em;
-    padding: 1em 0.5em;
+    padding: 2em 1em;
     cursor: pointer;
     margin-bottom: 2em;
+}
+
+#sidebar.close section {
+    padding: 2em 0.5em
 }
 
 #sidebar section:hover {
@@ -990,7 +990,7 @@ ul {
     background: var(--bg);
     box-shadow: var(--shadow);
     border: var(--border);
-    border-radius: var(--radius);
+    border-radius: 1.5rem;
     cursor: pointer;
     z-index: 10;
 }
@@ -1005,6 +1005,14 @@ ul {
     border: solid 1px var(--bg);
     border-radius: 50%;
     z-index: 11;
+}
+
+#notifications li.read {
+    opacity: 50%;
+}
+
+#notifications li.read:hover {
+    opacity: 100%;
 }
 
 #notificationPanel {
@@ -1149,6 +1157,23 @@ ul {
         padding: 0.5em;
         border-radius: 0 0 var(--radius) var(--radius);
     }
+}
+
+#dashboard #scheduleToday > li.expired{
+    position: relative;
+    background: var(--button-active);
+    opacity: 75%;
+}
+
+#dashboard #scheduleToday > li.expired::before {
+    position: absolute;
+    content: '';
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(138, 138, 138, 0.1);
+    border-radius: var(--radius);
+    pointer-events: none;
 }
 
 #dashboard #inventoryRestock {
@@ -1413,6 +1438,39 @@ ul {
     background: var(--button-active);
 }
 
+#care #results {
+    background: var(--bg);
+    border-radius: var(--radius);
+    width: 100%;
+    height: 0;
+    z-index: 10;
+    overflow: hidden;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+}
+
+#care #results.active {
+    padding: 1em 0;
+    height: 30rem;
+    border: var(--border);
+}
+
+#care #results li {
+    padding: 1em;
+    border-radius: var(--radius);
+    cursor: pointer;
+
+    && span {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+    }
+}
+
+#care #results li:hover {
+    background: var(--sub-bg);
+}
+
 #care #prescription {
     flex: 1 1 0;
     overflow-x: auto;
@@ -1530,6 +1588,7 @@ ul {
     width: var(--profile);
     height: var(--profile);
     overflow: hidden;
+    border: 0.5em solid var(--bg);
     border-radius: 50%;
     box-shadow: var(--shadow);
 }
@@ -1538,6 +1597,35 @@ ul {
     width: 100%;
     height: 100%;
     object-fit: cover;
+}
+
+.profile .avatarUpload {
+    color: var(--alt-font-color);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    left: 0;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    gap: 1em;
+    background: var(--transparent-bg);
+    z-index: 5;
+}
+
+.profile .avatarUpload.show {
+    width: 100%;
+    height: 100%;
+}
+
+.profile .avatarUpload svg {
+    cursor: pointer;
+}
+
+.profile .avatarUpload svg:hover {
+    scale: 1.5;
+    transition: scale 300ms ease;
 }
 
 .status {
@@ -1550,6 +1638,7 @@ ul {
     border: solid 5px var(--bg);
     border-radius: 2em;
     margin-top: -3rem;
+    z-index: 6;
 }
 
 #patients #collection div {
@@ -2031,10 +2120,6 @@ ul {
 
 #me .avatar {
     width: fit-content;
-
-    && label {
-        right: 0;
-    }
 }
 
 #me .userInfo {
@@ -2140,4 +2225,70 @@ ul {
     border: none;
     scale: 1.1;
     transition: scale 300ms ease;
+}
+
+#activityLogs {
+    display: flex;
+    flex-direction: column;
+    width: 70%;
+    height: 70%;
+}
+
+#activityLogs div {
+    background: var(--bg);
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--radius);
+}
+
+#activityLogs div > button {
+    width: fit-content;
+    align-self: end;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0.5em;
+}
+
+#activityLogs #collection {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+}
+
+#activityLogs #collection li {
+    width: 100%;
+    height: fit-content;
+    display: flex;
+    border: var(--border);
+    border-radius: var(--radius);
+    padding: 1em 0 ;
+    cursor: pointer;
+
+    && h3 {
+        flex: 1 1 0;
+        display: flex;
+        text-align: center;
+        align-items: center;
+        justify-content: center;
+    }
+}
+#collection li .details {
+    top: 0;
+    left: 0;
+    background: var(--bg);
+    width: 100%;
+    height: 0;
+    overflow: hidden;
+    transition: height 300ms ease;
+    border-radius: var(--radius);
+}
+    
+#collection li .details.view {
+    height: 100%;
+    transition: height 300ms ease;
 }

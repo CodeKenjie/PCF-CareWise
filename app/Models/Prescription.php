@@ -29,6 +29,21 @@ class Prescription extends Database{
         }
     }
 
+    public function getPrescriptionById($id){
+        try {
+            $query = "SELECT patients.first_name, patients.last_name
+                      FROM prescriptions
+                      JOIN patients ON prescriptions.patient_id = patients.id
+                      WHERE prescriptions.id = ?";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([$id]);
+
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $err) {
+            $this->logger->error($err->getMessage());
+        }
+    }
+
     public function delete(array $data){
         try{
             $query = 'DELETE FROM prescriptions WHERE id = :id AND patient_id = :patient_id';

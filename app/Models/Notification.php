@@ -46,11 +46,14 @@ class Notification extends Database {
         }
     }
 
-    public function setIsRead($id){
+    public function setIsRead(array $data){
         try {
-            $query = 'UPDATE notifications SET is_read = TRUE WHERE user_id = ?';
+            $query = 'UPDATE notifications SET is_read = TRUE WHERE user_id = :user_id AND id = :id';
             $stmt = $this->db->prepare($query);
-            $stmt->execute([$id]);
+            $stmt->execute([
+                ':id' => $data['id'],
+                ':user_id' => $data['userId']
+            ]);
         }catch(PDOException $err){
             $this->logger->error($err->getMessage());
         }

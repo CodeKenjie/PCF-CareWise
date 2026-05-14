@@ -1,5 +1,7 @@
 <?php
 namespace App\Core;
+
+use App\Models\Log;
 use App\Models\User;
 
 class Controller {
@@ -36,5 +38,21 @@ class Controller {
             echo json_encode([ 'ok' => false, 'code' => 401, 'error' => 'You can\'t access this, you are not an Editor']);
             exit;
         }
+    }
+    
+    protected function log($action, $details = ''){
+        $user = $this->getLoggedUser();
+        $ip = $_SERVER['REMOTE_ADDR'] ?? 'UNKNOWN';
+        $agent = $_SERVER['HTTP_USER_AGENT'] ?? 'UNKNOWN';
+        $data = [
+            'userId' => $user['id'],
+            'action' => ucwords($action),
+            'details' => $details,
+            'ipAddress' => $ip,
+            'agent' => $agent,
+        ];
+
+        $log = new Log();
+        $log->createLog($data);
     }
 }

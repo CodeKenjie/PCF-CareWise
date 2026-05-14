@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Core\Controller;
 use App\Models\Medicine;
+use App\Models\Prescription;
 use App\Models\PrescriptionItem;
 
 class PrescriptionItemsController extends Controller {
@@ -75,7 +76,9 @@ class PrescriptionItemsController extends Controller {
 
             $prescribe = new PrescriptionItem();
             $prescribe->create($data);
-
+            $patient = (new Prescription())->getPrescriptionById($id);
+            $medicine = (new Medicine())->getMedicineById($medicineId);
+            $this->log('Prescribed Medicine', $medicine['generic_name']. ' (' . $medicine['brand_name'] . ') ' . 'is was added to ' . $patient['last_name'] . ', ' . $patient['first_name']);
             $response = [ 'ok' => true, 'code' => 200, 'message' => 'Prescribed successfully' ];
             echo json_encode($response);
         }
@@ -150,7 +153,8 @@ class PrescriptionItemsController extends Controller {
 
             $prescribe = new PrescriptionItem();
             $prescribe->update($data);
-
+            $patient = (new Prescription())->getPrescriptionById($prescriptionId);
+            $this->log('Edited Prescribed Medicine', $patient['last_name']. ', ' . $patient['first_name'] . 'prescribed medicine was edited');
             $response = [ 'ok' => true, 'code' => 200, 'message' => 'prescribed Medicine updated successfully' ];
             echo json_encode($response);
         }
@@ -201,7 +205,8 @@ class PrescriptionItemsController extends Controller {
 
         $prescribe = new PrescriptionItem();
         $prescribe->delete($data);
-
+        $patient = (new Prescription())->getPrescriptionById($prescriptionId);
+        $this->log('Deleted Prescribed Medicine', $patient['last_name']. ', ' . $patient['first_name'] . 'prescribed medicine was deleted');
         $response = [ 'ok' => true, 'code' => 200, 'error' => 'prescibed medicine successfully deleted'];
         echo json_encode($response);
     }

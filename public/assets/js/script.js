@@ -238,8 +238,11 @@ function renderPatientsData(data){
     data.collection.forEach( patient => {
         const [year, month, day] = patient.birthdate.split('-');
         const clone = template.content.cloneNode(true);
-
+        const avatarUpload = clone.querySelector(`.avatarUpload`);
+        const form = clone.querySelector(`.patientAvatarForm`);
         const statusMark = clone.querySelector(`.status`);
+        const save = clone.querySelector(`.save`);
+        const img = clone.querySelector(`.profile img`);
         if(patient.status === `Active` || patient.status === `Complete`){
             statusMark.style.backgroundColor = `var(--good)`;
         } else if (patient.status === `Deceased` || patient.status === `Inactive`) {
@@ -249,7 +252,42 @@ function renderPatientsData(data){
         }
         statusMark.textContent = patient.status;
         clone.querySelector(`.id`).textContent = patient.id;
-        clone.querySelector(`.profile img`).src = patient.avatar ? patient.avatar : `assets/images/profile.png`;
+        img.src = patient.avatar ? patient.avatar : `assets/images/profile.png`;
+        clone.querySelector(`.profile`).addEventListener(`mouseenter`, () => {
+            avatarUpload.classList.add(`show`);
+        });
+        clone.querySelector(`.profile`).addEventListener(`mouseleave`, () => {
+            avatarUpload.classList.remove(`show`);
+        });
+
+        clone.querySelector(`input[name="avatar"]`).onchange = function (e) {
+            const file = e.target.files[0];
+
+            img.src = URL.createObjectURL(file);
+            save.classList.remove(`hidden`);
+        };
+
+        form.action = `/patients/${patient.id}/avatar`;
+        save.addEventListener(`click`, async (e) => {
+            e.preventDefault();
+            try{
+                const formdata = new FormData(form);
+                const res = await fetch(`/patients/${patient.id}/avatar`, {
+                    method: 'POST',
+                    body: formdata
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    return responseMessage(data, data.error);
+                }
+
+                responseMessage(data, data.message);
+                loadList(`patients`, renderPatientsData);
+            } catch(err){
+                console.error(err);
+            }
+        });
         clone.querySelector(`.name`).textContent = patient.last_name + ", " + patient.first_name;
         clone.querySelector(`.address`).textContent = patient.address;
         clone.querySelector(`.birthdate`).textContent = `${months[month - 1]} ${day}, ${year}`;
@@ -275,7 +313,6 @@ function renderPatientsData(data){
             state.patient.id = patient.id;
             document.getElementById(`editPatient`).classList.add(`active`);
             document.getElementById(`editPatientForm`).action = `/patients/${patient.id}/edit`
-            document.getElementById(`currentPic`).src = patient.avatar ? patient.avatar : `/assets/images/profile.png`;
             document.getElementById(`updateFirstName`).value = patient.first_name;
             document.getElementById(`updateLastName`).value = patient.last_name;
             document.querySelector(`.updateSex`).value = patient.sex;
@@ -345,6 +382,7 @@ function renderPatientsDataForCare(data){
             document.getElementById(`care`).classList.add(`open`);
             document.getElementById(`prescriptionForm`).action = `/care/prescription/${patient.id}`;
             document.getElementById(`diagnosisForm`).action = `/care/patient/${patient.id}/diagnosis`;
+            document.getElementById(`profpic`).src = patient.avatar ? patient.avatar : '/assets/images/profile.png';
             document.getElementById(`patientId`).textContent = patient.id;
             document.getElementById(`patientName`).textContent = `${patient.last_name}, ${patient.first_name}`;
             document.getElementById(`patientAge`).textContent = patient.age;
@@ -440,7 +478,7 @@ function renderMedsDrop(data){
     data.collection.forEach(medicine => {
         const clone = template.content.cloneNode(true);
 
-        clone.querySelector(`.genericName`).textContent = medicine.generic_name;
+        clone.querySelector(`.genericName`).innerHTML = `${medicine.generic_name} <span style="opacity: 50%">(${medicine.brand_name ? medicine.brand_name : `N/A`})</span>`;
         clone.querySelector(`.dosage`).textContent = medicine.dosage;
         clone.querySelector(`.form`).textContent = medicine.form;
 
@@ -455,7 +493,7 @@ function renderMedsDrop(data){
 
             if(care) {
                 document.getElementById(`medicineId`).value = medicine.id;
-                document.getElementById(`medicineName`).value = medicine.generic_name;
+                document.getElementById(`medicineName`).value = `${medicine.brand_name} ${medicine.generic_name}`;
                 document.getElementById(`doseUnit`).value = medicine.form;
             }
         });
@@ -647,14 +685,30 @@ async function renderNotifications(data){
 
         const newNotf = clone.querySelector(`.new`);
         if(!notification.is_read){
-            document.querySelector(`.new`).classList.remove(`hidden`);
+            document.querySelector(`#notifBtn > .new`).classList.remove(`hidden`);
             newNotf.classList.remove(`hidden`);
+        }
+
+        if(notification.is_read){
+            clone.querySelector(`li`).classList.add(`read`);
         }
 
         clone.querySelector(`.title`).textContent = notification.title;
         clone.querySelector(`.content`).textContent = notification.content;
         clone.querySelector(`.go`).addEventListener(`click`, () => {
-            window.location.replace(notification.link);
+            (async () =>{
+                try {
+                    const res = await fetch(`/notifications/${notification.id}/read`, {
+                        method: 'PATCH'
+                    });
+
+                    loadList(`notifications`, renderNotifications);
+                    newNotf.classList.add(`hidden`);
+                    window.location.replace(notification.link);
+                } catch(err){
+                    console.error(err);
+                }
+            })();
         });
 
         clone.querySelector(`.remove`).addEventListener(`click`, async (e) =>{
@@ -910,6 +964,47 @@ async function loadPrescriptionItems(id, container){
     }
 }
 
+async function loadLogs(){
+    try {
+        const res = await fetch(`activities`, {
+            method: 'GET'
+        });
+
+        const data = await res.json();
+
+        if(!data.collection){
+            return;
+        }
+
+        const container = document.querySelector(`#activityLogs #collection`);
+        const template = document.getElementById(`logCard`);
+
+        container.innerHTML = ``;
+        data.collection.forEach(activity => {
+            const clone = template.content.cloneNode(true);
+            const [ month, day, year ] = new Date(activity.recorded_at).toLocaleString(`en-PH`, { timeZone: 'Asia/Manila', month: '2-digit', day: '2-digit', year: 'numeric' }).split(`/`);
+            const usr_agent = activity.user_agent;
+            let browser = 'UNKNOWN';
+            let OS = 'UNKNOWN';
+            (usr_agent.includes(`Chrome`)) ? browser = `Chrome` : (usr_agent.includes(`Firefox`)) ? browser = `Firefox` : (usr_agent.includes(`Safari`)) ? browser = `Safari` : (usr_agent.includes(`Edg`)) ? browser = `Edge` : browser;
+            (usr_agent.includes(`Windows`)) ? OS = `Windows` : (usr_agent.includes(`Mac`)) ? OS = `MacOS` : (usr_agent.includes(`Linux`)) ? OS = `Linux` : (usr_agent.includes(`Android`)) ? OS = `Android` : (usr_agent.includes(`iPhone`)) ? OS = `iPhone` : OS ;
+            clone.querySelector(`.ipAddress`).textContent = activity.ip_address;
+            clone.querySelector(`.name`).textContent = `${activity.last_name}, ${activity.first_name} (${activity.display_name})`;
+            clone.querySelector(`.action`).textContent = activity.action;
+            clone.querySelector(`.agent`).textContent = `${browser} (${OS})`;
+            clone.querySelector(`.date`).textContent = `${months[month - 1]} ${day}, ${year}`;
+            clone.querySelector(`.details`).textContent = activity.details;
+            const details = clone.querySelector(`.details`);
+            clone.querySelector(`li`).addEventListener(`click`, () => {
+                details.classList.toggle(`view`);
+            });
+            container.appendChild(clone);
+        });
+    } catch (err) {
+        console.error(err);
+    }
+}
+
 async function loadList(page, render) {
     const dashboard = document.getElementById(`dashboard`);
     try {
@@ -1110,18 +1205,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         loadList(`notifications`, renderNotifications);
         notificationBtn.addEventListener(`click`, () => {
             document.getElementById(`notificationPanel`).classList.toggle(`open`);
-            (async () =>{
-                try {
-                    const res = await fetch(`/notifications/read`, {
-                        method: 'PATCH'
-                    });
-
-                    loadList(`notifications`, renderNotifications);
-                    document.querySelector(`.new`).classList.add(`hidden`);
-                } catch(err){
-                    console.error(err);
-                }
-            })();
+            document.querySelector(`#notifBtn > .new`).classList.add(`hidden`);
         });
     }
 
@@ -1143,6 +1227,12 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             if(page.href === window.location.href) {
                 page.classList.add(`currentPage`);
             }
+        });
+
+        const activityLogsBtn = document.getElementById(`activityLogsBtn`);
+        activityLogsBtn.addEventListener(`click`, () => {
+            document.getElementById(`activityPanel`).classList.add(`active`);
+            loadLogs();
         });
     }
 
@@ -1235,6 +1325,10 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             } catch(err){
                 console.error(err);    
             }
+        });
+
+        document.getElementById(`TCBtn`).addEventListener(`click`, () => {
+            document.querySelector(`.popup`).classList.add(`active`);
         });
     } 
 
@@ -1369,7 +1463,18 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                     const clone = template.content.cloneNode(true);
                     const timeFormat = new Date(`${schedule.date}T${schedule.time}`).toLocaleTimeString('en-PH', { hour: 'numeric', minute: '2-digit', hour12: true });
                     const [year, month, day] = schedule.date.split('-');
+                    const now = new Date();
+                    const [y, m, d] = schedule.date.split('-');
+                    const [hh, mm, ss] = schedule.time.split(':');
+                    const sched = new Date(Number(y), Number(m) - 1, Number(d), Number(hh), Number(mm), Number(ss));
 
+                    if(sched <= now){
+                        clone.querySelector(`.sched`).classList.add(`expired`);
+                    }
+
+                    clone.querySelector(`.sched`).addEventListener(`click`, () => {
+                        window.location.replace(`/schedule`);
+                    });
                     clone.querySelector(`.schedDate`).textContent = `${months[month - 1]} ${day}, ${year}`;
                     clone.querySelector(`.schedTime`).textContent = `${timeFormat} (${schedule.frequency})`;
                     clone.querySelector(`.clientName`).textContent = `${schedule.last_name}, ${schedule.first_name}`;
@@ -1430,7 +1535,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                             status.textContent = item.expiration_status;
                             itemQuant.textContent = `Expiration: ${months[month - 1]} ${day}, ${year}`;
                             status.classList.remove(`good`, `moderate`, `critical`);
-                            (item.expiration_status === "Good") ? status.classList.add(`good`) : (item.expiration_status === "Expring Soon") ? status.classList.add(`moderate`) : status.classList.add(`critical`);
+                            (item.expiration_status === "Good") ? status.classList.add(`good`) : (item.expiration_status === "Expiring Soon") ? status.classList.add(`moderate`) : status.classList.add(`critical`);
                             status.setAttribute(`data-showing`, `expiration`);
                         }
                     });
@@ -1543,17 +1648,24 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         });
 
         let timeout;
+        document.getElementById(`medicineName`).addEventListener(`click`, (e) => {
+            document.getElementById(`medicineOptn`).classList.toggle(`active`);
+            loadList(`medicines`, renderMedsDrop);
+        });
+
         document.getElementById(`medicineName`).addEventListener(`input`, (e) => {
             e.preventDefault();
             const input = document.getElementById(`medicineName`);
             clearTimeout(timeout);
-            document.getElementById(`medicineOptn`).classList.add(`active`);
+            if(input.value === ``){
+                document.getElementById(`medicineOptn`).classList.remove(`active`);
+            } else {
+                document.getElementById(`medicineOptn`).classList.add(`active`);
+            }
+
             timeout = setTimeout(() => {
                 dropdown(`care/medicine`, renderMedsDrop, input.value);
             }, 300);
-            if(input.value === ''){
-                document.getElementById(`medicineOptn`).classList.remove(`active`);
-            }
         });
 
         document.getElementById(`prescriptionForm`).addEventListener(`submit`, async (e) => {
@@ -1708,6 +1820,65 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             }
         });
 
+        const symptomsInput = document.getElementById(`symptomsInput`);
+        symptomsInput.addEventListener(`click`, () => {
+            document.getElementById(`results`).classList.toggle(`active`);
+        });
+        symptomsInput.addEventListener(`input`, () => {
+            clearTimeout(timeout);
+
+            if(symptomsInput.value === ``){
+                document.getElementById(`results`).classList.remove(`active`);
+            } else {
+                document.getElementById(`results`).classList.add(`active`);
+            }
+
+            timeout = setTimeout(async () => {
+                try {
+                    const res = await fetch(`/care/condition?symptoms=${symptomsInput.value}`, {
+                        method: 'GET'
+                    });
+
+                    const data = await res.json();
+                    if(!data.ok){
+                        return;
+                    }
+
+                    const container = document.getElementById(`results`);
+                    const template = document.getElementById(`possibleConditionCard`);
+                    container.innerHTML = ``;
+                    data.collection.results.forEach(result => {
+                        const clone = template.content.cloneNode(true);
+                        clone.querySelector(`li`).addEventListener(`click`, () => {
+                            document.getElementById(`conditionName`).value = result.condition;
+                        });
+                        clone.querySelector(`.condition`).textContent = result.condition;
+                        clone.querySelector(`.confidence`).textContent = `${result.confidence}%  (${result.confidenceLevel})`;
+                        clone.querySelector(`.description`).textContent = result.description;
+                        result.medications.forEach(suggestedMed => {
+                            const medicinesCollections = clone.querySelector(`.medications`);
+                            const h4 = document.createElement(`h4`);
+                            h4.textContent = suggestedMed.name;
+                            medicinesCollections.appendChild(h4);
+                        });
+                        container.appendChild(clone);
+                    });
+                    if(data.collection.emergency.detected){
+                        const emergency = data.collection.emergency.data;
+                        const clone = template.content.cloneNode(true);
+                        clone.querySelector(`li`).addEventListener(`click`, () => {
+                            document.getElementById(`conditionName`).value = emergency.name;
+                        });
+                        clone.querySelector(`.condition`).textContent = emergency.name;
+                        clone.querySelector(`.confidence`).textContent = emergency.urgency;
+                        clone.querySelector(`.description`).textContent = emergency.message;
+                        container.appendChild(clone);
+                    }
+                } catch(err){
+                    console.error(err);
+                }
+            }, 300);
+        });
     }
 
     const patients = document.getElementById(`patients`);
@@ -1715,20 +1886,6 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         loadList('patients', renderPatientsData);
         sorts(`patients`, renderPatientsData);
         search(`patients/patient`, renderPatientsData);
-
-        document.querySelector(`input[name="avatar"]`).onchange = function (e) {
-            const file = e.target.files[0];
-            const img = document.querySelector(`.profilePic`);
-
-            img.src = URL.createObjectURL(file);
-        };
-
-        document.querySelector(`input[id="updateAvatar"]`).onchange = function (e) {
-            const file = e.target.files[0];
-            const img = document.getElementById(`currentPic`);
-
-            img.src = URL.createObjectURL(file);
-        };
 
         const registerPatientBtn = document.getElementById(`registerPatientBtn`);
         registerPatientBtn.addEventListener(`click`, () => {
@@ -1740,16 +1897,6 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         const editPatientForm = document.getElementById(`editPatientForm`);
         editPatientForm.addEventListener(`submit`, async (e) => {
             e.preventDefault();
-            const updateAvatar = document.getElementById(`updateAvatar`).value;
-            const updateFirstName = document.getElementById(`updateFirstName`).value;
-            const updateLastName = document.getElementById(`updateLastName`).value;
-            const updateSex = document.getElementById(`updateSex`).value;
-            const updateBirthdate = document.getElementById(`updateBirthdate`).value;
-            const updateAddress = document.getElementById(`updateAddress`).value;
-            const updateContact = document.getElementById(`updateContact`).value;
-            const updateExContact = document.getElementById(`updateExContact`).value;
-            const updateStatus = document.getElementById(`updateStatus`).value;
-            const updateReferredBy = document.getElementById(`updateReferredBy`).value;
             const formdata = new FormData(e.target);
             try {
                 const res = await fetch(`/patients/${state.patient.id}/edit`, {
@@ -1765,16 +1912,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
 
                 responseMessage(data, data.message);
                 editPanel.classList.remove('active');
-                loadList('patients', renderPatientsData);
-                updateFirstName = ``;
-                updateLastName = ``;
-                updateSex = ``;
-                updateBirthdate = ``;
-                updateAddress = ``;
-                updateContact = ``;
-                updateExContact = ``;
-                updateStatus = ``;
-                updateReferredBy = ``;
+                loadList(`patients`, renderPatientsData);
             } catch (err) {
                 console.error(err);
             }
@@ -2140,14 +2278,17 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
 
         let timeout;
         const findPatient = document.getElementById(`find`);
+        findPatient.addEventListener(`click`, (e) => {
+            const patientOptn = document.getElementById(`patientOption`); 
+            patientOptn.classList.toggle(`active`);
+            loadList(`patients`, renderPatientsDrop);
+        });
+
         findPatient.addEventListener(`input`, (e) => {
             e.preventDefault();
-            const patientOptn = document.getElementById(`patientOption`); 
             clearTimeout(timeout);
             timeout = setTimeout(() => {
-                patientOptn.classList.add(`active`);
                 dropdown(`schedule/patient`, renderPatientsDrop, findPatient.value);
-
                 if(findPatient.value === ``){
                     patientOptn.classList.remove(`active`);
                 }
@@ -2232,13 +2373,41 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
 
     const me = document.getElementById(`me`);
     if(me){
+        const avatarUpload = document.querySelector(`.avatarUpload`);
+        document.querySelector(`.profile`).addEventListener(`mouseenter`, () => {
+            avatarUpload.classList.add(`show`);
+        });
+        document.querySelector(`.profile`).addEventListener(`mouseleave`, () => {
+            avatarUpload.classList.remove(`show`);
+        });
 
         document.querySelector(`input[name="avatar"]`).onchange = function (e) {
             const file = e.target.files[0];
-            const img = document.querySelector(`.profilePic`);
+            const img = document.querySelector(`.profile img`);
 
+            document.querySelector(`.save`).classList.remove(`hidden`);
             img.src = URL.createObjectURL(file);
         };
+
+        document.querySelector(`.save`).addEventListener(`click`, async (e) => {
+            e.preventDefault();
+            try {
+                const form = document.getElementById(`avatarUploadForm`);
+                const formdata = new FormData(form);
+                const res = await fetch(`/me/update/avatar`, {
+                    method: 'POST',
+                    body: formdata
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    return responseMessage(data, data.error);
+                }
+                responseMessage(data, data.message);
+            } catch(err) {
+                console.error(err);
+            }
+        });
 
         document.getElementById(`deleteAccount`).addEventListener(`click`, async (e) => {
             e.preventDefault();
@@ -2259,13 +2428,11 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         document.getElementById(`editInfoBtn`).addEventListener(`click`, () => {
             document.getElementById(`displayName`).classList.add(`hidden`);
             document.getElementById(`editInfoForm`).classList.remove(`hidden`);
-            document.getElementById(`avatarBtn`).classList.remove(`hidden`);
         });
 
         document.getElementById(`cancelUpdateBtn`).addEventListener(`click`, () => {
             document.getElementById(`displayName`).classList.remove(`hidden`);
             document.getElementById(`editInfoForm`).classList.add(`hidden`);
-            document.getElementById(`avatarBtn`).classList.add(`hidden`);
         });
 
         const requestAccessBtn = document.getElementById(`requestAccess`);
@@ -2425,5 +2592,27 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             });
         } 
 
+    }
+
+    const activityLogs = document.getElementById(`activityLogs`);
+    if(activityLogs) {
+        document.getElementById(`deleteAll`).addEventListener(`click`, async (e) => {
+            e.preventDefault();
+            try{
+                const res = await fetch(`/activities/delete`, {
+                    method: 'DELETE'
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    return responseMessage(data, data.error);
+                }
+
+                responseMessage(data, data.message);
+                loadLogs();
+            } catch(err){
+                console.error(err);
+            }
+        });
     }
 })

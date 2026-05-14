@@ -27,7 +27,7 @@
         <div id="info">
             <div class="avatar">
                 <span class="profile">
-                    <img src="/assets/images/profile.png" alt="">
+                    <img id="profpic" src="/assets/images/profile.png" alt="">
                 </span>
             </div>
             <div>
@@ -56,6 +56,10 @@
         <form id="diagnosisForm" action="/care/patient" method="post">
             <h5>Diagnosis:</h3>
             <input id="conditionName" name="conditionName" type="text" style="padding: 0.5em;" placeholder="Condition Name" <?= ($isEditor ?? false) ? '' : 'hidden'?>>
+            <div class="rel" style="width: 100%">
+                <input id="symptomsInput" name="symptoms" type="text" style="padding: 0.5em;" placeholder="Describe your Symptoms" <?= ($isEditor ?? false) ? '' : 'hidden'?>>
+                <ul id="results" class="abs"></ul>
+            </div>
             <button class="btn-borderless btn-highlight" type="submit" <?= ($isEditor ?? false) ? '' : 'hidden'?>>
                 <svg class="sm-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="Edit / Add_Plus_Square"> <path id="Vector" d="M8 12H12M12 12H16M12 12V16M12 12V8M4 16.8002V7.2002C4 6.08009 4 5.51962 4.21799 5.0918C4.40973 4.71547 4.71547 4.40973 5.0918 4.21799C5.51962 4 6.08009 4 7.2002 4H16.8002C17.9203 4 18.4801 4 18.9079 4.21799C19.2842 4.40973 19.5905 4.71547 19.7822 5.0918C20.0002 5.51962 20.0002 6.07967 20.0002 7.19978V16.7998C20.0002 17.9199 20.0002 18.48 19.7822 18.9078C19.5905 19.2841 19.2842 19.5905 18.9079 19.7822C18.4805 20 17.9215 20 16.8036 20H7.19691C6.07899 20 5.5192 20 5.0918 19.7822C4.71547 19.5905 4.40973 19.2842 4.21799 18.9079C4 18.4801 4 17.9203 4 16.8002Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g></svg>
             </button>
@@ -367,7 +371,7 @@
 <template id="medicineCard">
     <li class="medicine">
         <span class="p-sm">
-            <h4 class="genericName">testing testing</h4>
+            <h4 class="genericName" style="display: flex; gap: 0.5em">testing testing</h4>
             <h5 class="dosage" style="opacity: 50%;">dosage</h5>
             <h5 class="form" style="opacity: 50%;">form</h5>
         </span>
@@ -404,6 +408,17 @@
         <button class="btn-borderless btn-critical" style="padding: 0.2em">
             <svg class="sm-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g id="Edit / Add_Minus_Square"> <path id="Vector" d="M8 12H16M4 16.8002V7.2002C4 6.08009 4 5.51962 4.21799 5.0918C4.40973 4.71547 4.71547 4.40973 5.0918 4.21799C5.51962 4 6.08009 4 7.2002 4H16.8002C17.9203 4 18.4801 4 18.9079 4.21799C19.2842 4.40973 19.5905 4.71547 19.7822 5.0918C20.0002 5.51962 20.0002 6.07967 20.0002 7.19978V16.7998C20.0002 17.9199 20.0002 18.48 19.7822 18.9078C19.5905 19.2841 19.2842 19.5905 18.9079 19.7822C18.4805 20 17.9215 20 16.8036 20H7.19691C6.07899 20 5.5192 20 5.0918 19.7822C4.71547 19.5905 4.40973 19.2842 4.21799 18.9079C4 18.4801 4 17.9203 4 16.8002Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g> </g></svg>
         </button>
+    </li>
+</template>
+<template id="possibleConditionCard">
+    <li>
+        <span>
+            <h3 class="condition"></h3>
+            <h4 class="confidence"></h4>
+        </span>
+        <p class="description"></p>
+        <h6>suggestions:</h6>
+        <div class="medications"></div>
     </li>
 </template>
 <?php require __DIR__ . "/../partials/footer.php"; ?>

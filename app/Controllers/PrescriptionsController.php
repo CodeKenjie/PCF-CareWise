@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Core\Controller;
+use App\Models\Patient;
 use App\Models\Prescription;
 
 class PrescriptionsController extends Controller {
@@ -28,7 +29,8 @@ class PrescriptionsController extends Controller {
             ];
 
             (new Prescription())->create($data);
-
+            $patient = (new Patient())->getPatientById($id);
+            $this->log('Added Prescription', $patient['last_name'] . ', ' . $patient['first_name'] . ' was given a prescription');
             $response = [ 'ok' => true, 'code' => 200, 'message' => 'prescription created'];
             echo json_encode($response);
         }
@@ -78,6 +80,8 @@ class PrescriptionsController extends Controller {
                 'patientId' => $patientId
             ];
 
+            $patient = (new Prescription())->getPrescriptionById($id);
+            $this->log('Prescription Removed', $patient['last_name'] . ', ' . $patient['first_name'] . ' prescription was removed');
             (new Prescription())->delete($data);
             $response = [ 'ok' => true, 'code' => 200, 'message' => 'Prescription Successfully deleted'];
             echo json_encode($response);

@@ -107,13 +107,14 @@ class Medicine extends Database {
         try {
             $query = "SELECT *,
                         ts_rank(
-                            to_tsvector('english', generic_name || ' ' || dosage || ' ' || form ),
+                            to_tsvector('english', generic_name || ' ' || brand_name || ' ' || dosage || ' ' || form ),
                             plainto_tsquery('english', :kw)
                         ) AS rank
                         FROM medicines
-                        WHERE (:kw IS NULL OR to_tsvector('english', generic_name || ' ' || dosage || ' ' || form)
+                        WHERE (:kw IS NULL OR to_tsvector('english', generic_name || ' ' || brand_name || ' '|| dosage || ' ' || form)
                             @@ plainto_tsquery('english', :kw)
                             OR generic_name ILIKE '%' || :kw || '%'
+                            OR brand_name ILIKE '%' || :kw || '%'
                             OR dosage ILIKE '%' || :kw || '%'
                             OR form ILIKE '%' || :kw || '%')
                         ORDER BY rank DESC";
@@ -149,6 +150,18 @@ class Medicine extends Database {
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch(PDOException $err){
+            $this->logger->error($err->getMessage());
+        }
+    }
+
+    public function getMedicineById($id){
+        try {
+            $query = "SELECT generic_name, brand_name FROM medicines WHERE id = ?";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([$id]);
+
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $err) {
             $this->logger->error($err->getMessage());
         }
     }

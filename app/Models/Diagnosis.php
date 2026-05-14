@@ -39,6 +39,18 @@ class Diagnosis extends Database {
         }
     }
 
+    public function getDiagnosisById($id){
+        try {
+            $query = "SELECT condition_name FROM diagnosis WHERE id = ?";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([$id]);
+
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $err) {
+            $this->logger->error($err->getMessage());
+        }
+    }
+
     public function delete(array $data){
         try {
             $query = 'DELETE FROM diagnosis WHERE id = :id AND patient_id = :patient_id';

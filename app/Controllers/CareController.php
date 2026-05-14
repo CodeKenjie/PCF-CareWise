@@ -12,7 +12,7 @@ class CareController extends Controller{
         $data = [
             'title' => 'PCF: CareWise - Care',
             'displayName' => $user['display_name'],
-            'avatar' => (new CloudinaryService())->cloudinaryURL($user['avatar']),
+            'avatar' => $user['avatar'],
             'position' => $user['position'],
             'isEditor' => filter_var($user['is_editor'], FILTER_VALIDATE_BOOLEAN)
         ];

@@ -76,6 +76,17 @@ class Schedule extends Database {
         }
     }
 
+    public function getSchedById($id){
+        try{
+            $query = "SELECT * FROM schedules WHERE id = ? ";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([$id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        }catch(PDOException $err){
+            $this->logger->error($err->getMessage());
+        }
+    }
+
     public function deleteScheduleById($id){
         try{
             $query = 'DELETE FROM schedules WHERE id = ?';
@@ -88,7 +99,7 @@ class Schedule extends Database {
 
     public function getSchedToday(){
         try{
-            $query = 'SELECT * FROM schedules WHERE date = CURRENT_DATE';
+            $query = 'SELECT * FROM schedules WHERE date = CURRENT_DATE ORDER BY time ASC';
             $stmt = $this->db->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -110,12 +121,13 @@ class Schedule extends Database {
 
     public function getSchedulesToNotify(){
         try{
-            $query = "SELECT * FROM schedules WHERE date = CURRENT_DATE";
+            $query = "SELECT * FROM schedules WHERE date <= CURRENT_DATE";
             $stmt = $this->db->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch(PDOException $err){
             $this->logger->error($err->getMessage());
+            return [];
         }
     }
 }

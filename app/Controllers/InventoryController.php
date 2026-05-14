@@ -6,13 +6,15 @@ use App\Models\Item;
 use App\Models\Notification;
 use App\Services\CloudinaryService;
 
+use function PHPSTORM_META\type;
+
 class InventoryController extends Controller {
     public function index() {
         $user = $this->getLoggedUser();
         $data = [
             'title' => 'PCF:CareWise - Inventory',
+            'avatar' => $user['avatar'],
             'displayName' => $user['display_name'],
-            'avatar' => (new CloudinaryService())->cloudinaryURL($user['avatar']),
             'position' => $user['position'],
             'isEditor' => filter_var($user['is_editor'], FILTER_VALIDATE_BOOLEAN)
         ];
@@ -96,6 +98,7 @@ class InventoryController extends Controller {
             ];
             $item = new Item();
             $item->createItem($data);
+            $this->log('Added Item', ucwords($itemName) . ' with a quantity of ' . $quantity);
             $response = [ 'ok' => true, 'code' => 200, 'message' => 'Added to the Inventory: ' . ucwords($itemName) . '!' ];
             echo json_encode($response);
         }
@@ -133,6 +136,7 @@ class InventoryController extends Controller {
             ];
             $item = new Item();
             $item->editItem($data);
+            $this->log('Edited Item', ucwords($itemName) . ' has been edited');
             $response = [ 'ok' => true, 'code' => 200, 'message' => ucwords($itemName) . ' Edited successfully!' ];
             echo json_encode($response);
         }
@@ -159,8 +163,10 @@ class InventoryController extends Controller {
             if($type === 'export'){
                 $value = -$value;
                 $message = 'Successfully exported: ' . $value;
+                $type = 'exported';
             } else {
                 $message = 'Successfully imported: ' . $value;
+                $type = 'imported';
             }
 
             $data = [
@@ -170,13 +176,14 @@ class InventoryController extends Controller {
 
             $item = new Item();
             $adjust = $item->adjustItemQuantity($data);
-
+            $selected = $item->getItemById($id);
             if(!$adjust){
                 $response = [ 'ok' => false, 'code' => 400, 'error' => 'Insufficient stock'];
                 echo json_encode($response);
                 exit;
             }
 
+            $this->log('Ajusted Item Quantity', $value . ' was ' . $type . ' to ' . ucwords($selected['name']));
             $response = [ 'ok' => true, 'code' => 200, 'message' => $message ];
             echo json_encode($response);
         }
@@ -196,8 +203,10 @@ class InventoryController extends Controller {
         }
 
         $item = new Item();
-        $item->deleteItem($id);
+        $selected = $item->getItemById($id);
+        $this->log('Deleted Item', ucwords($selected['name']) . ' was deleted from inventory');
 
+        $item->deleteItem($id);
         $response = [ 'ok' => true, 'code' => 200, 'message' => 'Item: '. $id . ' is successfully deleted!']; 
         echo json_encode($response);
     }

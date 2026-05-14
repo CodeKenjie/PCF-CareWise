@@ -1,13 +1,11 @@
 <?php
 require __DIR__ . '/../app/Core/AutoLoader.php';
+require __DIR__ . '/../app/Core/Bootstrap.php';
 use App\Core\Migration;
 use App\Core\Router;
 
-session_start();
-
 $migration = new Migration();
 $migration->migrate();
-
 $router = new Router();
 
 $router->middleware(function () {
@@ -28,6 +26,7 @@ $router->middleware(function () {
     $_SESSION['notify_ran'] = date('Y-m-d H:i');
     (new App\Controllers\ScheduleController())->notify();
     (new App\Controllers\InventoryController())->notify();
+    (new App\Controllers\ActivityLogsController())->cleanup();
 });
 
 $router->get('/login', 'App\Controllers\LoginController@index');
@@ -38,7 +37,7 @@ $router->get('/register', 'App\Controllers\RegisterController@index');
 $router->post('/register', 'App\Controllers\UserController@register');
 
 $router->get('/notifications/all', 'App\Controllers\NotificationController@all');
-$router->patch('/notifications/read', 'App\Controllers\NotificationController@read');
+$router->patch('/notifications/{id}/read', 'App\Controllers\NotificationController@read');
 $router->delete('/notifications/{id}/delete', 'App\Controllers\NotificationController@delete');
 
 $router->get('/dashboard', 'App\Controllers\DashboardController@index');
@@ -53,6 +52,7 @@ $router->get('/care/all', 'App\Controllers\PatientsController@getAll');
 $router->get('/care/sort', 'App\Controllers\PatientsController@sort');
 $router->get('/care/search', 'App\Controllers\PatientsController@search');
 $router->get('/care/patient', 'App\Controllers\PatientsController@search');
+$router->get('/care/condition', 'App\Controllers\SymptomsCheckerController@analyze');
 $router->get('/care/medicine', 'App\Controllers\MedicinesController@dropdown');
 $router->get('/care/prescription/{id}/all', 'App\Controllers\PrescriptionItemsController@all');
 $router->get('/care/patient/{id}/diagnosis', 'App\Controllers\DiagnosisController@all');
@@ -66,6 +66,7 @@ $router->delete('/care/patient/{patientId}/diagnosis/{id}/delete', 'App\Controll
 $router->delete('/care/patient/{patientId}/prescription/{id}/delete', 'App\Controllers\PrescriptionsController@delete');
 
 $router->get('/patients', 'App\Controllers\PatientsController@index');
+$router->post('/patients/{id}/avatar', 'App\Controllers\PatientsController@avatar');
 $router->get('/patients/all', 'App\Controllers\PatientsController@getAll');
 $router->get('/patients/sort', 'App\Controllers\PatientsController@sort');
 $router->get('/patients/patient', 'App\Controllers\PatientsController@search');
@@ -105,10 +106,14 @@ $router->get('/me', 'App\Controllers\ProfileController@index');
 $router->get('/me/requests', 'App\Controllers\ProfileController@requests');
 $router->get('/me/editors', 'App\Controllers\ProfileController@editors');
 $router->post('/me/update', 'App\Controllers\UserController@update');
+$router->post('/me/update/avatar', 'App\Controllers\UserController@avatar');
 $router->delete('/me/delete', 'App\Controllers\UserController@delete');
 $router->patch('/me/{id}/accept', 'App\Controllers\UserController@changeRole');
 $router->patch('/me/{id}/decline', 'App\Controllers\UserController@decline');
 $router->patch('/me/{id}/remove', 'App\Controllers\UserController@changeRole');
 $router->patch('/me/requestAccess', 'App\Controllers\UserController@request');
+
+$router->get('/activities', 'App\Controllers\ActivityLogsController@all');
+$router->delete('/activities/delete', 'App\Controllers\ActivityLogsController@delete');
 
 $router->direct($_SERVER['REQUEST_URI'], $_SERVER['REQUEST_METHOD']);

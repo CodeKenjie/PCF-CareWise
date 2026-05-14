@@ -1,6 +1,7 @@
 <?php
 namespace App\Controllers;
 use App\Core\Controller;
+use App\Models\Notification;
 use App\Models\Patient;
 use App\Services\CloudinaryService;
 
@@ -10,7 +11,7 @@ class PatientsController extends Controller {
 
         $data = [
             'title' => 'PCF:CareWise - Patients',
-            'avatar' => (new CloudinaryService())->cloudinaryURL($user['avatar']),
+            'avatar' => $user['avatar'],
             'displayName' => $user['display_name'],
             'position' => $user['position'],
             'isEditor' => filter_var($user['is_editor'], FILTER_VALIDATE_BOOLEAN)
@@ -24,7 +25,6 @@ class PatientsController extends Controller {
 
         header('Content-Type: application/json');
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
-            $avatar = $_FILES['avatar'] ?? null;
             $firstName = $_POST['firstName'] ?? '';
             $lastName = $_POST['lastName'] ?? '';
             $sex = $_POST['sex'] ?? '';
@@ -35,6 +35,7 @@ class PatientsController extends Controller {
             $status = $_POST['status'] ?? '';
             $referredBy = $this->notApplicable($_POST['referredBy'] ?? '');
             $response = [];
+            $result = null;
 
             if(empty($firstName)){
                 $response = [ 'ok' => false, 'code' => 401, 'error' => 'Required: Patients First name' ];
@@ -78,19 +79,7 @@ class PatientsController extends Controller {
                 exit;
             }
 
-            if($avatar && $avatar['error'] === UPLOAD_ERR_OK){
-                $cloudinary = new CloudinaryService();
-                $result = $cloudinary->upload($avatar['tmp_name']);
-
-                if(!$result || !isset($result['secure_url'])){
-                    $response = [ 'ok' => false, 'code' => 400, 'error' => 'upload Image failed'];
-                    echo json_encode($response);
-                    exit;
-                }
-            }
-            
             $data = [
-                'avatar' => $result['secure_url'],
                 'firstName' => ucwords($firstName),
                 'lastName' => ucwords($lastName),
                 'sex' => ucwords($sex),
@@ -104,6 +93,7 @@ class PatientsController extends Controller {
 
             $patient = new Patient();
             $patient->create($data);
+            $this->log('Added Patient', 'added' . ucwords($lastName) . ', ' . ucwords($firstName));
             $response = [ 'ok' => true, 'code' => 201, 'message' => 'Patient: ' . ucwords($lastName) . ', ' . ucwords($firstName) . ' is successfully registered'];
             echo json_encode($response);
         }
@@ -115,7 +105,6 @@ class PatientsController extends Controller {
         header('Content-Type: application/json');
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $params['id'] ?? '';
-            $avatar = $_FILES['updateAvatar'] ?? null;
             $firstName = $_POST['updateFirstName'] ?? '';
             $lastName = $_POST['updateLastName'] ?? '';
             $sex = $_POST['updateSex'] ?? '';
@@ -126,6 +115,7 @@ class PatientsController extends Controller {
             $status = $_POST['updateStatus'] ?? '';
             $referredBy = $this->notApplicable($_POST['updateReferredBy'] ?? '');
             $response = [];
+            $result = null;
  
             if(empty($firstName)){
                 $response = [ 'ok' => false, 'code' => 401, 'error' => 'Required: Patients First name' ];
@@ -163,20 +153,8 @@ class PatientsController extends Controller {
                 exit;
             }
 
-            if($avatar && $avatar['error'] === UPLOAD_ERR_OK){
-                $cloudinary = new CloudinaryService();
-                $result = $cloudinary->upload($avatar['tmp_name']);
-
-                if(!$result || !isset($result['secure_url'])){
-                    $response = [ 'ok' => false, 'code' => 400, 'error' => 'upload Image failed'];
-                    echo json_encode($response);
-                    exit;
-                }
-            }
-
             $data = [
                 'id' => $id,
-                'avatar' => $result['secure_url'],
                 'firstName' => ucwords($firstName),
                 'lastName' => ucwords($lastName),
                 'sex' => ucwords($sex),
@@ -190,8 +168,53 @@ class PatientsController extends Controller {
 
             $patient = new Patient();
             $patient->updatePatient($data);
-
+            $this->log('Edited Patient', ucwords($lastName) . ', ' . ucwords($firstName) . ' has been edited' );
             $response = [ 'ok' => true, 'code' => 200, 'message' => 'Patient: ' . ucwords($lastName) . ', ' . ucwords($firstName) . ' update success' ];
+            echo json_encode($response);
+        }
+    }
+    
+    public function avatar(array $params){
+        $this->editorOnly();
+
+        if($_SERVER['REQUEST_METHOD'] === 'POST'){
+            $id = $params['id'] ?? null;
+            $avatar = $_FILES['avatar'] ?? null;
+            $result = null;
+            $response = [];
+
+            if(is_null($id)){
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'No patient Identified'];
+                echo json_encode($response);
+                exit;
+            }
+
+            if(is_null($avatar)){
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'No image is identified'];
+                echo json_encode($response);
+                exit;
+            }
+
+            if($avatar && $avatar['error'] === UPLOAD_ERR_OK){
+                $cloudinary = new CloudinaryService();
+                $result = $cloudinary->upload($avatar['tmp_name']);
+
+                if(!$result || !isset($result['secure_url'])){
+                    $response = [ 'ok' => false, 'code' => 400, 'error' => 'upload Image failed'];
+                    echo json_encode($response);
+                    exit;
+                }
+            }
+
+            $data = [
+                'id' => $id,
+                'avatar' => $result['secure_url']
+            ];
+
+            (new Patient())->uploadPaitentAvatar($data);
+            $patient = (new Patient())->getPatientById($id);
+            $this->log('Edited Patient', ucwords($patient['last_name']) . ', ' . ucwords($patient['first_name']) . ' has been edited' );
+            $response = [ 'ok' => true, 'code' => 200, 'message' => 'Successfully changed avatar'];
             echo json_encode($response);
         }
     }
@@ -202,7 +225,6 @@ class PatientsController extends Controller {
         header('Content-Type: application/json');
         $id = $params['id'] ?? null;
         $response = [];
-
         if($id === 'null'){
             $response = [ 'ok' => false, 'code' => 400, 'error' => 'Please select a Patient to delete'];
             echo json_encode($response);
@@ -210,8 +232,11 @@ class PatientsController extends Controller {
         }
 
         $patient = new Patient();
-        $patient->deletePatient($id);
 
+        $selected = $patient->getPatientById($id);
+        $this->log('Deleted Patient', ucwords($selected['last_name']) . ', ' . ucwords($selected['first_name']) . ' has been deleted' );
+
+        $patient->deletePatient($id);
         $response = [ 'ok' => true, 'code' => 200, 'message' => 'Patient successfully deleted' ];
         echo json_encode($response);
     }
@@ -257,9 +282,35 @@ class PatientsController extends Controller {
 
     public function new(){
         header('Content-Type: application/json');
+        $user = $this->getLoggedUser();
+        $id = $user['id'] ?? null;
         $response = [];
         $patients = new Patient();
         $newPatients = $patients->getNewPatients();
+        $notificationModel = new Notification();
+
+        foreach($newPatients as $patient){
+            $requirements = [
+                'userId' => $id,
+                'referenceId' => $patient['id'],
+                'key' => 'newPatient',
+            ];
+
+            if(!$notificationModel->doesExist($requirements)) {
+                $notification = [
+                    'userId' => $id,
+                    'type' => 'reminder',
+                    'key' => 'newPatient',
+                    'referenceId' => $patient['id'],
+                    'title' => 'There\'s A New Patient',
+                    'content' => $patient['last_name'] . ', ' . $patient['first_name'] . ' was added to the patients',
+                    'link' => '/patients'
+                ];
+
+                $notificationModel->createNotification($notification);
+            }
+
+        }
 
         $response = ['ok' => true, 'code' => 200, 'collection' => $newPatients ];
         echo json_encode($response);

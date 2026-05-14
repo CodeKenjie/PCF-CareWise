@@ -202,7 +202,7 @@
     </li>
 </template>
 <template id="todaySchedCard">
-    <li>
+    <li class="sched" style="cursor: pointer">
         <div style="display:flex; gap: 1em; font-size: var(--small);">
             <h3 class="schedDate"></h3>
             <h3 class="schedTime" style="opacity: 50%"></h3>
