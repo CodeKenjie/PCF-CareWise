@@ -4,8 +4,16 @@ use App\Core\Controller;
 use App\Models\Notification;
 use App\Services\CloudinaryService;
 use App\Models\User;
+use App\Services\ResendService;
 
 class UserController extends Controller {
+    private function generateVerificationCode(){
+        $min = pow(10, 6 - 1);
+        $max = pow(10, 6) - 1;
+
+        return random_int($min, $max);
+    }
+
     public function register() {
         header('Content-Type: application/json');
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -19,6 +27,7 @@ class UserController extends Controller {
             $position = $_POST['position'] ?? '';
             $confPass = $_POST['confPass'] ?? '';
             $accept = isset($_POST['accept']);
+            $verificationCode = $this->generateVerificationCode();
 
             if(!filter_var($email, FILTER_VALIDATE_EMAIL)){
                 $response = ['ok' => false, 'code' => 400,  'error' => "Email is not Valid"];
@@ -44,6 +53,24 @@ class UserController extends Controller {
                 exit;
             }
 
+            $send = [
+                'to' => [ 'franciskenjiemaraasin@jrccmanila.edu.ph' ],
+                'subject' => 'Your PCF: CareWise - Verification Code: ' . $verificationCode,
+                'html' => "
+                <h3>Welcome to Philadelphia Christcentered Fellowship Church</h3>
+                <p>I would like for you to confirm your account. Here is your verification code:</p>
+                <h4>Verification Code:</h4>
+                <h1>{$verificationCode}</h1>"
+            ];
+
+            $result = (new ResendService())->sendEmail($send);
+            
+            if(!$result['ok']) {
+                $response = [ 'ok' => false, 'code' => 500, 'error' => 'Cant send the email', 'result' => $result['error'] ?? $result['response'] ];
+                echo json_encode($response);
+                exit;
+            }
+
             $data = [
                 'displayName'=> $displayName,
                 'firstName'=> ucwords($firstName),
@@ -53,6 +80,7 @@ class UserController extends Controller {
                 'isEditor'=> ($position ?? '') === 'ADMIN' ? 'true' : 'false',
                 'email'=> strtolower($email),
                 'password'=>$password,
+                'code' => $verificationCode,
             ];
             $user = new User();
 
@@ -144,6 +172,52 @@ class UserController extends Controller {
         }
     }
 
+    public function password(){
+        $input = json_decode(file_get_contents('php://input'), true);
+        header('Content-Type: application/json');
+        if($_SERVER['REQUEST_METHOD'] === 'PATCH'){
+            $user = $this->getLoggedUser();
+            $id = $user['id'] ?? null;
+            $password = $input['password'] ?? '';
+            $newPassword = $input['newPassword'] ?? null;
+            $confirmPassword = $input['confirmPassword'] ?? '';
+            $response = [];
+            if(is_null($id)){
+                $response = [ 'ok' => false, 'code' => 401, 'error' => 'Error: Not authorized to change password'];
+                echo json_encode($response);
+                exit;
+            }
+
+            if(is_null($newPassword)){
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'Error: No new password was entered'];
+                echo json_encode($response);
+                exit;
+            }
+
+            if (!password_verify($password, $user['password'])) {
+                $response = ['ok' => false, 'code' => 400, 'error' => 'Change failed: Wrong password' ];
+                echo json_encode($response);
+                exit;
+            }
+
+            if($newPassword !== $confirmPassword){
+                $response = ['ok' => false, 'code' => 409,'error' => "Password did not match"];
+                echo json_encode($response);
+                exit;
+            }
+
+            $data = [
+                'id' => $id,
+                'password' => $newPassword,
+            ];
+
+            (new User())->changePassword($data);
+            $this->log('Update Profile', 'Changed Password');
+            $response = ['ok' => true, 'code' => 200,'message' => "Password was changed successfully"];
+            echo json_encode($response);
+        }
+    }
+
     public function avatar(){
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
             $user = $this->getLoggedUser();
@@ -186,6 +260,71 @@ class UserController extends Controller {
         }
     }
 
+    public function verify(){
+        $input = json_decode(file_get_contents('php://input'), true);
+        if($_SERVER['REQUEST_METHOD'] === 'PATCH'){
+            $user = $this->getLoggedUser();
+            $id = $user['id'] ?? null;
+            $code = (int) $input['code'] ?? null;
+            $response = [];
+
+            if(is_null($id)){
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'No patient Identified'];
+                echo json_encode($response);
+                exit;
+            }
+
+            if(is_null($code)){
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'No code was recieved'];
+                echo json_encode($response);
+                exit;
+            }
+
+            if($code !== $user['verification_code']){
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'Wrong Code: Please check your email for the correct Code'];
+                echo json_encode($response);
+                exit;
+            }
+
+            (new User())->verifyAccount($id);
+            $response = [ 'ok' => true, 'code' => 200, 'message' => 'Successfully verified account' ];
+            echo json_encode($response);
+        }
+    }
+
+    public function resend(){
+        $user = $this->getLoggedUser();
+        $response = [];
+
+        if(!$user){
+            $response = [ 'ok' => false, 'code' => 400, 'message' => 'Cant find the user logged' ];
+            echo json_encode($response);
+            exit;
+        }
+
+        $send = [
+            'to' => ['franciskenjiemaraasin@jrccmanila.edu.ph'],
+            'subject' => 'Your PCF: CareWise - Verification Code: ' . $user['verification_code'],
+            'html' => "
+            <h3>Welcome to Philadelphia Christcentered Fellowship Church</h3>
+            <p>I would like for you to confirm your account. Here is your verification code:</p>
+            <h4>Verification Code:</h4> 
+            <h1>" . $user['verification_code'] . "</h1>"
+        ];
+
+        $result = (new ResendService())->sendEmail($send);
+
+        if(!$result['ok']) {
+            $response = [ 'ok' => false, 'code' => 500, 'error' => 'Cant send the email', 'result' => $result['error'] ?? $result['response'] ];
+            echo json_encode($response);
+            exit;
+        }
+
+
+        $response = [ 'ok' => true, 'code' => 200, 'message' => 'Verification code sent, please check your email' ];
+        echo json_encode($response);
+    }
+
     public function changeRole(array $params){
         $this->editorOnly();
 
@@ -210,6 +349,7 @@ class UserController extends Controller {
     }
 
     public function request(){
+        $this->VerifiedOnly();
         header('Content-Type: application/json');
         if($_SERVER['REQUEST_METHOD'] === 'PATCH'){
             $user = $this->getLoggedUser();

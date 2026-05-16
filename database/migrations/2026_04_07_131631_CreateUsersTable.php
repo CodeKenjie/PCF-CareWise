@@ -20,6 +20,7 @@ class CreateUsersTable extends Migration {
                         password VARCHAR(255) NOT NULL,
                         request BOOLEAN DEFAULT FALSE, 
                         is_editor BOOLEAN DEFAULT FALSE, 
+                        verification_code INTEGER NOT NULL, 
                         is_verified BOOLEAN NOT NULL DEFAULT FALSE,
                         created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
                  )';

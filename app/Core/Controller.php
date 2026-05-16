@@ -39,6 +39,15 @@ class Controller {
             exit;
         }
     }
+
+    protected function VerifiedOnly(){
+        $user = $this->getLoggedUser();
+        $verified = filter_var($user['is_verified'], FILTER_VALIDATE_BOOLEAN);
+        if(!$verified){
+            echo json_encode([ 'ok' => false, 'code' => 401, 'error' => 'You can\'t access this, your account is not verified yet']);
+            exit;
+        }
+    }
     
     protected function log($action, $details = ''){
         $user = $this->getLoggedUser();

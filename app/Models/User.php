@@ -9,24 +9,25 @@ class User extends Database {
     private $db;
     private $logger;
 
-    public function __construct($db = new Database()) {
-        $this->db = $db->conn();
+    public function __construct() {
+        $this->db = (new Database())->conn();
         $this->logger = new Logger();
     }
 
     public function create(array $data){
         try {
-            $query = 'INSERT INTO users (display_name, first_name, last_name, sex, position, email, is_editor, password) VALUES (:display_name, :first_name, :last_name, :sex, :position, :email, :is_editor, :password);';
+            $query = 'INSERT INTO users (display_name, first_name, last_name, sex, position, email, is_editor, password, verification_code) VALUES (:display_name, :first_name, :last_name, :sex, :position, :email, :is_editor, :password, :verification_code);';
             $stmt = $this->db->prepare($query);
             $stmt->execute([
-                ':display_name' => $data['displayName'] ?? '',
-                ':first_name' => $data['firstName'] ?? '',
-                ':last_name' => $data['lastName'] ?? '',
-                ':sex' => $data['sex'] ?? '',
-                ':position' => $data['position'] ?? '',
-                ':email' => $data['email'] ?? '',
+                ':display_name' => $data['displayName'],
+                ':first_name' => $data['firstName'],
+                ':last_name' => $data['lastName'],
+                ':sex' => $data['sex'],
+                ':position' => $data['position'],
+                ':email' => $data['email'],
                 ':is_editor' => $data['isEditor'] ?? false,
-                ':password' => password_hash($data['password'] ?? '', PASSWORD_DEFAULT) ,
+                ':verification_code' => $data['code'],
+                ':password' => password_hash($data['password'] ?? '', PASSWORD_DEFAULT),
             ]);
         } catch (PDOException $err) {
             $this->logger->error($err->getMessage());
@@ -61,6 +62,29 @@ class User extends Database {
                 ':id' => $data['id'],
                 ':avatar' => $data['avatar']
             ]);
+        } catch(PDOException $err){
+            $this->logger->error($err->getMessage());
+        }
+    }
+
+    public function changePassword(array $data){
+        try {
+            $query = 'UPDATE users SET password = :password WHERE id = :id';
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([
+                ':id' => $data['id'],
+                ':password' => password_hash($data['password'] ?? '', PASSWORD_DEFAULT) 
+            ]);
+        } catch(PDOException $err) {
+            $this->logger->error($err->getMessage());
+        }
+    }
+
+    public function verifyAccount($id){
+        try {
+            $query = 'UPDATE users SET is_verified = TRUE WHERE id = ?';
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([$id]);
         } catch(PDOException $err){
             $this->logger->error($err->getMessage());
         }

@@ -22,6 +22,7 @@ class ProfileController extends Controller{
             'contact' => $user['contact'],
             'address' => $user['address'],
             'isEditor' => filter_var($user['is_editor'], FILTER_VALIDATE_BOOLEAN),
+            'isVerified' => filter_var($user['is_verified'], FILTER_VALIDATE_BOOLEAN),
             'request' => filter_var($user['request'], FILTER_VALIDATE_BOOLEAN)
         ];
 

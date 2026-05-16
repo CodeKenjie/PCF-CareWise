@@ -39,7 +39,7 @@
             <span>
                 <strong style="opacity: 75%">Email: </strong>
                 <h4><?= htmlspecialchars($email ?? '') ?></h4>
-                <button class="btn-accent btn-borderless" style="opacity: 75%">verify</button>
+                <button id="verifyBtn" class="btn-accent btn-borderless" style="opacity: 75%" <?= ($isVerified ?? false) ? 'hidden' : ''?>>verify</button>
             </span>
             <span>
                 <strong style="opacity: 75%">Contact: </strong>
@@ -104,8 +104,7 @@
                 </div>
             </form>
         </div>
-        <button id="requestAccess" class="btn-accent btn-borderless <?= ($request ?? false) ? 'requested' : '' ?>" <?=  ($isEditor ?? false) ? 'hidden' : '' ?>><?= ($request ?? false) ? 'Cancel request' : 'Request Access' ?></button>
-        <button id="deleteAccount" class="btn-borderless btn-critical">Delete Account</button>
+        <button id="requestAccess" class="btn-accent btn-borderless <?= ($request ?? false) ? 'requested' : '' ?>" <?=  ($isEditor ?? false) ? 'hidden' : '' ?> style="<?= ($isVerified ?? false) ? '' : 'opacity: 50%' ?>" ><?= ($request ?? false) ? 'Cancel request' : 'Request Access' ?></button>
     </section>
     <section id="editorPanel" class="acrylic-bg main-panel <?= ($isEditor ?? false) ? '' : 'hidden'?>">
         <h3 style="align-self: start">Requests:</h3>
@@ -114,6 +113,23 @@
         <ul id="editorCollection"></ul>
     </section>
 </main>
+<div id="verify" class="popup">
+    <form id="verifyForm" class="form-ui" action="/me/verify">
+        <span class="f p-sm" style="flex-direction: row">
+            <span>
+                <input id="code" type="text" required>
+                <label for="code">Enter Code</label>
+            </span>
+            <button id="resendCode" class="btn-borderless btn-highlight" style="opacity: 50%;">
+                <svg class="svg icon" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 861.143 861.143" xml:space="preserve"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <g> <path d="M301.209,517.691c0-28.994-23.505-52.5-52.5-52.5H52.5c-28.995,0-52.5,23.506-52.5,52.5v198.885 c0,28.994,23.505,52.5,52.5,52.5c28.995,0,52.5-23.506,52.5-52.5v-84.329c31.275,54.438,74.821,100.956,127.655,135.996 c66.345,44.001,143.649,67.259,223.556,67.259c54.645,0,107.68-10.713,157.635-31.843c48.225-20.397,91.523-49.587,128.695-86.759 c37.17-37.171,66.361-80.471,86.758-128.695c21.131-49.956,31.844-102.991,31.844-157.633c0-54.643-10.713-107.678-31.844-157.633 c-20.396-48.225-49.588-91.525-86.758-128.696c-37.172-37.171-80.471-66.361-128.695-86.758 c-49.955-21.13-102.99-31.843-157.635-31.843c-46.663,0-92.43,7.883-136.029,23.431c-42.136,15.024-81.295,36.846-116.394,64.857 c-34.752,27.735-64.539,60.748-88.534,98.12C90.81,250.122,73.063,291.67,62.507,335.542c-6.783,28.189,10.57,56.542,38.761,63.325 c28.19,6.784,56.542-10.57,63.325-38.762c15.47-64.291,52.65-122.573,104.694-164.107c26.001-20.751,54.989-36.909,86.161-48.025 c32.249-11.5,66.151-17.331,100.763-17.331c80.115,0,155.436,31.198,212.084,87.848s87.848,131.969,87.848,212.083 c0,80.113-31.197,155.434-87.848,212.083c-56.65,56.648-131.969,87.848-212.084,87.848c-59.197,0-116.435-17.208-165.522-49.763 c-42.299-28.054-76.561-66.008-100.006-110.546h58.027C277.705,570.191,301.209,546.686,301.209,517.691z"></path> </g> </g></svg>
+            </button>
+        </span>
+        <span class="f p-md" style="flex-direction: row">
+            <button class="btn-bordered btn-accent">Verify</button>
+            <button class="btn-bordered btn-higlight" type="button" onclick="closePopup()">Cancel</button>
+        </span>
+    </form>
+</div>
 <div id="removeAccess" class="delete popup">
     <form id="removeAccessForm" class="form-ui">
         <header>

@@ -17,6 +17,7 @@
     main {
         padding-bottom: 6em;
     }
+
     #sidebar #profile {
         padding: 1em;
     }
@@ -124,6 +125,7 @@
     #activityLogs {
         flex: 1 1 0;
     }
+
 }
 
 @media ( max-width: 600px ) and ( orientation: portrait ){
@@ -175,6 +177,11 @@
     .actions div {
         flex: 1 1 0;
         flex-direction: column;
+    }
+
+    #settings,
+    #medicalReport > div{
+        flex: 1 1 0;
     }
     
 }
@@ -290,5 +297,16 @@
 
     #patients #collection tr {
         flex-direction: column;
+    }
+}
+
+@media print {
+    body * {
+        visibility: hidden;
+    }
+
+    #medicalReport div,
+    #medicalReport div * {
+        visibility: visible !important;
     }
 }

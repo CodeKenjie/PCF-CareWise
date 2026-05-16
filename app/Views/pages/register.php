@@ -70,7 +70,7 @@
                     </div>
                     <label for="password">Password</label>
                 </span>
-                <h4 id="strength" class="p-sm"></h4>
+                <h4 id="strength" class="p-sm hidden"></h4>
                 <span class="p-sm">
                     <div class="password">
                         <input id="confPass" name="confPass" id="confPass" type="password" required>
@@ -88,31 +88,7 @@
             </form>
         </section>
     </main>
-    <div class="popup">
-        <div class="acrylic-bg p-sm" style=" display: flex; flex-direction: column; gap: 0.2em">
-            <span class="btn-close btn-highlight" onclick="closePopup()"></span>
-            <div id="tnc">
-                <h1>Terms and Condition</h1>
-                <hr>
-                <div class="p-sm" style="display: grid; gap: 1em">
-                    <h3>Introduction</h3>
-                    <p>Welcome to <strong>Philadelphia Christ center Fellowship</strong>. By accessing or using this website and its medical services platform, you agree to comply with and be bound by these Terms and Conditions.</p>
-                    <p>These Terms apply to all users, including patients, clinic staff, administrators, doctors, nurses, and other authorized personnel using the system.</p>
-                    <p>If you do not agree with any part of these Terms, you must discontinue use of the platform immediately.</p>
-                    <h3>Purpose of the Platform</h3>
-                    <p>This platform is designed to:</p>
-                    <ul style="list-style-type: disc; padding:0 1em">
-                        <li>Manage clinic operations</li>
-                        <li>Store and process patient medical records</li>
-                        <li>Assist in generating preliminary diagnoses</li>
-                        <li>Provide prescription management</li>
-                        <li>Facilitate appointment scheduling</li>
-                    </ul>
-                    <p>The platform is intended solely for lawful medical and administrative purposes.</p>
-                </div>
-            </div>
-        </div>
-    </div>
+    <?php require __DIR__ . '/../partials/terms_and_condition.php'?>
     <script src="assets/js/script.js" defer></script>
 </body>
 </html>

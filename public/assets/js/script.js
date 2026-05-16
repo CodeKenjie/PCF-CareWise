@@ -362,6 +362,7 @@ function renderPatientsDataForCare(data){
 
     container.innerHTML = ``;
     data.collection.forEach(patient => {
+        const [m, d, y] = new Date().toLocaleDateString('en-PH', { month: '2-digit', day: '2-digit', year: 'numeric' }).split('/');
         const [year, month, day] = patient.birthdate.split('-');
         const clone = template.content.cloneNode(true);
         const statusMark = clone.querySelector(`.pstatus`);
@@ -393,6 +394,118 @@ function renderPatientsDataForCare(data){
         });
         clone.querySelector(`.name`).textContent = `${patient.last_name}, ${patient.first_name}`;
         clone.querySelector(`.age`).textContent = patient.age;
+        clone.querySelector(`.medicalReport`).addEventListener(`click`, async (e) => {
+            e.preventDefault();
+            document.getElementById(`printDate`).textContent = `${months[m - 1]} ${d}, ${y}`;
+            document.getElementById(`medicalReport`).classList.add(`active`);
+            document.getElementById(`printAvatar`).src = patient.avatar ? patient.avatar : `/assets/images/profile.png`;
+            document.getElementById(`printName`).textContent = `${patient.last_name}, ${patient.first_name}`;
+            document.getElementById(`printBirthdate`).textContent =  `${months[month - 1]} ${day}, ${year}`;
+            document.getElementById(`printAge`).textContent = patient.age;
+            document.getElementById(`printSex`).textContent = patient.sex;
+            document.getElementById(`printAddress`).textContent = patient.address;
+            document.getElementById(`printContacts`).textContent = `${patient.contact}${patient.extra_contact ? `, ${patient.extra_contact}`: ``}`;
+            try{
+                const res = await fetch(`/care/patient/${patient.id}/diagnosis`, {
+                    method: 'GET'
+                });
+                const data = await res.json();
+                if(!data.ok){
+                    return responseMessage(data, data.error);
+                }
+
+                const container = document.getElementById(`printDiagnosis`);
+                container.innerHTML = ``;
+                data.diagnosis.forEach(diagnosed => {
+                    const created = new Date(diagnosed.created_at).toLocaleString(`en-PH`, { timeZone: 'Asia/Manila', month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+                    const li = document.createElement(`li`);
+                    const conditionName = document.createElement(`h3`);
+                    conditionName.textContent = diagnosed.condition_name;
+                    const createdAt = document.createElement(`h3`);
+                    createdAt.textContent = created;
+                    li.append(conditionName, createdAt);
+                    container.appendChild(li);
+                });
+            } catch(err){
+                console.error(err);
+            }
+
+            try{
+                const res = await fetch(`/care/patient/${patient.id}/prescriptions`, {
+                    method: 'GET'
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    return responseMessage(data, data.error);
+                }
+
+                const container = document.getElementById(`printPrescriptions`);
+                container.innerHTML = ``;
+                data.collection.forEach(prescription => {
+                    const created = new Date(prescription.created_at).toLocaleString(`en-PH`, { timeZone: 'Asia/Manila', month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: true });
+                    const div = document.createElement(`div`);
+                    div.style.display = `flex`;
+                    div.style.justifyContent = `space-between`;
+                    const li = document.createElement(`li`);
+                    li.style.display = `flex`;
+                    li.style.flexDirection = `column`;
+                    li.style.gap = `0`;
+                    const date = document.createElement(`h3`);
+                    date.textContent = created;
+                    const condition = document.createElement(`h3`);
+                    condition.textContent = prescription.condition_name ? prescription.condition_name : ``; 
+
+                    const ul = document.createElement(`ul`);
+                    ul.style.gap = `0`;
+                    ul.style.padding = `0`;
+                    (async () => {
+                        try {
+                            const res = await fetch(`/care/prescription/${prescription.id}/all`, {
+                                method: 'GET'
+                            });
+                            const data = await res.json();
+                            if(!data.ok){
+                                return responseMessage(data, data.error);
+                            }
+
+                            data.collection.forEach(medication => {
+                                const [ month, day, year ] = new Date(medication.valid_until).toLocaleString(`en-PH`, { timeZone: 'Asia/Manila', month: '2-digit', day: '2-digit', year: 'numeric' }).split(`/`);
+                                const li = document.createElement(`li`);
+                                li.classList.add(`medicineGiven`);
+                                const medicine = document.createElement(`h3`);
+                                medicine.textContent = `${medication.generic_name} (${medication.brand_name})`;
+                                const dosage = document.createElement(`h3`);
+                                dosage.textContent = `${medication.dose_amount} ${medication.dose_unit}`;
+                                const frequency = document.createElement(`h3`);
+                                frequency.textContent = `${medication.frequency_per_day}x a day`;
+                                const duration = document.createElement(`h3`);
+                                duration.textContent = `for: ${medication.duration} ${medication.duration_unit}`;
+                                const validUntil = document.createElement(`h3`);
+                                validUntil.textContent = `${months[month - 1]} ${day}, ${year}`;
+                                const span = document.createElement(`span`);
+                                const h5 = document.createElement(`h5`);
+                                h5.textContent = `Instructions:`
+                                const p = document.createElement(`p`);
+                                p.textContent = medication.instructions;
+
+                                span.append(h5, p);
+                                li.append(medicine, dosage, frequency, duration, validUntil, span);
+                                ul.appendChild(li);
+                            });
+                        } catch(err) {
+                            console.error(err);
+                        }
+                    })();
+                    
+                    div.append(condition, date);
+                    li.append(div, ul);
+                    container.appendChild(li);
+                });
+            } catch(err){
+                console.error(err);
+            }
+        });
         statusMark.textContent = patient.status;
         if(patient.status === `Active` || patient.status === `Complete`){
             statusMark.style.backgroundColor = `var(--good)`;
@@ -1191,6 +1304,57 @@ async function chart(page) {
     }
 }
 
+function showTab(tab, element){
+    document.querySelectorAll(`.tab`).forEach(content => {
+        content.style.display = `none`;
+    });
+
+    document.querySelectorAll(`.option`).forEach(opt => {
+        opt.classList.remove(`selected`);
+    });
+
+    if(tab === `account`){
+        document.getElementById(`accountSettings`).style.display = `flex`;
+    } else if(tab === `display`){
+        document.getElementById(`displaySettings`).style.display = `flex`;
+    }
+
+    element.classList.add(`selected`);
+}
+
+function passwordCheck(input, input2){
+    const strength = document.getElementById(`strength`);
+    const value = input.value;
+    const hasUpper = /[A-Z]/.test(value);
+    const hasDigit = /\d/.test(value);
+    const hasSpecial = /[!@#$%^&*]/.test(value);
+    const longEnough = value.length >= 6;
+
+    if (value === "" || value.length === 0) {
+        strength.classList.add(`hidden`);
+        input.style.borderColor = "var(--border-color)";
+        input2.style.borderColor = "var(--border-color)";
+        return;
+    }
+
+    if (longEnough && hasUpper && hasDigit && hasSpecial) {
+        strength.classList.remove('hidden');
+        strength.textContent = "STRONG (please take note of your password to avoid forgetting)";
+        strength.style.color = "var(--good)";
+        input.style.borderColor = "var(--good)";
+    } else if (longEnough && (hasDigit || hasUpper || hasSpecial)){
+        strength.classList.remove('hidden');
+        strength.textContent = "Medium (to further enhance protection must have number, uppercase, and special character)";
+        strength.style.color = "var(--moderate)";
+        input.style.borderColor = "var(--moderate)";
+    } else if(value.length > 0) {
+        strength.classList.remove('hidden');
+        strength.textContent = "weak (should have number, uppercase letter, or special character)";
+        strength.style.color = "var(--critical)";
+        input.style.borderColor = "var(--critical)";
+    }
+}
+
 document.addEventListener(`DOMContentLoaded`, function(e) {
     e.preventDefault();
 
@@ -1199,6 +1363,80 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             closePopup();
         }
     });
+
+    const settings = document.getElementById(`settings`);
+    if(settings){
+        document.getElementById(`accountSettings`).style.display = `flex`;
+        document.getElementById(`deleteAccountBtn`).addEventListener(`click`, () => {
+            document.getElementById(`deleteAccount`).classList.add(`active`);
+        });
+        document.getElementById(`deleteAccountCancel`).addEventListener(`click`, () => {
+            document.querySelector(`#deleteAccount`).classList.remove(`active`);
+        });
+
+        const password = document.getElementById(`currentPassword`);
+        password.addEventListener(`input`, () => {
+            if(password.value === ``){
+                password.style.borderColor = `var(--border-color)`;
+            }
+        });
+        const newPassword = document.getElementById(`newPassword`);
+        const confirmNewPassword = document.getElementById(`confirmNewPassword`);
+        newPassword.addEventListener(`input`, () => {
+            passwordCheck(newPassword, confirmNewPassword);
+        });
+
+        const form = document.getElementById(`changePasswordForm`);
+        form.addEventListener(`submit`, async (e) => {
+            e.preventDefault();
+            try {
+                const res = await fetch(`/me/update/password`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ password: password.value, newPassword: newPassword.value, confirmPassword: confirmNewPassword.value })
+                });
+
+                const data = await res.json();
+
+                if(data.code === 400){
+                    password.style.borderColor = `var(--critical)`;
+                }
+
+                if(newPassword.value !== confirmNewPassword.value || data.code === 409){
+                    newPassword.style.borderColor = `var(--critical)`;
+                    confirmNewPassword.style.borderColor = `var(--critical)`;
+                }
+
+                if(!data.ok){
+                    return responseMessage(data, data.error);
+                }
+
+                responseMessage(data, data.message);
+                password.value = ``;
+                newPassword.value = ``;
+                confirmNewPassword.value = ``;
+            } catch(err){
+                console.error(err);
+            }
+        });
+
+        document.getElementById(`deleteAccountForm`).addEventListener(`submit`, async (e) => {
+            try {
+                const res = await fetch(`/me/delete`, {
+                    method: 'DELETE'
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    return responseMessage(data, data.error);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        });
+    }
 
     const notificationBtn = document.getElementById(`notifBtn`);
     if(notificationBtn){
@@ -1229,6 +1467,11 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             }
         });
 
+        const settingsBtn = document.getElementById(`settingsBtn`);
+        settingsBtn.addEventListener(`click`, () => {
+            document.getElementById(`settingsPop`).classList.add(`active`);
+        });
+
         const activityLogsBtn = document.getElementById(`activityLogsBtn`);
         activityLogsBtn.addEventListener(`click`, () => {
             document.getElementById(`activityPanel`).classList.add(`active`);
@@ -1238,8 +1481,6 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
 
     const register = document.getElementById(`register`);
     if (register) {
-        const strength = document.getElementById(`strength`);
-        strength.classList.add(`hidden`);
         
         const displayName = document.getElementById(`displayName`);
         displayName.addEventListener("input", () => {
@@ -1258,35 +1499,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         const pass = document.getElementById(`password`);
         const confPass = document.getElementById(`confPass`);
         pass.addEventListener('input', function(e) {
-            const value = pass.value;
-            const hasUpper = /[A-Z]/.test(value);
-            const hasDigit = /\d/.test(value);
-            const hasSpecial = /[!@#$%^&*]/.test(value);
-            const longEnough = value.length >= 6;
-
-            if (value === "" || value.length === 0) {
-                strength.classList.add(`hidden`);
-                pass.style.borderColor = "var(--border-color)";
-                confPass.style.borderColor = "var(--border-color)";
-                return;
-            }
-
-            if (longEnough && hasUpper && hasDigit && hasSpecial) {
-                strength.classList.remove('hidden');
-                strength.textContent = "STRONG (please take note of your password to avoid forgetting)";
-                strength.style.color = "var(--good)";
-                pass.style.borderColor = "var(--good)";
-            } else if (longEnough && (hasDigit || hasUpper || hasSpecial)){
-                strength.classList.remove('hidden');
-                strength.textContent = "Medium (to further enhance protection must have number, uppercase, and special character)";
-                strength.style.color = "var(--moderate)";
-                pass.style.borderColor = "var(--moderate)";
-            } else if(value.length > 0) {
-                strength.classList.remove('hidden');
-                strength.textContent = "weak (should have number, uppercase letter, or special character)";
-                strength.style.color = "var(--critical)";
-                pass.style.borderColor = "var(--critical)";
-            }
+            passwordCheck(pass, confPass);
         });
 
         register.addEventListener('submit', async (e) => {
@@ -1302,26 +1515,26 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 const data = await res.json();
                 console.log(data);
 
-                if (!data.ok) {
-                    responseMessage(data, data.error);
-                    return;
-                }
-
                 if (data.code === 401) {
-                    displayName.classList.add(`critical`);
+                    displayName.style.borderColor = `var(--critical)`;
                 } 
 
                 if(confPass.value !== pass.value) {
-                    confPass.classList.add(`critical`);
-                    pass.classList.add(`critical`);
+                    confPass.style.borderColor = `var(--critical)`;
+                    pass.style.borderColor = `var(--critical)`;
                 }
 
                 if (data.code === 400) {
-                    email.classList.add(`critical`);
+                    email.style.borderColor = `var(--critical)`;
+                }
+
+                if (!data.ok) {
+                    return responseMessage(data, data.error);
                 }
 
                 responseMessage(data, data.message);
                 window.location.replace(`/login`);
+
             } catch(err){
                 console.error(err);    
             }
@@ -2409,22 +2622,6 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             }
         });
 
-        document.getElementById(`deleteAccount`).addEventListener(`click`, async (e) => {
-            e.preventDefault();
-            try {
-                const res = await fetch(`/me/delete`, {
-                    method: 'DELETE'
-                });
-
-                const data = await res.json();
-                if(!data.ok){
-                    return responseMessage(data, data.error);
-                }
-            } catch(err){
-                console.error(err);
-            }
-        });
-
         document.getElementById(`editInfoBtn`).addEventListener(`click`, () => {
             document.getElementById(`displayName`).classList.add(`hidden`);
             document.getElementById(`editInfoForm`).classList.remove(`hidden`);
@@ -2433,6 +2630,52 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         document.getElementById(`cancelUpdateBtn`).addEventListener(`click`, () => {
             document.getElementById(`displayName`).classList.remove(`hidden`);
             document.getElementById(`editInfoForm`).classList.add(`hidden`);
+        });
+
+        document.getElementById(`verifyBtn`).addEventListener(`click`, () => {
+            document.getElementById(`verify`).classList.add(`active`);
+        });
+
+        document.getElementById(`resendCode`).addEventListener(`click`, async (e) => {
+            e.preventDefault();
+            try {
+                const res = await fetch(`/me/verification/resend`, {
+                    method: 'GET'
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    return responseMessage(data, data.error);
+                }
+
+                responseMessage(data, data.message);
+            } catch(err){
+                console.error(err);
+            }
+        });
+        document.getElementById(`verifyForm`).addEventListener(`submit`, async (e) => {
+            e.preventDefault();
+            const code = document.getElementById(`code`);
+            try {
+                const res = await fetch(`/me/verify`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ code: code.value })
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    return responseMessage(data, data.error);
+                }
+
+                responseMessage(data, data.message);
+                document.getElementById(`verify`).classList.remove(`active`);
+                location.reload();
+            } catch(err) {
+                console.error(err);
+            }
         });
 
         const requestAccessBtn = document.getElementById(`requestAccess`);
@@ -2482,7 +2725,9 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 });
 
                 const data = await res.json();
-
+                if(!data.collection){
+                    return;
+                }
                 const container = document.getElementById(`collection`);
                 const template = document.getElementById(`requesterCard`);
                 container.innerHTML = ``;
@@ -2547,6 +2792,9 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 const container = document.getElementById(`editorCollection`);
                 const template = document.getElementById(`editorCard`);
                 container.innerHTML = ``;
+                if(!data.collection){
+                    return;
+                }
                 data.collection.forEach(editor => {
                     const clone = template.content.cloneNode(true);
 
