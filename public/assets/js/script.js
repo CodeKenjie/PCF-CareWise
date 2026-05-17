@@ -1357,6 +1357,65 @@ function passwordCheck(input, input2){
 
 document.addEventListener(`DOMContentLoaded`, function(e) {
     e.preventDefault();
+    const goodColor = localStorage.getItem(`good-color`);
+    const moderateColor = localStorage.getItem(`moderate-color`);
+    const criticalColor = localStorage.getItem(`critical-color`);
+    const accentColor = localStorage.getItem(`accent-color`);
+    const accentFontColor = localStorage.getItem(`accent-font-color`);
+    const font = localStorage.getItem(`font`);
+    const theme = localStorage.getItem(`theme`);
+
+    if(goodColor, moderateColor, criticalColor){
+        document.documentElement.style.setProperty(`--good`, goodColor);
+        document.documentElement.style.setProperty(`--moderate`, moderateColor);
+        document.documentElement.style.setProperty(`--critical`, criticalColor);
+
+        const good = document.getElementById(`goodColorPicker`);
+        if(good){
+            good.value = goodColor;
+        };
+        const moderate = document.getElementById(`moderateColorPicker`);
+        if(moderate){
+            moderate.value = moderateColor;
+        };
+        const critical = document.getElementById(`criticalColorPicker`);
+        if(critical){
+            critical.value = criticalColor;
+        };
+    }
+
+    if(theme){
+        document.documentElement.setAttribute(`data-theme`, theme);
+        const btn = document.getElementById(`themeBtn`);
+        if(btn){
+            theme === `dark` ? btn.textContent = `Switch to Light mode` : btn.textContent = `Switch to Dark mode`;
+        };
+    }
+
+    if(accentColor){
+        document.documentElement.style.setProperty(`--button-color`, accentColor);
+        document.documentElement.style.setProperty(`--button-hover`, accentColor);
+        const colorPicker = document.getElementById(`colorPicker`);
+        if(colorPicker){
+            colorPicker.value = accentColor;
+        };
+    }
+
+    if(accentFontColor){
+        document.documentElement.style.setProperty(`--alt-font-color`, accentFontColor);
+        const fontColorPicker = document.getElementById(`accentFontColorPicker`);
+        if(fontColorPicker){
+            fontColorPicker.value = accentFontColor;
+        }
+    }
+    
+    if(font){
+        document.documentElement.style.setProperty(`--font-fam`, font);
+        const fontPicker = document.getElementById(`fontPicker`);
+        if(fontPicker){
+            fontPicker.value = font;
+        }
+    }
 
     document.addEventListener('keydown', (event) => {
         if (event.key === "Escape"){
@@ -1366,6 +1425,88 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
 
     const settings = document.getElementById(`settings`);
     if(settings){
+        document.getElementById(`colorPicker`).addEventListener(`input`, (e) => {
+            const color = e.target.value
+            document.documentElement.style.setProperty(`--button-color`, color);
+            document.documentElement.style.setProperty(`--button-hover`, color);
+
+            localStorage.setItem(`accent-color`, color);
+        });
+
+        document.getElementById(`accentFontColorPicker`).addEventListener(`input`, (e) => {
+            const color = e.target.value
+            document.documentElement.style.setProperty(`--alt-font-color`, color);
+            localStorage.setItem(`accent-font-color`, color);
+        });
+
+        document.getElementById(`goodColorPicker`).addEventListener(`input`, (e) => {
+            const color = e.target.value
+            document.documentElement.style.setProperty(`--good`, color);
+            localStorage.setItem(`good-color`, color);
+        });
+
+        document.getElementById(`moderateColorPicker`).addEventListener(`input`, (e) => {
+            const color = e.target.value
+            document.documentElement.style.setProperty(`--moderate`, color);
+            localStorage.setItem(`moderate-color`, color);
+        });
+
+        document.getElementById(`criticalColorPicker`).addEventListener(`input`, (e) => {
+            const color = e.target.value
+            document.documentElement.style.setProperty(`--critical`, color);
+            localStorage.setItem(`critical-color`, color);
+        });
+
+        document.getElementById(`fontPicker`).addEventListener(`change`, (e) => {
+            const font = e.target.value;
+            document.documentElement.style.setProperty(`--font-fam`, font);
+            localStorage.setItem(`font`, font);
+        });
+
+        document.getElementById(`default`).addEventListener(`click`, () => {
+            const DEFAULT_GOOD = `rgb(34, 139, 34)`;
+            const DEFAULT_MODERATE = `rgb(221, 162, 52)`;
+            const DEFAULT_CRITICAL = `rgb(178, 34, 34)`;
+            const DEFAULT_ACCENT = `rgb(26, 77, 92)`;
+            const DEFAULT_HOVER = `rgba(26, 77, 92, 0.8)`;
+            const DEFAULT_ACCENT_FONT_COLOR = `rgb(255, 255, 255)`;
+            const DEFAULT_FONT = `Arial, sans-serif`;
+
+            document.documentElement.style.setProperty(`--good`, DEFAULT_GOOD);
+            document.documentElement.style.setProperty(`--moderate`, DEFAULT_MODERATE);
+            document.documentElement.style.setProperty(`--critical`, DEFAULT_CRITICAL);
+            document.getElementById(`goodColorPicker`).value = DEFAULT_GOOD;
+            document.getElementById(`moderateColorPicker`).value = DEFAULT_MODERATE;
+            document.getElementById(`criticalColorPicker`).value = DEFAULT_CRITICAL;
+            localStorage.setItem(`good-color`, DEFAULT_GOOD);
+            localStorage.setItem(`moderate-color`, DEFAULT_MODERATE);
+            localStorage.setItem(`critical-color`, DEFAULT_CRITICAL);
+
+            document.documentElement.style.setProperty(`--button-color`, DEFAULT_ACCENT);
+            document.documentElement.style.setProperty(`--button-hover`, DEFAULT_HOVER);
+            document.getElementById(`colorPicker`).value = DEFAULT_ACCENT;
+            localStorage.setItem(`accent-color`, DEFAULT_ACCENT);
+
+            document.documentElement.style.setProperty(`--alt-font-color`, DEFAULT_ACCENT_FONT_COLOR);
+            document.documentElement.style.setProperty(`--font-fam`, DEFAULT_FONT);
+            document.getElementById(`fontPicker`).value = `Arial, sans-serif`;
+            localStorage.setItem(`font`, DEFAULT_FONT);
+
+            document.getElementById(`accentFontColorPicker`).value = DEFAULT_ACCENT_FONT_COLOR;
+            localStorage.setItem(`accent-font-color`, DEFAULT_ACCENT_FONT_COLOR);
+        });
+
+        document.getElementById(`themeBtn`).addEventListener(`click`, () => {
+            const current = document.documentElement.getAttribute(`data-theme`);
+            const newTheme = current === `dark` ? `light` : `dark`;
+
+            document.documentElement.setAttribute(`data-theme`, newTheme);
+            localStorage.setItem(`theme`, newTheme);
+
+            const btn = document.getElementById(`themeBtn`);
+            newTheme === `dark` ? btn.textContent = `Switch to Light mode` : btn.textContent = `Switch to Dark mode`;
+        });
+
         document.getElementById(`accountSettings`).style.display = `flex`;
         document.getElementById(`deleteAccountBtn`).addEventListener(`click`, () => {
             document.getElementById(`deleteAccount`).classList.add(`active`);
@@ -2081,6 +2222,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                         const clone = template.content.cloneNode(true);
                         clone.querySelector(`li`).addEventListener(`click`, () => {
                             document.getElementById(`conditionName`).value = emergency.name;
+                            document.getElementById(`results`).classList.remove(`active`);
                         });
                         clone.querySelector(`.condition`).textContent = emergency.name;
                         clone.querySelector(`.confidence`).textContent = emergency.urgency;

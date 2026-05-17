@@ -41,7 +41,7 @@
                         <label for="confirmNewPassword">Confirm Password</label>
                     </span>
                     <span class="p-sm">
-                        <button class="btn-borderless btn-accent" style="color:var(--alt-font-color); background: var(--button-color); font-size: var(--normal); width:fit-content">Save</button>
+                        <button class="btn-borderless btn-accent" style="color:var(--alt-font-color); background: var(--button-color); font-size: var(--normal); width:fit-content">Change Password</button>
                     </span>
                 </form>
                 <div class="p-md">
@@ -52,29 +52,45 @@
             </div>
             <div id="displaySettings" class="tab">
                 <h3 class="p-sm">Appearance</h3>
-                <span class="f p-sm">
-                    <label for="">Button Color: </label>
-                    <input type="color">
+                <span class="flx p-sm">
+                    <label for="">Accent Color: </label>
+                    <input id="colorPicker" type="color">
                 </span>
-                <span class="f p-sm">
+                <span class="flx p-sm">
+                    <label for="">Accent Font Color: </label>
+                    <input id="accentFontColorPicker" type="color">
+                </span>
+                <span class="flx p-sm">
+                    <label for="">Good: </label>
+                    <input id="goodColorPicker" type="color">
+                </span>
+                <span class="flx p-sm">
+                    <label for="">Moderate: </label>
+                    <input id="moderateColorPicker" type="color">
+                </span>
+                <span class="flx p-sm">
+                    <label for="">Critical: </label>
+                    <input id="criticalColorPicker" type="color">
+                </span>
+                <span class="flx p-sm">
                     <label for="">Font: </label>
-                    <select name="" id="">
-                        <option value="" selected>Arial</option>
-                        <option value="">Poppins</option>
-                        <option value="">Verdana</option>
-                        <option value="">Times</option>
+                    <select id="fontPicker">
+                        <option value="Arial, sans-serif">Arial</option>
+                        <option value="Verdana, sans-serif">Verdana</option>
+                        <option value="Tahoma, sans-serif">Tahoma</option>
+                        <option value="Trebuchet MS, sans-serif">Trebuchet</option>
+                        <option value="Georgia, serif">Georgia</option>
+                        <option value="Times New Roman, serif">Times New Roman</option>
+                        <option value="Courier New, monospace">Courier New</option>
+                        <option value="Consolas, monospace">Consolas</option>
                     </select>
                 </span>
                 <h3 class="p-sm">Theme</h3>
                 <span class="p-sm">
-                    <select name="" id="">
-                        <option value="" selected>Default</option>
-                        <option value="">Light</option>
-                        <option value="">Dark</option>
-                    </select>
+                    <button id="themeBtn" class="btn-bordered btn-highlight" style="font-size: var(--normal);">Switch Theme(light, dark)</button>
                 </span>
                 <span class="p-md" style="align-self: end">
-                    <button class="btn-bordered btn-highlight">Default Settings</button>
+                    <button id="default" class="btn-bordered btn-highlight">Default Settings</button>
                 </span>
             </div>
         </div>

@@ -35,7 +35,7 @@
                     </div>
                     <label for="password">Password</label>
                 </span>
-                <a class="forgotten" href="#">Forgotten?</a>
+                <a class="forgotten" style="color: purple; cursor: pointer">Forgotten?</a>
                 <input type="submit" value="Login">
             </form>
         </section>
