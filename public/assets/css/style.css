@@ -2064,6 +2064,17 @@ ul {
     box-shadow: var(--shadow);
 }
 
+#medicines #collection li .copyBtn {
+    opacity: 25%;
+    top: 0.1em;
+    right: 0.1em;
+    padding: 0.2em;
+}
+
+#medicines #collection li .copyBtn:hover {
+    opacity: 100%;
+}
+
 #medicines #collection button {
     border: none;
     padding: 0.5em;
