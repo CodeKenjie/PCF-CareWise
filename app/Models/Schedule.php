@@ -98,10 +98,14 @@ class Schedule extends Database {
     }
 
     public function getSchedToday(){
+        date_default_timezone_set('Asia/Manila');
         try{
-            $query = 'SELECT * FROM schedules WHERE date = CURRENT_DATE ORDER BY time ASC';
+            $query = 'SELECT * FROM schedules WHERE date = :date AND time >= :time ORDER BY time ASC';
             $stmt = $this->db->prepare($query);
-            $stmt->execute();
+            $stmt->execute([
+                ':date' => date('Y-m-d'),
+                ':time' => date('H:i:s')
+                ]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch(PDOException $err){
             $this->logger->error($err->getMessage());
@@ -120,10 +124,14 @@ class Schedule extends Database {
     }
 
     public function getSchedulesToNotify(){
+        date_default_timezone_set('Asia/Manila');
         try{
-            $query = "SELECT * FROM schedules WHERE date <= CURRENT_DATE";
+            $query = "SELECT * FROM schedules WHERE date <= :date AND time = :time";
             $stmt = $this->db->prepare($query);
-            $stmt->execute();
+            $stmt->execute([
+                ':date' => date('Y-m-d'),
+                ':time' => date('H:i:s', strtotime("+10 minutes"))
+            ]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch(PDOException $err){
             $this->logger->error($err->getMessage());
