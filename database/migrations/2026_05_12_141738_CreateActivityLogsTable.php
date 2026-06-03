@@ -10,8 +10,8 @@ class CreateActivityLogsTable extends Migration{
                         user_id INTEGER NOT NULL,
                         action VARCHAR(200) NOT NULL,
                         details TEXT,
-                        ip_address VARCHAR(50) NULL,
-                        user_agent VARCHAR(200) NULL,
+                        ip_address VARCHAR(50) NOT NULL,
+                        user_agent VARCHAR(200) NOT NULL,
                         recorded_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
 
                         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE

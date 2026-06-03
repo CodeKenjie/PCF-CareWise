@@ -1,4 +1,5 @@
 @media ( max-height: 640px ) and ( orientation: portrait ) {
+    #patientCare #info .avatar,
     #register header {
         display: none;
     }
@@ -24,6 +25,7 @@
 }
 
 @media ( max-width: 1000px) and ( orientation: portrait) {
+    #patientCare #info .avatar,
     #dashboard > div:nth-of-type(2) > section:nth-of-type(1),
     #sidebar div,
     #sidebar header,
@@ -183,7 +185,6 @@
     #medicalReport > div{
         flex: 1 1 0;
     }
-    
 }
 
 @media (max-width: 1000px) and (orientation: landscape) {
@@ -305,6 +306,8 @@
         visibility: hidden;
     }
 
+    #maintenanceReport div,
+    #maintenanceReport div *,
     #medicalReport div,
     #medicalReport div * {
         visibility: visible !important;

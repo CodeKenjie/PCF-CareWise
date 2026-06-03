@@ -9,9 +9,7 @@ class LoginController extends Controller {
             exit;
         }
 
-        $data = [
-            'title' => 'PCF:CareWise - Login Account' 
-        ];
+        $data = [];
         
         $this->view('pages/login', $data);
     }

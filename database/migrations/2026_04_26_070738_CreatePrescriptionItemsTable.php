@@ -17,6 +17,7 @@ class CreatePrescriptionItemsTable extends Migration {
                         duration_unit VARCHAR(50),
                         valid_until DATE,
                         instructions TEXT,
+                        is_maintenance BOOLEAN NOT NULL,
                         created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
 
                         FOREIGN KEY (prescription_id) REFERENCES prescriptions(id) ON DELETE CASCADE,

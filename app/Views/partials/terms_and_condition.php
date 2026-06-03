@@ -6,7 +6,7 @@
             <hr>
             <div class="p-sm" style="display: grid; gap: 1em">
                 <h3>Introduction</h3>
-                <p>Welcome to <strong>Philadelphia Christ center Fellowship</strong>. By accessing or using this website and its medical services platform, you agree to comply with and be bound by these Terms and Conditions.</p>
+                <p>Welcome to <strong>Philadelphia Christcentered Fellowship</strong>. By accessing or using this website and its medical services platform, you agree to comply with and be bound by these Terms and Conditions.</p>
                 <p>These Terms apply to all users, including patients, clinic staff, administrators, doctors, nurses, and other authorized personnel using the system.</p>
                 <p>If you do not agree with any part of these Terms, you must discontinue use of the platform immediately.</p>
                 <h3>Purpose of the Platform</h3>
@@ -130,7 +130,7 @@
                 <h3>Contact Information</h3>
                 <p>For concerns regarding these Terms, privacy, or medical records, please contact:</p>
                 <ul>
-                    <li><strong>Philadelphia Christcenter Fellowship</strong></li>
+                    <li><strong>Philadelphia Christcentered Fellowship</strong></li>
                     <li># 26 Lunas Street, Quezon City, Philippines, 1114</li>
                     <li>pcfmainchurch@gmail.com</li>
                 </ul>

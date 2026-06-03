@@ -37,7 +37,28 @@ class CloudinaryService {
         return json_decode($response, true);
     }
 
-    public function cloudinaryURL($publicId, $transform = ''){
-        return "https://res.cloudinary.com/{$this->cloud}/image/upload/$transform/$publicId";
+    public function destroy($publicId){
+        $timestamp = time();
+        $signature = sha1("public_id={$publicId}&timestamp={$timestamp}" . $this->secret);
+
+        $postFields = [
+            'public_id' => $publicId,
+            'api_key' => $this->key,
+            'timestamp' => $timestamp,
+            'signature' => $signature
+        ];
+
+        $url = "https://api.cloudinary.com/v1_1/{$this->cloud}/image/destroy";
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+        $response = curl_exec($ch);
+        curl_close($ch);
+
+        return json_decode($response, true);
     }
+
 }

@@ -16,7 +16,7 @@ class Patient extends Database {
 
     public function create(array $data){
         try{
-            $query = 'INSERT INTO patients (first_name, last_name, sex, birthdate, address, contact, extra_contact, status, referred_by) VALUES(:first_name, :last_name, :sex, :birthdate, :address, :contact, :extra_contact, :status, :referred_by)';
+            $query = 'INSERT INTO patients (first_name, last_name, sex, birthdate, address, contact, extra_contact, status, allergies, referred_by) VALUES(:first_name, :last_name, :sex, :birthdate, :address, :contact, :extra_contact, :status, :allergies, :referred_by)';
             $stmt = $this->db->prepare($query);
             $stmt->execute([
                 ':first_name' => $data['firstName'] ?? '',
@@ -27,6 +27,7 @@ class Patient extends Database {
                 ':contact' => $data['contact'] ?? '',
                 ':extra_contact' => $data['extraContact'] ?? '',
                 ':status' => $data['status'] ?? '',
+                ':allergies' => $data['allergies'] ?? '',
                 ':referred_by' => $data['referredBy'] ?? ''
             ]);
         }catch(PDOException $err){
@@ -58,7 +59,7 @@ class Patient extends Database {
 
     public function updatePatient(array $data){
         try {
-            $query = 'UPDATE patients SET first_name = :first_name, last_name = :last_name, sex = :sex, birthdate = :birthdate, address = :address, contact = :contact, extra_contact = :extra_contact, status = :status, referred_by = :referred_by WHERE id = :id';
+            $query = 'UPDATE patients SET first_name = :first_name, last_name = :last_name, sex = :sex, birthdate = :birthdate, address = :address, contact = :contact, extra_contact = :extra_contact, status = :status, allergies = :allergies, referred_by = :referred_by WHERE id = :id';
             $stmt = $this->db->prepare($query);
             $stmt->execute([
                 ':id' => $data['id'],
@@ -70,6 +71,7 @@ class Patient extends Database {
                 ':contact' => $data['contact'],
                 ':extra_contact' => $data['extraContact'],
                 ':status' => $data['status'],
+                ':allergies' => $data['allergies'],
                 ':referred_by' => $data['referredBy']
             ]);
         } catch(PDOException $err){
@@ -79,11 +81,12 @@ class Patient extends Database {
 
     public function uploadPaitentAvatar(array $data){
         try {
-            $query = 'UPDATE patients SET avatar = :avatar WHERE id = :id';
+            $query = 'UPDATE patients SET avatar = :avatar, public_id = :public_id WHERE id = :id';
             $stmt = $this->db->prepare($query);
             $stmt->execute([
                 ':id' => $data['id'],
-                ':avatar' => $data['avatar']
+                ':avatar' => $data['avatar'],
+                ':public_id' => $data['publicId']
             ]);
         } catch(PDOException $err){
             $this->logger->error($err->getMessage());
@@ -108,11 +111,11 @@ class Patient extends Database {
             $keyword = ($id === null && $birthdate === null) ? $keyWord : null;
             $query = "SELECT *, DATE_PART('year', AGE(CURRENT_DATE, birthdate)) as age,
                         ts_rank(
-                            to_tsvector('english', first_name || ' ' || last_name || ' ' || sex || ' ' || address || ' ' || contact || ' ' || extra_contact || ' ' || status || ' ' || referred_by),
+                            to_tsvector('english', first_name || ' ' || last_name || ' ' || sex || ' ' || address || ' ' || contact || ' ' || extra_contact || ' ' || status || ' ' || allergies || ' ' || maintenance_pickup_day || ' ' || referred_by),
                             plainto_tsquery('english', COALESCE(:kw, ''))
                         ) AS rank
                         FROM patients
-                        WHERE (:kw IS NULL OR to_tsvector('english', first_name || ' ' || last_name || ' ' || sex || ' ' || address || ' ' || contact || ' ' || extra_contact || ' ' || status || ' ' || referred_by)
+                        WHERE (:kw IS NULL OR to_tsvector('english', first_name || ' ' || last_name || ' ' || sex || ' ' || address || ' ' || contact || ' ' || extra_contact || ' ' || status || ' ' || allergies || ' ' || maintenance_pickup_day || ' ' || referred_by)
                             @@ plainto_tsquery('english', :kw)
                             OR first_name ILIKE '%' || :kw || '%'
                             OR last_name ILIKE '%' || :kw || '%'
@@ -121,10 +124,12 @@ class Patient extends Database {
                             OR contact ILIKE '%' || :kw || '%'
                             OR extra_contact ILIKE '%' || :kw || '%'
                             OR status ILIKE '%' || :kw || '%'
+                            OR allergies ILIKE '%' || :kw || '%'
+                            OR maintenance_pickup_day ILIKE '%' || :kw || '%'
                             OR referred_by ILIKE '%' || :kw || '%')
                         AND (id = :id OR :id IS NULL OR DATE_PART('year', AGE(CURRENT_DATE, birthdate)) = :id)
                         AND (birthdate <= :birthdate OR :birthdate IS NULL)
-                        ORDER BY rank DESC";
+                        ORDER BY rank ASC";
             $stmt = $this->db->prepare($query);
             $stmt->bindValue(':kw', $keyword);
             $stmt->bindValue(':id', $id);
@@ -151,7 +156,7 @@ class Patient extends Database {
                             OR last_name ILIKE '%' || :kw || '%'
                             OR contact ILIKE '%' || :kw || '%'
                             OR extra_contact ILIKE '%' || :kw || '%')
-                        ORDER BY rank DESC";
+                        ORDER BY rank ASC";
             $stmt = $this->db->prepare($query);
             $stmt->bindValue(':kw', $keyWord);
 
@@ -191,6 +196,30 @@ class Patient extends Database {
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $err) {
+            $this->logger->error($err->getMessage());
+        }
+    }
+
+    public function getAllUnassignedPatients(){
+        try {
+            $query = "SELECT id, first_name, last_name, DATE_PART('year', AGE(CURRENT_DATE, birthdate)) AS age FROM patients WHERE maintenance_pickup_day IS NULL OR maintenance_pickup_day = '' ORDER BY id ASC";
+            $stmt = $this->db->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $err) {
+            $this->logger->error($err->getMessage());
+        }
+    }
+
+    public function updatePatientMaintenanceDay($data){
+        try {
+            $query = 'UPDATE patients SET maintenance_pickup_day = :maintenance_pickup_day WHERE id = :id';
+            $stmt = $this->db->prepare($query);
+            $stmt->execute([
+                ':id' => $data['id'],
+                ':maintenance_pickup_day' => $data['day']
+            ]);
+        } catch(PDOException $err){
             $this->logger->error($err->getMessage());
         }
     }

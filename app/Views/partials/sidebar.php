@@ -6,7 +6,7 @@
             <span></span>
         </div>
         <img class="icon" src="/assets/images/logo.png" alt="">
-        <h2 class="sm-h">PCF:CareWise</h2>
+        <h2 class="sm-h">PCF CareWise</h2>
     </header>
     <ul>
         <li>
@@ -16,9 +16,9 @@
             </a>
         </li>
         <li>
-            <a href="/care">
-                <svg viewBox="0 0 24 24" class="svg sm-icon" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M20,7H17V4a3,3,0,0,0-3-3H10A3,3,0,0,0,7,4V7H4a3,3,0,0,0-3,3v4a3,3,0,0,0,3,3H7v3a3,3,0,0,0,3,3h4a3,3,0,0,0,3-3V17h3a3,3,0,0,0,3-3V10A3,3,0,0,0,20,7ZM9,4a1,1,0,0,1,1-1h4a1,1,0,0,1,1,1V7H9Zm6,5v6H9V9ZM4,15a1,1,0,0,1-1-1V10A1,1,0,0,1,4,9H7v6Zm11,5a1,1,0,0,1-1,1H10a1,1,0,0,1-1-1V17h6Zm6-6a1,1,0,0,1-1,1H17V9h3a1,1,0,0,1,1,1Z"></path></g></svg>
-                <span>Care</span>
+            <a href="/distribute">
+                <svg class="sm-icon" version="1.1" id="Icons" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 32 32" xml:space="preserve" fill="currentColor"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <style type="text/css"> .st0{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;} </style> <g> <path d="M16,9c1.7,0,3-1.3,3-3s-1.3-3-3-3s-3,1.3-3,3S14.3,9,16,9z"></path> <path d="M29.7,11.3l-7-6.5c-0.3-0.3-0.7-0.3-1.1-0.2c-0.4,0.2-0.6,0.6-0.6,1c0,0.1,0,0.3,0,0.4c0,2.8-2.2,5-5,5s-5-2.2-5-5 c0-0.1,0-0.3,0-0.4c0-0.4-0.2-0.8-0.6-1c-0.4-0.2-0.8-0.1-1.1,0.2l-7,6.5c-0.3,0.2-0.4,0.6-0.3,1s0.3,0.6,0.7,0.7l8.9,2.8 C10.1,16.3,9,17.2,9,18.5c0,0.5,0.2,1.3,1.1,2c0.4,0.3,1.1,0.2,1.4-0.2c0.3-0.4,0.2-1.1-0.2-1.4c-0.3-0.2-0.3-0.4-0.3-0.4 c0-0.3,1.4-1.3,4-1.5v3c-2.3,0.3-4,1.4-4,2.9c0,1,0.7,1.8,1.8,2.4c0.1,0.1,0.3,0.1,0.4,0.1c0.4,0,0.7-0.2,0.9-0.6 c0.2-0.5,0-1.1-0.5-1.3C13.2,23.3,13,23.1,13,23c0-0.2,0.7-0.7,2-0.9V27c0,0.6,0.4,1,1,1s1-0.4,1-1v-0.8c0.6,0.2,1,0.6,1,0.8 c0,0.4-0.8,1-2,1s-2-0.6-2-1c0-0.6-0.4-1-1-1s-1,0.4-1,1c0,1.7,1.8,3,4,3s4-1.3,4-3c0-1.4-1.3-2.6-3-2.9V22c3.1-0.2,6-1.4,6-3.5 c0-1.3-1.1-2.2-2.6-2.8l8.9-2.8c0.3-0.1,0.6-0.4,0.7-0.7S29.9,11.5,29.7,11.3z M21,18.5c0,0.3-1.4,1.3-4,1.5V17 C19.6,17.2,21,18.2,21,18.5z"></path> </g> </g></svg>
+                <span>Distribute</span>
             </a>
         </li>
         <li>

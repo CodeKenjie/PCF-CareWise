@@ -56,11 +56,12 @@ class User extends Database {
 
     public function uploadUserAvatar(array $data){
         try {
-            $query = 'UPDATE users SET avatar = :avatar WHERE id = :id';
+            $query = 'UPDATE users SET avatar = :avatar, public_id = :public_id WHERE id = :id';
             $stmt = $this->db->prepare($query);
             $stmt->execute([
                 ':id' => $data['id'],
-                ':avatar' => $data['avatar']
+                ':avatar' => $data['avatar'],
+                ':public_id' => $data['publicId']
             ]);
         } catch(PDOException $err){
             $this->logger->error($err->getMessage());

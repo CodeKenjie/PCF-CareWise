@@ -29,6 +29,7 @@ $router->middleware(function () {
     (new App\Controllers\ActivityLogsController())->cleanup();
 });
 
+$router->get('', 'App\Controllers\LoginController@index');
 $router->get('/login', 'App\Controllers\LoginController@index');
 $router->post('/login', 'App\Controllers\UserController@login');
 $router->post('/logout', 'App\Controllers\UserController@logout');
@@ -47,11 +48,6 @@ $router->get('/dashboard/patients/new', 'App\Controllers\PatientsController@new'
 $router->get('/dashboard/schedule/today', 'App\Controllers\ScheduleController@today');
 $router->get('/dashboard/inventory/low', 'App\Controllers\InventoryController@low');
 
-$router->get('/care', 'App\Controllers\CareController@index');
-$router->get('/care/all', 'App\Controllers\PatientsController@getAll');
-$router->get('/care/sort', 'App\Controllers\PatientsController@sort');
-$router->get('/care/search', 'App\Controllers\PatientsController@search');
-$router->get('/care/patient', 'App\Controllers\PatientsController@search');
 $router->get('/care/condition', 'App\Controllers\SymptomsCheckerController@analyze');
 $router->get('/care/medicine', 'App\Controllers\MedicinesController@dropdown');
 $router->get('/care/prescription/{id}/all', 'App\Controllers\PrescriptionItemsController@all');
@@ -60,6 +56,7 @@ $router->get('/care/patient/{id}/prescriptions', 'App\Controllers\PrescriptionsC
 $router->post('/care/patient/{id}/diagnosis', 'App\Controllers\DiagnosisController@add');
 $router->post('/care/prescription/{id}', 'App\Controllers\PrescriptionsController@create');
 $router->post('/care/prescribe/{id}', 'App\Controllers\PrescriptionItemsController@prescribe');
+$router->post('/care/prescribe/{id}/maintenance', 'App\Controllers\PrescriptionItemsController@maintenance');
 $router->put('/care/prescription/{prescriptionId}/prescribed/{id}/edit', 'App\Controllers\PrescriptionItemsController@edit');
 $router->delete('/care/prescription/{prescriptionId}/prescribed/{id}/delete', 'App\Controllers\PrescriptionItemsController@delete');
 $router->delete('/care/patient/{patientId}/diagnosis/{id}/delete', 'App\Controllers\DiagnosisController@delete');
@@ -115,6 +112,15 @@ $router->patch('/me/{id}/accept', 'App\Controllers\UserController@changeRole');
 $router->patch('/me/{id}/decline', 'App\Controllers\UserController@decline');
 $router->patch('/me/{id}/remove', 'App\Controllers\UserController@changeRole');
 $router->patch('/me/requestAccess', 'App\Controllers\UserController@request');
+
+$router->get('/distribute', 'App\Controllers\DistributionController@index');
+$router->get('/distribute/medicines', 'App\Controllers\DistributionController@medicines');
+$router->get('/distribute/maintenance', 'App\Controllers\DistributionController@maintenance');
+$router->get('/distribute/patients/unassigned', 'App\Controllers\PatientsController@unassigned');
+$router->patch('/distribute/{id}/assign', 'App\Controllers\PatientsController@assign');
+$router->post('/distribute/{id}/maintenance', 'App\Controllers\MedicalReportController@insert');
+$router->get('/maintenance/report/', 'App\Controllers\MedicalReportController@report');
+$router->patch('/maintenance/report/{id}/update', 'App\Controllers\MedicalReportController@update');
 
 $router->get('/activities', 'App\Controllers\ActivityLogsController@all');
 $router->delete('/activities/delete', 'App\Controllers\ActivityLogsController@delete');

@@ -1,14 +1,13 @@
 <?php
 namespace App\Controllers;
 use App\Core\Controller;
-use App\Services\CloudinaryService;
 
 class DashboardController extends Controller  {
     public function index() {
         $user = $this->getLoggedUser();
 
         $data = [
-            'title' => 'PCF:CareWise - Dashboard',
+            'title' => 'PCF CareWise - Dashboard',
             'avatar' => $user['avatar'],
             'displayName' => $user['display_name'],
             'position' => $user['position'],

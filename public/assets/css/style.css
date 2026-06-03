@@ -1,6 +1,6 @@
 :root {
     --font-fam: Arial, sans-serif;
-    --profile: clamp(10rem, 6.2vw + 3rem, 20rem);
+    --profile: clamp(10rem, 6.2vw + 1rem, 20rem);
     --super-header: clamp(3rem, 4.2vw + 2rem, 4.8rem);
     --big-header: clamp(2.2rem, 3vw + 1.6rem, 3.8rem);
     --header: clamp(1.8rem, 2.2vw + 1.3rem, 2.8rem);
@@ -127,6 +127,20 @@
     border-color: var(--critical);
 }
 
+.fr {
+    display: flex;
+}
+
+.fc {
+    display: flex;
+    flex-direction: column;
+}
+
+.aj-c {
+    justify-content: center;
+    align-items: center;
+}
+
 .svg{
     fill: currentColor;
     width: 1em;
@@ -146,7 +160,7 @@ body {
     display: flex;
     flex-wrap: wrap-reverse;
     color: var(--font-color);
-    font-size: var(--normal);
+    font-size: 1rem;
     font-family: var(--font-fam);
     height: 100dvh;
     width: 100%;
@@ -333,13 +347,13 @@ ul {
 }
 
 .sm-icon {
-    width: var(--bigger);
-    height: var(--bigger);
+    width: 1rem;
+    height: 1rem;
 }
 
 .icon {
-    width: var(--header);
-    height: var(--header);
+    width: 2rem;
+    height: 2rem;
 }
 
 .password {
@@ -478,12 +492,6 @@ ul {
     overflow: auto;
 }
 
-.flx {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1em;
-}
-
 .site {
     flex: 1 1 0;
     border: 1.5em solid var(--bg);
@@ -505,14 +513,54 @@ ul {
     z-index: 1;
 }
 
+#loadingScreen {
+    background: var(--transparent-bg);
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    padding: 1em;
+    z-index: 100;
+}
+
+.loading {
+    position: absolute;
+    left: 50%;
+    right: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1em;
+    background: var(--bg);
+    width: fit-content;
+    height: fit-content;
+    border-radius: 51%;
+    animation: spin 10s linear infinite;
+}
+
 .f {
     display: flex;
     gap: 1em;
     align-items: center;
 }
 
+.fc {
+    display: flex;
+    flex-direction: column;
+}
+
+.flx {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1em;
+}
+
+
 .fit {
     flex: 0 0 fit-content;
+}
+
+.flswb {
+    flex: 1 1 0;
 }
 
 .sortsSpan {
@@ -623,6 +671,17 @@ ul {
     flex-direction: column;
 }
 
+.form-ui textarea::placeholder,
+.form-ui input::placeholder {
+    opacity: 0;
+}
+
+.form-ui textarea:focus::placeholder,
+.form-ui input:focus::placeholder{
+    opacity: 100%;
+}
+
+
 .form-ui span label {
     background: transparent;
     font-size: var(--normal);
@@ -681,6 +740,10 @@ ul {
 }
 
 .popup.active{
+    display: flex;
+}
+
+.popup.pop {
     display: flex;
 }
 
@@ -789,6 +852,10 @@ ul {
     cursor: pointer;
 }
 
+.btn-accent {
+    color: var(--font-color);
+}
+
 .btn-accent:hover {
     color: var(--alt-font-color);
     background: var(--button-color);
@@ -803,6 +870,10 @@ ul {
     border: var(--border);
     border-radius: var(--radius);
     cursor: pointer;
+}
+
+.btn-critical {
+    color: var(--font-color);
 }
 
 .btn-critical:hover {
@@ -1106,6 +1177,7 @@ ul {
     overflow: auto;
     scrollbar-width: none;
     scroll-behavior: smooth;
+    width: 100%;
 }
 
 #notifications li {
@@ -1348,159 +1420,91 @@ ul {
 #dashboard .donut > .soon { stroke: var(--moderate) }
 #dashboard .donut > .expired { stroke: var(--critical) }
 
-#care{
-    flex: 1 1 0;
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    gap: 1em;
-}
-#care > section:nth-of-type(1){
-    width: 100%;
-    align-self: last baseline;
-}
-
-#care section:nth-of-type(2),
-#care section:nth-of-type(3){
-    width: 100%;
-}
-
-#care #diagnose{
-    display: none;
-    gap: 0;
-}
-
-#care.open {
-    flex: 1 1 0;
-    flex-direction: row;
-    flex-wrap: wrap;
-}
-
-#care.open > section:nth-of-type(2),
-#care.open > section:nth-of-type(3){
-    flex: 1 1 0;
-    min-width: 25rem;
-}
-
-#care.open #diagnose {
-    display: flex;
+#patients,
+#medicines,
+#inventory {
     flex-direction: column;
 }
 
-#care #collection {
+#patients #collection {
     flex: 1 1 0;
     display: flex;
     flex-direction: column;
+    border-radius: var(--radius);
     overflow: auto;
     scrollbar-width: none;
-    gap: 0.1em;
+    gap: 0.2em;
 }
 
-#care #collection li {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    padding: 0.5em;
+#patients #collection li {
+    background: var(--bg);
+    display: grid;
+    grid-template-columns: 1fr auto; 
+    padding: 1em;
+    gap: 0.5em;
     border: var(--border);
     border-radius: var(--radius);
-    cursor: pointer;
-    min-width: 15rem;
+    width: 100%;
+    height: fit-content;
     box-shadow: var(--shadow);
     opacity: 75%;
+}
+
+#patients #collection li:hover {
+    opacity: 100%;
+}
+
+#carePanel #patientCare {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg);
+    border-radius: var(--radius);
     gap: 0.5em;
 }
 
-#care #collection li:hover {
-    color: var(--alt-font-color);
-    background: var(--button-hover);
+#patientCare #prescriptionForm,
+#patientCare #diagnosisForm {
+    flex-direction: row;
+    align-items: center;
     border: none;
-    opacity: 100%;
-
-    && button {
-        color: var(--alt-font-color);
-    }
-
-    && button:hover {
-        color: var(--font-color);
-    }
+    gap: 0.5em;
+    box-shadow: none;
+    width: 100%;
+    padding: 0;
 }
 
-#care #collection li.selected {
-    color: var(--alt-font-color);
-    background: var(--button-color);
-    border: none;
-    opacity: 100%;
-
-    && button {
-        color: var(--alt-font-color);
-    }
-
-    && button:hover {
-        color: var(--font-color);
-    }
-}
-
-#care #collection li h3 {
-    flex: 1 1 0;
-    font-size: var(--normal);
-    padding: 0.5em;
-}
-
-#care .pstatus {
-    color: var(--alt-font-color);
-    border-radius: var(--radius);
-}
-
-#care #diagnose #info {
+#carePanel #info {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
     height: fit-content;
     width: 100%;
     gap: 1em;
+    padding: 0;
+
+    span {
+        display: flex;
+        gap: 0.5em;
+        align-items: center;
+    }
+
+    label {
+        font-weight: var(--bold);
+        font-size: var(--small);
+        opacity: 75%;
+        width: 5rem;
+    }
+
+    h3 {
+        color: var(--font-color);
+        font-size: var(--small);
+    }
 }
 
-#care #diagnose #info span {
-    display: flex;
-    gap: 0.5em;
-    align-items: center;
-}
-
-#care #diagnose #info label {
-    font-weight: var(--bold);
-    font-size: var(--small);
-    opacity: 75%;
-    width: 5rem;
-}
-
-#care #diagnose #info .avatar {
-    position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: auto;
-}
-
-#care #diagnose #info div:nth-of-type(2) {
-    flex: 1 1 0;
-    display: flex;
-    flex-direction: column;
-    padding: 1em 0;
-    justify-content: center;
-    gap: 0.5em;
-}
-
-#care #diagnose form {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 0.5em;
-    padding: 0.5em;
-}
-
-#care #diagnosis {
-    flex: 1 1 0;
+#patientCare #diagnosis {
+    width: 100%;
+    height: clamp(10rem, 40vw, 14rem);
+    min-height: 10em;
+    max-height: 14em;
     background: var(--bg-dim);
     display: flex;
     flex-direction: column;
@@ -1509,18 +1513,18 @@ ul {
     scrollbar-width: none;
 }
 
-#care #diagnosis li {
+#patientCare #diagnosis li {
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-radius: var(--radius);
 }
 
-#care #diagnosis li:hover {
+#patientCare #diagnosis li:hover {
     background: var(--button-active);
 }
 
-#care #results {
+#patientCare #results {
     background: var(--bg);
     border-radius: var(--radius);
     width: 100%;
@@ -1531,13 +1535,13 @@ ul {
     scroll-behavior: smooth;
 }
 
-#care #results.active {
+#patientCare #results.active {
     padding: 1em 0;
     height: 30rem;
     border: var(--border);
 }
 
-#care #results li {
+#patientCare #results li {
     padding: 1em;
     border-radius: var(--radius);
     cursor: pointer;
@@ -1549,12 +1553,15 @@ ul {
     }
 }
 
-#care #results li:hover {
+#patientCare #results li:hover {
     background: var(--sub-bg);
 }
 
-#care #prescription {
-    flex: 1 1 0;
+#patientCare #prescription {
+    width: 100%;
+    height: clamp(10rem, 40vw, 14rem);
+    min-height: 10rem;
+    max-height: 14rem;
     overflow-x: auto;
     scrollbar-width: none;
     scroll-snap-type: y mandatory;
@@ -1562,7 +1569,7 @@ ul {
     scroll-padding: 0.5em;
 }
 
-#care #prescription > li {
+#patientCare #prescription > li {
     flex: 1 1 0;
     display: flex;
     flex-direction: column;
@@ -1636,34 +1643,7 @@ ul {
     background-color: transparent;
 }
 
-#patients,
-#medicines,
-#inventory {
-    flex-direction: column;
-}
 
-#patients #collection {
-    flex: 1 1 0;
-    display: flex;
-    flex-direction: column;
-    border-radius: var(--radius);
-    overflow: auto;
-    scrollbar-width: none;
-    gap: 0.2em;
-}
-
-#patients #collection li {
-    background: var(--bg);
-    display: grid;
-    grid-template-columns: auto 1fr auto; 
-    padding: 1em;
-    gap: 1em;
-    border: var(--border);
-    border-radius: var(--radius);
-    width: 100%;
-    height: fit-content;
-    box-shadow: var(--shadow);
-}
 
 .profile {
     justify-self: center;
@@ -1724,7 +1704,6 @@ ul {
 }
 
 #patients #collection div {
-    flex: 1 1 0;
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
@@ -1732,6 +1711,7 @@ ul {
 }
 
 #patients #collection table {
+    flex: 1 1 0;
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 1em;
@@ -2298,6 +2278,155 @@ ul {
     scroll-padding: 1em;
 }
 
+#distribution {
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    section {
+        flex: 1 1 0;
+        min-width: 15rem;
+    }
+
+    section:nth-of-type(3){
+        min-width: 100%;
+    }
+}
+
+.maintenance-list {
+    border: var(--border);
+    border-radius: var(--radius);
+    padding: 0.5em;
+    gap: 0.5em;
+
+    button {
+        font-weight: var(--bold);
+    }
+
+    input[type="date"]{
+        color: var(--font-color);
+        opacity: 100%;
+        padding: 0.5em;
+        width: fit-content;
+    }
+}
+
+.meds {
+    display: flex;
+    justify-content: space-between;
+
+    h3{
+        font-size: var(--small);
+    }
+}
+
+#unassignedPatients{
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+    gap: 0.2em;
+    li {
+        border: var(--border);
+        border-radius: var(--radius);
+        padding: 0.5em;
+    }
+
+    h3{
+        font-size: var(--normal);
+    }
+}
+
+.day-btn {
+    font-weight: var(--bold);
+}
+.day-btn.selected {
+    scale: 1.1;
+    color: var(--alt-font-color);
+    transition: scale 300ms ease;
+    background: var(--button-color);
+    border: none;
+}
+
+#distribute {
+    display: flex;
+    flex-direction: column;
+    overflow: auto;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+    gap: 0.2em;
+
+    li{
+        border: var(--border);
+        border-radius: var(--radius);
+        padding: 0.5em;
+        gap: 0.5em;
+    }
+
+    .needs {
+        display: flex;
+        flex-direction: column;
+        gap: 0.1em;
+    }
+    .needs .meds {
+        flex: 1 1 0;
+        flex-wrap: wrap;
+        gap: 0.5em;
+        align-items: center;
+        input {
+            padding: 0.5em;
+        }
+
+        h3{
+            font-size: var(--normal);
+        }
+    }
+}
+
+#distribution #collection{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.1em;
+    overflow: auto;
+    scrollbar-width: none;
+    scroll-behavior: smooth;
+    justify-content: center;
+}
+
+#distribution #collection > li {
+    flex: 1 1 49.5%;
+    min-width: 15rem;
+    height: fit-content;
+}
+
+.maintenanceStatus {
+    display: none;
+}
+
+.maintenanceStatus.reported{
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    background: var(--transparent-bg);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: var(--radius);
+    z-index: 100;
+
+    button {
+        color: var(--alt-font-color);
+        background: var(--button-color);
+        font-weight: var(--bold);
+        border: none;
+    }
+}
+
+.isGiven {
+    color: var(--alt-font-color);
+}
 #activityLogs {
     display: flex;
     flex-direction: column;
@@ -2368,6 +2497,7 @@ ul {
     background: var(--button-active);
 }
 
+#maintenanceReport > span,
 #medicalReport > span {
     display: flex;
     align-items: center;
@@ -2388,6 +2518,7 @@ ul {
     }
 }
 
+#maintenanceReport > div,
 #medicalReport > div{
     display: flex;
     background: white;
@@ -2421,6 +2552,7 @@ ul {
     }
 }
 
+#maintenanceReport header,
 #medicalReport header {
     display: flex;
     justify-content: center;
@@ -2430,6 +2562,7 @@ ul {
     gap: 1em;
 }
 
+#maintenanceReport .profile,
 #medicalReport .profile {
     width: 10rem;
     height: 10rem;
@@ -2450,6 +2583,29 @@ ul {
         display: flex;
         justify-content: space-between;
         gap: 1em;
+    }
+}
+
+#recordCollection {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+#recordCollection li{
+    display: flex;
+    gap: 0.5em;
+
+    .dates {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.1em;
+    }
+
+    .dates li {
+        border: var(--border);
+        padding: 0.5em;
+        width: fit-content;
     }
 }
 
@@ -2577,3 +2733,10 @@ ul {
     transition: scale 300ms ease;
 }
 
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    } to {
+        transform: rotate(3600deg);
+    }
+}

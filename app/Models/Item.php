@@ -180,7 +180,7 @@ class Item extends Database {
                         AND (id = :id OR :id IS NULL)
                         AND (is_donated = :is_donated OR :is_donated IS NULL)
                         AND (expiration_date <= :expiration_date OR :expiration_date IS NULL)
-                        ORDER BY rank DESC";
+                        ORDER BY rank ASC";
             $stmt = $this->db->prepare($query);
             $stmt->bindValue(':kw', $keyword);
             $stmt->bindValue(':id', $id);

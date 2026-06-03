@@ -85,7 +85,7 @@ class Medicine extends Database {
                         AND (medicines.id = :id OR :id IS NULL)
                         AND (inventory.is_donated = :is_donated OR :is_donated IS NULL)
                         AND (inventory.expiration_date <= :expiration_date OR :expiration_date IS NULL)
-                        ORDER BY rank DESC";
+                        ORDER BY rank ASC";
             $stmt = $this->db->prepare($query);
             $stmt->bindValue(':kw', $keyword);
             $stmt->bindValue(':id', $id);
@@ -117,7 +117,7 @@ class Medicine extends Database {
                             OR brand_name ILIKE '%' || :kw || '%'
                             OR dosage ILIKE '%' || :kw || '%'
                             OR form ILIKE '%' || :kw || '%')
-                        ORDER BY rank DESC";
+                        ORDER BY rank ASC";
             $stmt = $this->db->prepare($query);
             $stmt->bindValue(':kw', $keyWord);
 

@@ -251,7 +251,8 @@ class UserController extends Controller {
 
             $data = [
                 'id' => $id,
-                'avatar' => $result['secure_url']
+                'avatar' => $result['secure_url'],
+                'publicId' => $result['public_id']
             ];
 
             (new User())->uploadUserAvatar($data);
@@ -409,6 +410,7 @@ class UserController extends Controller {
 
     public function delete() {
         $user = $this->getLoggedUser();
+        (new CloudinaryService())->destroy($user['public_id']);
         $id = $user['id'] ?? null;
         $response = [];
 

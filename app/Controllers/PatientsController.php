@@ -10,7 +10,7 @@ class PatientsController extends Controller {
         $user = $this->getLoggedUser();
 
         $data = [
-            'title' => 'PCF:CareWise - Patients',
+            'title' => 'PCF CareWise - Patients',
             'avatar' => $user['avatar'],
             'displayName' => $user['display_name'],
             'position' => $user['position'],
@@ -26,13 +26,14 @@ class PatientsController extends Controller {
         header('Content-Type: application/json');
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
             $firstName = $_POST['firstName'] ?? '';
-            $lastName = $_POST['lastName'] ?? '';
+            $lastName = $this->notApplicable($_POST['lastName'] ?? '');
             $sex = $_POST['sex'] ?? '';
             $birthdate = $_POST['birthdate'] ?? '';
             $address = $_POST['address'] ?? '';
             $contact = $_POST['contact'] ?? '';
             $exContact = $this->notApplicable($_POST['exContact'] ?? '');
             $status = $_POST['status'] ?? '';
+            $allergies = $this->notApplicable($_POST['allergies'] ?? '');
             $referredBy = $this->notApplicable($_POST['referredBy'] ?? '');
             $response = [];
             $result = null;
@@ -43,7 +44,7 @@ class PatientsController extends Controller {
                 exit;
             }
 
-            if(empty($lastName)){
+            if(is_null($lastName)){
                 $response = [ 'ok' => false, 'code' => 401, 'error' => 'Required: Patients Last name' ];
                 echo json_encode($response);
                 exit;
@@ -88,13 +89,14 @@ class PatientsController extends Controller {
                 'contact' => $contact,
                 'extraContact' =>$exContact,
                 'status' => ucwords($status),
+                'allergies' => $allergies,
                 'referredBy' => ucwords($referredBy),
             ];
 
             $patient = new Patient();
             $patient->create($data);
-            $this->log('Added Patient', 'added' . ucwords($lastName) . ', ' . ucwords($firstName));
-            $response = [ 'ok' => true, 'code' => 201, 'message' => 'Patient: ' . ucwords($lastName) . ', ' . ucwords($firstName) . ' is successfully registered'];
+            $this->log('Added Patient', 'added' . ucwords($firstName) . ' ' . ucwords($lastName));
+            $response = [ 'ok' => true, 'code' => 201, 'message' => 'Patient: ' . ucwords($firstName) . ' ' . ucwords($lastName) . ' is successfully registered'];
             echo json_encode($response);
         }
     }
@@ -106,13 +108,14 @@ class PatientsController extends Controller {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = $params['id'] ?? '';
             $firstName = $_POST['updateFirstName'] ?? '';
-            $lastName = $_POST['updateLastName'] ?? '';
+            $lastName = $this->notApplicable($_POST['updateLastName'] ?? '');
             $sex = $_POST['updateSex'] ?? '';
             $birthdate = $_POST['updateBirthdate'] ?? '';
             $address = $_POST['updateAddress'] ?? '';
             $contact = $_POST['updateContact'] ?? '';
             $exContact = $this->notApplicable($_POST['updateExContact'] ?? '');
             $status = $_POST['updateStatus'] ?? '';
+            $allergies = $this->notApplicable($_POST['updateAllergies'] ?? '');
             $referredBy = $this->notApplicable($_POST['updateReferredBy'] ?? '');
             $response = [];
             $result = null;
@@ -123,7 +126,7 @@ class PatientsController extends Controller {
                 exit;
             }
 
-            if(empty($lastName)){
+            if(is_null($lastName)){
                 $response = [ 'ok' => false, 'code' => 401, 'error' => 'Required: Patients Last name' ];
                 echo json_encode($response);
                 exit;
@@ -163,12 +166,13 @@ class PatientsController extends Controller {
                 'contact' => $contact,
                 'extraContact' =>$exContact,
                 'status' => ucwords($status),
+                'allergies' => $allergies,
                 'referredBy' => ucwords($referredBy),
             ];
 
             $patient = new Patient();
             $patient->updatePatient($data);
-            $this->log('Edited Patient', ucwords($lastName) . ', ' . ucwords($firstName) . ' has been edited' );
+            $this->log('Edited Patient', ucwords($firstName) . ' ' . ucwords($lastName) . ' has been edited' );
             $response = [ 'ok' => true, 'code' => 200, 'message' => 'Patient: ' . ucwords($lastName) . ', ' . ucwords($firstName) . ' update success' ];
             echo json_encode($response);
         }
@@ -208,12 +212,13 @@ class PatientsController extends Controller {
 
             $data = [
                 'id' => $id,
-                'avatar' => $result['secure_url']
+                'avatar' => $result['secure_url'],
+                'publicId' => $result['public_id']
             ];
 
             (new Patient())->uploadPaitentAvatar($data);
             $patient = (new Patient())->getPatientById($id);
-            $this->log('Edited Patient', ucwords($patient['last_name']) . ', ' . ucwords($patient['first_name']) . ' has been edited' );
+            $this->log('Edited Patient', ucwords($patient['first_name']) . ' ' . ucwords($patient['last_name']) . ' has been edited' );
             $response = [ 'ok' => true, 'code' => 200, 'message' => 'Successfully changed avatar'];
             echo json_encode($response);
         }
@@ -234,8 +239,8 @@ class PatientsController extends Controller {
         $patient = new Patient();
 
         $selected = $patient->getPatientById($id);
-        $this->log('Deleted Patient', ucwords($selected['last_name']) . ', ' . ucwords($selected['first_name']) . ' has been deleted' );
-
+        $this->log('Deleted Patient', ucwords($selected['first_name']) . ', ' . ucwords($selected['last_name']) . ' has been deleted' );
+        (new CloudinaryService())->destroy($selected['public_id']);
         $patient->deletePatient($id);
         $response = [ 'ok' => true, 'code' => 200, 'message' => 'Patient successfully deleted' ];
         echo json_encode($response);
@@ -303,7 +308,7 @@ class PatientsController extends Controller {
                     'key' => 'newPatient',
                     'referenceId' => $patient['id'],
                     'title' => 'There\'s A New Patient',
-                    'content' => $patient['last_name'] . ', ' . $patient['first_name'] . ' was added to the patients',
+                    'content' => $patient['first_name'] . ' ' . $patient['last_name'] . ' was added to the patients',
                     'link' => '/patients'
                 ];
 
@@ -334,6 +339,47 @@ class PatientsController extends Controller {
 
         $response = ['ok' => true, 'code' => 200, 'collection' => $patientsList ];
         echo json_encode($response);
+    }
+
+    public function unassigned(){
+        header('Content-Type: application/json');
+        $response = [];
+        $patients = new Patient();
+        $patientsList = $patients->getAllUnassignedPatients();
+
+        $response = ['ok' => true, 'code' => 200, 'collection' => $patientsList ];
+        echo json_encode($response);
+    }
+
+    public function assign($params){
+        $this->editorOnly();
+        header('Content-Type: application/json');
+        if($_SERVER['REQUEST_METHOD'] === 'PATCH'){
+            $input = json_decode(file_get_contents('php://input'), true);
+            $id = $params['id'] ?? null;
+            $day = $input['day'] ?? null;
+            $response = [];
+
+            if(is_null($id)){
+                $response = [ 'ok' => false, 'code' => 401, 'error' => 'Error: No patient is selected'];
+                echo json_encode($response);
+                exit;
+            }
+
+            if(is_null($day)){
+                $response = [ 'ok' => false, 'code' => 401, 'error' => 'Error: No day selected'];
+                echo json_encode($response);
+                exit;
+            }
+
+            $data = [
+                'id' => $id,
+                'day' => ucwords($day)
+            ];
+            (new Patient())->updatePatientMaintenanceDay($data);
+            $response = [ 'ok' => true, 'code' => 200, 'message' => 'Patient successfully assigned'];
+            echo json_encode($response);
+        }
     }
 
 }

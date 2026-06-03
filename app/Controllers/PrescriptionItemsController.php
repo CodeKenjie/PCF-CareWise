@@ -71,7 +71,76 @@ class PrescriptionItemsController extends Controller {
                 'duration' => $duration,
                 'durationUnit' => strtolower($durationUnit),
                 'validUntil' => $validUntil,
-                'instructions' => $instructions
+                'instructions' => $instructions,
+                'isMaintenance' => 'false'
+            ];
+
+            $prescribe = new PrescriptionItem();
+            $prescribe->create($data);
+            $patient = (new Prescription())->getPrescriptionById($id);
+            $medicine = (new Medicine())->getMedicineById($medicineId);
+            $this->log('Prescribed Medicine', $medicine['generic_name']. ' (' . $medicine['brand_name'] . ') ' . 'is was added to ' . $patient['last_name'] . ', ' . $patient['first_name']);
+            $response = [ 'ok' => true, 'code' => 200, 'message' => 'Prescribed successfully' ];
+            echo json_encode($response);
+        }
+    }
+
+    public function maintenance($params){
+        $this->editorOnly();
+
+        header('Content-Type: application/json');
+        if($_SERVER['REQUEST_METHOD'] === 'POST'){
+            $id = $params['id'] ?? null;
+            $medicineId = $_POST['medicineId'] ?? '';
+            $doseAmount = $_POST['doseAmount'] ?? null;
+            $doseUnit = $this->notApplicable($_POST['doseUnit'] ?? '');
+            $frequencyPerDay = $_POST['frequencyPerDay'] ?? null;
+            $instructions = $this->notApplicable($_POST['instructions'] ?? '');
+            $response = [];
+            
+            if($id === null){
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'Error: No selected prescription'];
+                echo json_encode($response);
+                exit;
+            }
+            
+            if($doseAmount === null){
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'Error: no dose amount entered'];
+                echo json_encode($response);
+                exit;
+            } else if(!is_numeric($doseAmount)){
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'Error: Please enter a numeric value for Dose Amount'];
+                echo json_encode($response);
+                exit;
+            }
+            
+            if($frequencyPerDay === null){
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'Error: no frequency per day amount entered'];
+                echo json_encode($response);
+                exit;
+            } else if(!is_numeric($frequencyPerDay)) {
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'Error: Please enter a numeric value for frequency per day'];
+                echo json_encode($response);
+                exit;
+            }
+
+            if(empty($medicineId)){
+                $response = [ 'ok' => false, 'code' => 400, 'error' => 'Error: No selected medicine to add'];
+                echo json_encode($response);
+                exit;
+            }
+
+            $data = [
+                'id' => $id,
+                'medicineId' => $medicineId,
+                'doseAmount' => $doseAmount,
+                'doseUnit' => strtolower($doseUnit),
+                'frequencyPerDay' => $frequencyPerDay,
+                'duration' => 0,
+                'durationUnit' => '',
+                'validUntil' => null,
+                'instructions' => $instructions,
+                'isMaintenance' => 'true'
             ];
 
             $prescribe = new PrescriptionItem();
@@ -97,7 +166,7 @@ class PrescriptionItemsController extends Controller {
             $frequencyPerDay = $input['frequencyPerDay'] ?? '';
             $duration = $this->notApplicable($input['duration'] ?? '');
             $durationUnit = $this->notApplicable($input['durationUnit'] ?? '');
-            $validUntil = $input['validUntil'] ?? '';
+            $validUntil = $this->notApplicable($input['validUntil'] ?? '');
             $instructions = $this->notApplicable($input['instructions'] ?? '');
             $response = [];
 
@@ -127,16 +196,14 @@ class PrescriptionItemsController extends Controller {
                 $response = [ 'ok' => false, 'code' => 400, 'error' => 'Error: no frequency per day amount entered'];
                 echo json_encode($response);
                 exit;
-            } else if(!is_numeric($frequencyPerDay)) {
-                $response = [ 'ok' => false, 'code' => 400, 'error' => 'Error: Please enter a numeric value for frequency per day'];
-                echo json_encode($response);
-                exit;
             }
 
-            if(!is_numeric($duration)){
-                $response = [ 'ok' => false, 'code' => 400, 'error' => 'Error: Please enter a numeric value for duration'];
-                echo json_encode($response);
-                exit;
+            if(empty($duration)){
+                $duration = 0;
+            }
+
+            if(empty($validUntil)){
+                $validUntil = null;
             }
             
             $data = [

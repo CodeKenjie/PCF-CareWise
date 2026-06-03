@@ -10,5 +10,6 @@
 </head>
 <body>
     <div id="responseContainer"></div>
+    <?php require __DIR__ . "/../partials/loading.php"; ?>
     <?php require __DIR__ . "/../partials/sidebar.php"; ?>
     <?php require __DIR__ . "/../partials/notification.php"; ?>

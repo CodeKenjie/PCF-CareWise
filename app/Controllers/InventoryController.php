@@ -4,15 +4,12 @@ namespace App\Controllers;
 use App\Core\Controller;
 use App\Models\Item;
 use App\Models\Notification;
-use App\Services\CloudinaryService;
-
-use function PHPSTORM_META\type;
 
 class InventoryController extends Controller {
     public function index() {
         $user = $this->getLoggedUser();
         $data = [
-            'title' => 'PCF:CareWise - Inventory',
+            'title' => 'PCF CareWise - Inventory',
             'avatar' => $user['avatar'],
             'displayName' => $user['display_name'],
             'position' => $user['position'],

@@ -5,6 +5,7 @@ const state = {
     item: { id: null },
     schedule:{ id: null },
     condition: { id: null },
+    report: { id: null },
     prescription: { id: null, item: null },
     calendar: { selected: null },
     sort: { order: 'id', direction: 'ASC' }
@@ -229,6 +230,19 @@ function closePopup(){
     }
 }
 
+function closePop(){
+    const activePopup = document.querySelector(`.pop`);
+    const selected = document.querySelector(`.selected`);
+    const schedule = document.getElementById(`schedule`);
+    if(activePopup){ 
+        activePopup.classList.remove(`pop`);
+        if(schedule && selected){
+            selected.classList.remove(`selected`);
+            document.getElementById(`addSchedBtn`).classList.add(`hidden`);
+        }
+    }
+}
+
 function renderPatientsData(data){
     const container = document.getElementById(`collection`);
     const template = document.getElementById(`patientsCard`);
@@ -236,6 +250,7 @@ function renderPatientsData(data){
     container.innerHTML = ``;
 
     data.collection.forEach( patient => {
+        const [m, d, y] = new Date().toLocaleDateString('en-PH', { month: '2-digit', day: '2-digit', year: 'numeric' }).split('/');
         const [year, month, day] = patient.birthdate.split('-');
         const clone = template.content.cloneNode(true);
         const avatarUpload = clone.querySelector(`.avatarUpload`);
@@ -251,7 +266,6 @@ function renderPatientsData(data){
             statusMark.style.backgroundColor = `var(--moderate)`;
         }
         statusMark.textContent = patient.status;
-        clone.querySelector(`.id`).textContent = patient.id;
         img.src = patient.avatar ? patient.avatar : `assets/images/profile.png`;
         clone.querySelector(`.profile`).addEventListener(`mouseenter`, () => {
             avatarUpload.classList.add(`show`);
@@ -270,6 +284,7 @@ function renderPatientsData(data){
         form.action = `/patients/${patient.id}/avatar`;
         save.addEventListener(`click`, async (e) => {
             e.preventDefault();
+            document.getElementById(`loadingScreen`).classList.remove(`hidden`);
             try{
                 const formdata = new FormData(form);
                 const res = await fetch(`/patients/${patient.id}/avatar`, {
@@ -286,124 +301,59 @@ function renderPatientsData(data){
                 loadList(`patients`, renderPatientsData);
             } catch(err){
                 console.error(err);
+            } finally {
+                document.getElementById(`loadingScreen`).classList.add(`hidden`);
             }
         });
-        clone.querySelector(`.name`).textContent = patient.last_name + ", " + patient.first_name;
+        clone.querySelector(`.name`).textContent = patient.first_name + " " + patient.last_name;
         clone.querySelector(`.address`).textContent = patient.address;
         clone.querySelector(`.birthdate`).textContent = `${months[month - 1]} ${day}, ${year}`;
         clone.querySelector(`.age`).textContent = patient.age;
         clone.querySelector(`.sex`).textContent = patient.sex;
         clone.querySelector(`.contact`).textContent = patient.contact + " " + patient.extra_contact;
         clone.querySelector(`.referredBy`).textContent = patient.referred_by;
-        clone.querySelector(`.patientPreviewBtn`).addEventListener(`click`, () => {
-            document.getElementById(`dp`).src = patient.avatar ? patient.avatar : `assets/images/profile.png`;
-            document.getElementById(`patientPreview`).classList.add(`active`);
-            document.getElementById(`pId`).textContent = patient.id;
-            document.getElementById(`pName`).textContent = `${patient.last_name}, ${patient.first_name}`;
-            document.getElementById(`pStatus`).textContent = patient.status;
-            document.getElementById(`pAge`).textContent = patient.age;
-            document.getElementById(`pSex`).textContent = patient.sex;
-            document.getElementById(`pBirthdate`).textContent = `${months[month - 1]} ${day}, ${year}`;
-            document.getElementById(`pAddress`).textContent = patient.address;
-            document.getElementById(`pContacts`).textContent = patient.contact + " " + patient.extra_contact;
-            document.getElementById(`pReferredBy`).textContent = patient.referred_by;
+        clone.querySelector(`.allergies`).textContent = patient.allergies;
+        clone.querySelector(`.careBtn`).addEventListener(`click`, () => {
+            state.patient.id = patient.id;
+            document.getElementById(`carePanel`).classList.add(`active`);
+            document.getElementById(`profpic`).src = patient.avatar ? patient.avatar : '/assets/images/profile.png';
+            document.getElementById(`patientStatus`).textContent = patient.status;
+            document.getElementById(`patientName`).textContent = `${patient.first_name} ${patient.last_name}`;
+            document.getElementById(`patientSex`).textContent = patient.sex;
+            document.getElementById(`patientAge`).textContent = patient.age;
+            document.getElementById(`patientBirthdate`).textContent = `${months[month - 1]} ${day}, ${year}`;
+            document.getElementById(`patientContact`).textContent = patient.contact + " " + patient.extra_contact;
+            document.getElementById(`patientAddress`).textContent = patient.address;
+            document.getElementById(`patientAllergies`).textContent = patient.allergies;
+            loadPatientDiagnosis(patient.id);
+            loadPatientPrescriptions(patient.id);
         });
-        
         clone.querySelector(`.editPatientBtn`).addEventListener(`click`, () => {
             state.patient.id = patient.id;
             document.getElementById(`editPatient`).classList.add(`active`);
             document.getElementById(`editPatientForm`).action = `/patients/${patient.id}/edit`
             document.getElementById(`updateFirstName`).value = patient.first_name;
-            document.getElementById(`updateLastName`).value = patient.last_name;
+            document.getElementById(`updateLastName`).value = patient.last_name ? patient.last_name : `N/A`;
             document.querySelector(`.updateSex`).value = patient.sex;
             document.getElementById(`updateBirthdate`).value = patient.birthdate;
             document.getElementById(`updateAddress`).value = patient.address;
             document.getElementById(`updateContact`).value = patient.contact;
             document.getElementById(`updateExContact`).value = patient.extra_contact ? patient.extra_contact : `N/A`;
             document.getElementById(`updateStatus`).value = patient.status;
+            document.getElementById(`updateAllergies`).value = patient.allergies ? patient.allergies : `none`;
             document.getElementById(`updateReferredBy`).value = patient.referred_by ? patient.referred_by : `N/A`;
         });
-
-        clone.querySelector(`.deletePatientBtn`).addEventListener(`click`, () => {
-            state.patient.id = patient.id;
-            document.getElementById(`name`).textContent = patient.last_name + ", " + patient.first_name;
-            document.getElementById(`id`).textContent = patient.id;
-            document.getElementById(`deletePatient`).classList.add(`active`);
-        });
-
-        container.appendChild(clone);
-    });
-}
-
-function renderPatientsDrop(data){
-    const container = document.getElementById(`patientOption`);
-    const template = document.getElementById(`patientOptnTemplate`);
-
-    container.innerHTML = ``;
-    data.collection.forEach(patient => {
-        const clone = template.content.cloneNode(true);
-        clone.querySelector(`.id`).textContent = patient.id;
-        clone.querySelector(`.name`).textContent = `${patient.last_name}, ${patient.first_name}`;
-
-        clone.querySelector(`.patient`).addEventListener(`click`, () => {
-            document.getElementById(`firstName`).value = patient.first_name;
-            document.getElementById(`lastName`).value = patient.last_name;
-            document.getElementById(`contact`).value = patient.contact;
-            document.getElementById(`exContact`).value = patient.extra_contact ? patient.extra_contact : 'N/A';
-            document.getElementById(`patientOption`).classList.remove(`active`);
-        });
-        container.appendChild(clone);
-    });
-}
-
-function renderPatientsDataForCare(data){
-    const container = document.getElementById(`collection`);
-    const template = document.getElementById(`patientCareCard`);
-
-    container.innerHTML = ``;
-    data.collection.forEach(patient => {
-        const [m, d, y] = new Date().toLocaleDateString('en-PH', { month: '2-digit', day: '2-digit', year: 'numeric' }).split('/');
-        const [year, month, day] = patient.birthdate.split('-');
-        const clone = template.content.cloneNode(true);
-        const statusMark = clone.querySelector(`.pstatus`);
-        clone.querySelector(`.patient`).addEventListener(`click`, (e) => {
-            state.patient.id = patient.id;
-            const isSelected = e.currentTarget.classList.contains(`selected`);
-            document.querySelectorAll(`.patient`).forEach(li => {
-                li.classList.remove(`selected`)
-            });
-
-            if(isSelected){
-                document.getElementById(`care`).classList.remove(`open`);
-                return;
-            }
-
-            e.currentTarget.classList.add(`selected`);
-
-            document.getElementById(`care`).classList.add(`open`);
-            document.getElementById(`prescriptionForm`).action = `/care/prescription/${patient.id}`;
-            document.getElementById(`diagnosisForm`).action = `/care/patient/${patient.id}/diagnosis`;
-            document.getElementById(`profpic`).src = patient.avatar ? patient.avatar : '/assets/images/profile.png';
-            document.getElementById(`patientId`).textContent = patient.id;
-            document.getElementById(`patientName`).textContent = `${patient.last_name}, ${patient.first_name}`;
-            document.getElementById(`patientAge`).textContent = patient.age;
-            document.getElementById(`patientBirthdate`).textContent = `${months[month - 1]} ${day}, ${year}`;
-            document.getElementById(`patientStatus`).textContent = patient.status;
-            loadPatientDiagnosis(patient.id);
-            loadPatientPrescriptions(patient.id);
-        });
-        clone.querySelector(`.name`).textContent = `${patient.last_name}, ${patient.first_name}`;
-        clone.querySelector(`.age`).textContent = patient.age;
         clone.querySelector(`.medicalReport`).addEventListener(`click`, async (e) => {
             e.preventDefault();
             document.getElementById(`printDate`).textContent = `${months[m - 1]} ${d}, ${y}`;
             document.getElementById(`medicalReport`).classList.add(`active`);
             document.getElementById(`printAvatar`).src = patient.avatar ? patient.avatar : `/assets/images/profile.png`;
-            document.getElementById(`printName`).textContent = `${patient.last_name}, ${patient.first_name}`;
+            document.getElementById(`printName`).textContent = `${patient.first_name}${patient.last_name ? ' ' + patient.last_name : ''}`;
             document.getElementById(`printBirthdate`).textContent =  `${months[month - 1]} ${day}, ${year}`;
             document.getElementById(`printAge`).textContent = patient.age;
             document.getElementById(`printSex`).textContent = patient.sex;
             document.getElementById(`printAddress`).textContent = patient.address;
+            document.getElementById(`printAllergies`).textContent = patient.allergies;
             document.getElementById(`printContacts`).textContent = `${patient.contact}${patient.extra_contact ? `, ${patient.extra_contact}`: ``}`;
             try{
                 const res = await fetch(`/care/patient/${patient.id}/diagnosis`, {
@@ -506,24 +456,43 @@ function renderPatientsDataForCare(data){
                 console.error(err);
             }
         });
-        statusMark.textContent = patient.status;
-        if(patient.status === `Active` || patient.status === `Complete`){
-            statusMark.style.backgroundColor = `var(--good)`;
-        } else if (patient.status === `Deceased` || patient.status === `Inactive`) {
-            statusMark.style.backgroundColor = `var(--critical)`;
-        } else {
-            statusMark.style.backgroundColor = `var(--moderate)`;
-        }
-        container.appendChild(clone);
+        clone.querySelector(`.deletePatientBtn`).addEventListener(`click`, () => {
+            state.patient.id = patient.id;
+            document.getElementById(`name`).textContent = `${patient.first_name}${patient.last_name ? ' ' + patient.last_name : ''}`;
+            document.getElementById(`id`).textContent = patient.id;
+            document.getElementById(`deletePatient`).classList.add(`active`);
+        });
 
         document.getElementById(`setSchedBtn`).addEventListener(`click`, () => {
-            document.getElementById(`setSched`).classList.add(`active`);
-            document.getElementById(`firstName`).value = patient.first_name;
-            document.getElementById(`lastName`).value = patient.last_name;
-            document.getElementById(`contact`).value = patient.contact;
-            document.getElementById(`exContact`).value = patient.extra_contact ? patient.extra_contact : `N/A`;
-            document.getElementById(`scheduledFor`).value = `Taking medicines`;
+            document.getElementById(`setSched`).classList.add(`pop`);
+            document.getElementById(`schedFirstName`).value = patient.first_name;
+            document.getElementById(`schedLastName`).value = patient.last_name ? patient.last_name : `N/A`;
+            document.getElementById(`schedContact`).value = patient.contact;
+            document.getElementById(`schedExContact`).value = patient.extra_contact ? patient.extra_contact : `N/A`;
+            document.getElementById(`schedScheduledFor`).value = `Taking medicines`;
         });
+
+        container.appendChild(clone);
+    });
+}
+
+function renderPatientsDrop(data){
+    const container = document.getElementById(`patientOption`);
+    const template = document.getElementById(`patientOptnTemplate`);
+
+    container.innerHTML = ``;
+    data.collection.forEach(patient => {
+        const clone = template.content.cloneNode(true);
+        clone.querySelector(`.name`).textContent = `${patient.first_name}${patient.last_name ? ` ` + patient.last_name : `` }`;
+
+        clone.querySelector(`.patient`).addEventListener(`click`, () => {
+            document.getElementById(`firstName`).value = patient.first_name;
+            document.getElementById(`lastName`).value = patient.last_name ? patient.last_name : `N/A`;
+            document.getElementById(`contact`).value = patient.contact;
+            document.getElementById(`exContact`).value = patient.extra_contact ? patient.extra_contact : 'N/A';
+            document.getElementById(`patientOption`).classList.remove(`active`);
+        });
+        container.appendChild(clone);
     });
 }
 
@@ -584,14 +553,14 @@ function renderMedsDrop(data){
     const container = document.getElementById(`medicineOptn`);
     const template = document.getElementById(`medicineCard`);
     const inventory = document.getElementById(`inventory`);
-    const care = document.getElementById(`care`);
+    const patients = document.getElementById(`patients`);
 
     container.innerHTML = ``;
 
     data.collection.forEach(medicine => {
         const clone = template.content.cloneNode(true);
 
-        clone.querySelector(`.genericName`).innerHTML = `${medicine.generic_name} <span style="opacity: 50%">(${medicine.brand_name ? medicine.brand_name : `N/A`})</span>`;
+        clone.querySelector(`.genericName`).innerHTML = `${medicine.generic_name} <span style="opacity: 50%">(${medicine.dosage ? medicine.dosage : `N/A`})</span>`;
         clone.querySelector(`.dosage`).textContent = medicine.dosage;
         clone.querySelector(`.form`).textContent = medicine.form;
 
@@ -599,14 +568,14 @@ function renderMedsDrop(data){
             document.getElementById(`medicineOptn`).classList.remove(`active`);
             if(inventory){
                 document.getElementById(`medicineId`).value = medicine.id;
-                document.getElementById(`itemName`).value = medicine.generic_name;
+                document.getElementById(`itemName`).value = `${medicine.generic_name} (${medicine.dosage})`;
                 document.getElementById(`category`).value = `Medicine`;
                 document.getElementById(`description`).value = `${medicine.brand_name} ${medicine.dosage} ${medicine.form}`;
             }
 
-            if(care) {
+            if(patients) {
                 document.getElementById(`medicineId`).value = medicine.id;
-                document.getElementById(`medicineName`).value = `${medicine.brand_name} ${medicine.generic_name}`;
+                document.getElementById(`medicineName`).value = `${medicine.generic_name} ${medicine.dosage}`;
                 document.getElementById(`doseUnit`).value = medicine.form;
             }
         });
@@ -718,7 +687,7 @@ function renderSchedulesData(data){
             clone.querySelector(`.viewBtn`).classList.add(`hidden`);
 
             if(schedule.frequency === `Everyday`){
-                date.setDate(date.getDate() + 1);
+                date.setDate(date.getDate() + (now.getDate() + 1));
                 const newDate = date.toISOString().split('T')[0];
                 reschedule(schedule.id, newDate);
             } else if(schedule.frequency === `Every week`) {
@@ -734,7 +703,7 @@ function renderSchedulesData(data){
 
         clone.querySelector(`.schedDate`).textContent = `${months[month - 1]} ${day}, ${year}`;
         clone.querySelector(`.schedTime`).textContent = `${timeFormat} (${schedule.frequency})`;
-        clone.querySelector(`.patientName`).textContent = `${schedule.last_name}, ${schedule.first_name}`;
+        clone.querySelector(`.patientName`).textContent = `${schedule.first_name}${schedule.last_name ? ` `+ schedule.last_name : ``}`;
         clone.querySelector(`.schedFor`).textContent = schedule.scheduled_for;
         clone.querySelector(`.reSched`).addEventListener(`click`, async (e) => {
             e.preventDefault();
@@ -745,7 +714,7 @@ function renderSchedulesData(data){
         clone.querySelector(`.editBtn`).addEventListener(`click`, () => {
             state.schedule.id = schedule.id;
             document.getElementById(`sDate`).textContent = `${months[month - 1]} ${day}, ${year}`;
-            document.getElementById(`patientName`).textContent = `${schedule.last_name}, ${schedule.first_name}`;
+            document.getElementById(`patientName`).textContent = `${schedule.first_name}${schedule.last_name ? `` + schedule.last_name : ``}`;
             document.getElementById(`editSched`).classList.add(`active`);
             document.getElementById(`updateTime`).value = schedule.time;
             document.getElementById(`updateFrequency`).value = schedule.frequency;
@@ -756,14 +725,14 @@ function renderSchedulesData(data){
             document.getElementById(`sId`).textContent = schedule.id;
             document.getElementById(`vDate`).textContent = `${months[month - 1]} ${day}, ${year}`;
             document.getElementById(`vTime`).textContent = timeFormat;
-            document.getElementById(`sName`).textContent = `${schedule.last_name}, ${schedule.first_name}`;
+            document.getElementById(`sName`).textContent = `${schedule.first_name}${schedule.last_name ? `` + schedule.last_name : ``}`;
             document.getElementById(`sContact`).textContent = schedule.contact;
             document.getElementById(`sExContact`).textContent = schedule.extra_contact ? schedule.extra_contact : `N/A`;
         });
         clone.querySelector(`.deleteBtn`).addEventListener(`click`, () => {
             state.schedule.id = schedule.id;
             document.getElementById(`deleteSched`).classList.add(`active`);
-            document.getElementById(`name`).textContent = `${schedule.last_name}, ${schedule.first_name}`;
+            document.getElementById(`name`).textContent = `${schedule.first_name}${schedule.last_name ? `` + schedule.last_name : ``}`;
             document.getElementById(`schedDate`).textContent = schedule.date;
         });
         container.appendChild(clone);
@@ -949,7 +918,7 @@ async function loadPatientPrescriptions(id) {
         }
 
         document.getElementById(`setSchedBtn`).addEventListener(`click`, () => {
-            document.getElementById(`scheduledFor`).value = `Take ${data.collection.map(p => {
+            document.getElementById(`schedScheduledFor`).value = `Take ${data.collection.map(p => {
                 const [ month, day, year ] = new Date(p.created_at).toLocaleString(`en-PH`, { timeZone: 'Asia/Manila', month: '2-digit', day: '2-digit', year: 'numeric'}).split(`/`)
                 return `${months[month - 1]} ${day}, ${year} prescription ${p.condition_name ? `for ` + p.condition_name : ``}`
             }).join(', ')} prescribed medicine/s`;
@@ -975,14 +944,14 @@ async function loadPatientPrescriptions(id) {
                 state.prescription.id = prescription.id;
                 expand.classList.add(`hide`);
                 prescribedMeds.classList.add(`expand`);
-                document.getElementById(`prescribeMed`).classList.add(`active`);
+                document.getElementById(`prescribeMed`).classList.add(`pop`);
                 document.getElementById(`prescribeMedForm`).action = `/care/prescribe/${prescription.id}`;
                 loadPrescriptionItems(prescription.id, prescribedMeds);
             });
             clone.querySelector(`.deletePrescription`).addEventListener(`click`, () => {
                 state.prescription.id = prescription.id;
                 document.getElementById(`deletePrescriptionForm`).action = `/care/patient/${state.patient.id}/prescription/${prescription.id}/delete`;
-                document.getElementById(`deletePrescription`).classList.add(`active`);
+                document.getElementById(`deletePrescription`).classList.add(`pop`);
                 document.getElementById(`name`).textContent = created;
                 document.getElementById(`id`).textContent = prescription.id;
             });
@@ -1015,26 +984,36 @@ async function loadPrescriptionItems(id, container){
             if(!medication.quantity){
                 clone.querySelector(`li`).classList.add(`null`);
             }
-            clone.querySelector(`.medicineName`).innerHTML = `${medication.generic_name} <span>(${medication.brand_name})</span>`;
+            clone.querySelector(`.medicineName`).innerHTML = `${medication.generic_name} <span>(${medication.dosage})</span>`;
             clone.querySelector(`.doseAmount`).innerHTML =`${medication.dose_amount} <span>${medication.dose_unit}</span>`;
             clone.querySelector(`.frequency`).textContent = medication.frequency_per_day;
-            clone.querySelector(`.duration`).innerHTML = `for: ${medication.duration} ${medication.duration_unit}`;
+            if(medication.is_maintenance){
+                clone.querySelector(`.duration`).innerHTML = `for: Maintenance`;
+            } else {
+                clone.querySelector(`.duration`).innerHTML = `for: ${medication.duration} ${medication.duration_unit}`;
+            }
             clone.querySelector(`.setSched`).addEventListener(`click`, () => {
                 if(!medication.quantity){
-                    responseMessage(false, `${medication.generic_name}(${medication.brand_name}) has no quantity or stock`);
+                    responseMessage(false, `${medication.generic_name}(${medication.dosage}) has no quantity or stock`);
                     return;
                 }
-                document.getElementById(`setSched`).classList.add(`active`);
-                document.getElementById(`firstName`).value = medication.first_name;
-                document.getElementById(`lastName`).value = medication.last_name;
-                document.getElementById(`contact`).value = medication.contact;
-                document.getElementById(`exContact`).value = medication.extra_contact;
-                document.getElementById(`scheduledFor`).value = `${medication.generic_name}(${medication.brand_name}) - ${medication.dosage}(${medication.form}) ${medication.dose_amount} ${medication.dose_unit}`;
+                document.getElementById(`setSched`).classList.add(`pop`);
+                document.getElementById(`schedFirstName`).value = medication.first_name;
+                document.getElementById(`schedLastName`).value = medication.last_name;
+                document.getElementById(`schedContact`).value = medication.contact;
+                document.getElementById(`schedExContact`).value = medication.extra_contact ? medication.extra_contact : `N/A`;
+                document.getElementById(`schedScheduledFor`).value = `${medication.generic_name}(${medication.dosage}) - ${medication.dosage}(${medication.form}) ${medication.dose_amount} ${medication.dose_unit} ${medication.instructions}`;
             });
             clone.querySelector(`.info`).addEventListener(`click`, () => {
-                document.getElementById(`prescribedInfo`).classList.add(`active`);
+                document.getElementById(`prescribedInfo`).classList.add(`pop`);
                 document.getElementById(`presCreatedAt`).textContent = `${months[createdMonth - 1]} ${createdDay}, ${createdYear}`;
-                document.getElementById(`presValidUntil`).textContent = `${months[exMonth - 1]} ${exDay}, ${exYear}`;
+                if(medication.is_maintenance){
+                    document.getElementById(`presValidUntil`).textContent = `Maintenance`;
+                    document.getElementById(`presDuration`).textContent = `Maintenance`;
+                } else {
+                    document.getElementById(`presValidUntil`).textContent = `${months[exMonth - 1]} ${exDay}, ${exYear}`;
+                    document.getElementById(`presDuration`).textContent = `for ${medication.duration} ${medication.duration_unit}`;
+                }
                 document.getElementById(`pmId`).textContent = medication.id;
                 document.getElementById(`genericName`).textContent = medication.generic_name;
                 document.getElementById(`brandName`).textContent = medication.brand_name ? medication.brand_name : `N.A`;
@@ -1044,15 +1023,14 @@ async function loadPrescriptionItems(id, container){
                 document.getElementById(`presDose`).textContent = `${medication.dose_amount} ${medication.dose_unit}`;
                 document.getElementById(`presFrequency`).textContent = `${medication.frequency_per_day}x a day`;
                 document.getElementById(`presMedExp`).textContent = `${medication.expiration_date}`;
-                document.getElementById(`presDuration`).textContent = `for ${medication.duration} ${medication.duration_unit}`;
                 document.getElementById(`presInstructions`).textContent = medication.instructions;
             });
             clone.querySelector(`.edit`).addEventListener(`click`, async (e) => {
                 state.prescription.id = id;
                 state.prescription.item = medication.id;
-                document.getElementById(`editMed`).classList.add(`active`);
+                document.getElementById(`editMed`).classList.add(`pop`);
                 document.getElementById(`editMedForm`).action = `/care/prescription/${id}/prescribed/${medication.id}/edit`;
-                document.getElementById(`otherInfo`).textContent = `${medication.generic_name}(${medication.brand_name}) - ${months[createdMonth - 1]} ${createdDay}, ${createdYear}`;
+                document.getElementById(`otherInfo`).textContent = `${medication.generic_name}(${medication.dosage}) - ${months[createdMonth - 1]} ${createdDay}, ${createdYear}`;
                 document.getElementById(`updateDoseAmount`).value = medication.dose_amount ? medication.dose_amount : `N/A`;
                 document.getElementById(`updateDoseUnit`).value = medication.dose_unit ? medication.dose_unit : `N/A`;
                 document.getElementById(`updateFrequencyPerDay`).value = medication.frequency_per_day ? medication.frequency_per_day : `N/A`;
@@ -1065,7 +1043,7 @@ async function loadPrescriptionItems(id, container){
                 state.prescription.id = id;
                 state.prescription.item = medication.id;
                 e.preventDefault();
-                document.getElementById(`deletePrescribedMed`).classList.add(`active`);
+                document.getElementById(`deletePrescribedMed`).classList.add(`pop`);
                 document.getElementById(`deletePrescribedMedForm`).action = `/care/prescription/${id}/prescribed/${medication.id}/delete`;
                 document.getElementById(`medName`).innerHTML = `${medication.generic_name} <span>(${medication.brand_name})</span>`;
                 document.getElementById(`medId`).textContent = medication.id;
@@ -1240,7 +1218,6 @@ async function adjustQuantity(value, type){
         }
 
         responseMessage(data, data.message);
-        document.getElementById(`valueInput`).value = "";
         loadList('inventory', renderItemData);
     } catch(err) {
         console.error(err);
@@ -1790,7 +1767,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 data.collection.forEach(patient => {
                     const clone = template.content.cloneNode(true);
                     const [ month, day, year ] = new Date(patient.created_at).toLocaleString(`en-PH`, { timeZone: 'Asia/Manila', month: '2-digit', day: '2-digit', year: 'numeric' }).split(`/`);
-                    clone.querySelector(`.patientName`).textContent = `${patient.last_name}, ${patient.first_name}`;
+                    clone.querySelector(`.patientName`).textContent = `${patient.first_name}${patient.last_name ? ` ` + patient.last_name : ``}`;
                     clone.querySelector(`.patientSex`).textContent = patient.sex;
                     clone.querySelector(`.addedDate`).textContent = `${months[month - 1]} ${day}, ${year}`;
                     container.appendChild(clone);
@@ -1915,9 +1892,10 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
 
         document.getElementById(`importBtn`).addEventListener(`click`, (e) => {
             e.preventDefault();
-            const valueInput = document.getElementById(`valueInput`).value;
-            adjustQuantity(Number(valueInput), 'import');
+            const valueInput = document.getElementById(`valueInput`);
+            adjustQuantity(Number(valueInput.value), 'import');
             lowStocks();
+            valueInput.value = ``;
         });
 
         const deleteItemForm = document.getElementById(`deleteItemForm`);
@@ -1973,11 +1951,11 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         });
     }
 
-    const care = document.getElementById(`care`);
-    if(care){
-        loadList(`care`, renderPatientsDataForCare);
-        sorts(`care`, renderPatientsDataForCare);
-        search(`care/patient`, renderPatientsDataForCare);
+    const patients = document.getElementById(`patients`);
+    if(patients){
+        loadList('patients', renderPatientsData);
+        sorts(`patients`, renderPatientsData);
+        search(`patients/patient`, renderPatientsData);
 
         document.getElementById(`diagnosisForm`).addEventListener(`submit`, async (e) => {
             e.preventDefault();
@@ -2057,7 +2035,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                     return;
                 }
                 loadPatientPrescriptions(state.patient.id);
-                document.getElementById(`deletePrescription`).classList.remove(`active`);
+                document.getElementById(`deletePrescription`).classList.remove(`pop`);
             } catch(err){
                 console.error(err);
             }
@@ -2076,22 +2054,23 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                     return;
                 }
                 loadPatientPrescriptions(state.patient.id);
-                document.getElementById(`deletePrescribedMed`).classList.remove(`active`);
+                document.getElementById(`deletePrescribedMed`).classList.remove(`pop`);
             } catch(err){
                 console.error(err);
             }
         });
 
-        document.getElementById(`prescribeMedForm`).addEventListener(`submit`, async (e) => {
+        const prescribeMeds = document.getElementById(`prescribeMedForm`); 
+        const medName = document.getElementById(`medicineName`);
+        const doseAmount = document.getElementById(`doseAmount`);
+        const doseUnit = document.getElementById(`doseUnit`);
+        const frequencyPerDay = document.getElementById(`frequencyPerDay`);
+        const duration = document.getElementById(`duration`);
+        const durationUnit = document.getElementById(`durationUnit`);
+        const validUntil = document.getElementById(`validUntil`);
+        const instructions = document.getElementById(`instructions`);
+        prescribeMeds.addEventListener(`submit`, async (e) => {
             e.preventDefault();
-            const medName = document.getElementById(`medicineName`);
-            const doseAmount = document.getElementById(`doseAmount`);
-            const doseUnit = document.getElementById(`doseUnit`);
-            const frequencyPerDay = document.getElementById(`frequencyPerDay`);
-            const duration = document.getElementById(`duration`);
-            const durationUnit = document.getElementById(`durationUnit`);
-            const validUntil = document.getElementById(`validUntil`);
-            const instructions = document.getElementById(`instructions`);
             try{
                 const formdata = new FormData(e.target);
                 const res = await fetch(`/care/prescribe/${state.prescription.id}`, {
@@ -2106,7 +2085,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
 
                 loadPatientPrescriptions(state.patient.id);
                 responseMessage(data, data.message);
-                document.getElementById(`prescribeMed`).classList.remove(`active`);
+                document.getElementById(`prescribeMed`).classList.remove(`pop`);
                 medName.value = ``;
                 doseAmount.value = ``;
                 doseUnit.value = ``;
@@ -2116,6 +2095,36 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 validUntil.value = ``;
                 instructions.value = ``;
             } catch(err){
+                console.error(err);
+            }
+        });
+
+        document.getElementById(`maintenanceBtn`).addEventListener(`click`, async (e) => {
+            e.preventDefault();
+            try{
+                const formdata = new FormData(prescribeMeds);
+                const res = await fetch(`/care/prescribe/${state.prescription.id}/maintenance`, {
+                    method: 'POST',
+                    body: formdata
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    responseMessage(data, data.error);
+                }
+
+                loadPatientPrescriptions(state.patient.id);
+                responseMessage(data, data.message);
+                document.getElementById(`prescribeMed`).classList.remove(`pop`);
+                medName.value = ``;
+                doseAmount.value = ``;
+                doseUnit.value = ``;
+                frequencyPerDay.value = ``;
+                duration.value = ``;
+                durationUnit.value = ``;
+                validUntil.value = ``;
+                instructions.value = ``;
+            }catch(err){
                 console.error(err);
             }
         });
@@ -2146,7 +2155,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
 
                 responseMessage(data, data.message);
                 loadPatientPrescriptions(state.patient.id);
-                document.getElementById(`editMed`).classList.remove(`active`);
+                document.getElementById(`editMed`).classList.remove(`pop`);
             } catch (err){
                 console.error(err);
             }
@@ -2168,7 +2177,10 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 }
 
                 responseMessage(data, data.message);
-                document.getElementById(`setSched`).classList.remove(`active`);
+                document.getElementById(`setSched`).classList.remove(`pop`);
+                document.getElementById(`getDate`).value = ``;
+                document.getElementById(`getTime`).value = ``;
+                document.getElementById(`frequency`).value = ``;
             } catch(err) {
                 console.error(err);
             }
@@ -2234,13 +2246,6 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 }
             }, 300);
         });
-    }
-
-    const patients = document.getElementById(`patients`);
-    if(patients){
-        loadList('patients', renderPatientsData);
-        sorts(`patients`, renderPatientsData);
-        search(`patients/patient`, renderPatientsData);
 
         const registerPatientBtn = document.getElementById(`registerPatientBtn`);
         registerPatientBtn.addEventListener(`click`, () => {
@@ -2285,6 +2290,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             const exContact = document.getElementById(`exContact`);
             const referredBy = document.getElementById(`referredBy`);
             const status = document.getElementById(`status`);
+            const allergies = document.getElementById(`allergies`);
 
             const formdata = new FormData(e.target);
             try {
@@ -2310,6 +2316,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 exContact.value = ``;
                 referredBy.value = ``;
                 status.value = ``;
+                allergies.value = ``;
             } catch (err) {
                 console.error(err);
             }
@@ -2317,6 +2324,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
 
         document.getElementById(`deletePatientForm`).addEventListener(`submit`, async (e) => {
             e.preventDefault();
+            document.getElementById(`loadingScreen`).classList.remove(`hidden`);
             try {
                 const res = await fetch(`/patients/delete/${state.patient.id}`, {
                     method: 'DELETE'
@@ -2333,6 +2341,8 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 loadList('patients', renderPatientsData);
             } catch (err) {
                 console.error(err)
+            } finally {
+                document.getElementById(`loadingScreen`).classList.add(`hidden`);
             }
         });
     }
@@ -2446,14 +2456,16 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
 
         document.getElementById(`exportBtn`).addEventListener(`click`, (e)=> {
             e.preventDefault();
-            const valueInput = document.getElementById(`valueInput`).value;
-            adjustQuantity(Number(valueInput), 'export');
+            const valueInput = document.getElementById(`valueInput`);
+            adjustQuantity(Number(valueInput.value), 'export');
+            valueInput.value = ``;
         });
 
         document.getElementById(`importBtn`).addEventListener(`click`, (e) => {
             e.preventDefault();
-            const valueInput = document.getElementById(`valueInput`).value;
-            adjustQuantity(Number(valueInput), 'import');
+            const valueInput = document.getElementById(`valueInput`);
+            adjustQuantity(Number(valueInput.value), 'import');
+            valueInput.value = ``;
         });
 
         let timeout;
@@ -2746,6 +2758,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
 
         document.querySelector(`.save`).addEventListener(`click`, async (e) => {
             e.preventDefault();
+            document.getElementById(`loadingScreen`).classList.remove(`hidden`);
             try {
                 const form = document.getElementById(`avatarUploadForm`);
                 const formdata = new FormData(form);
@@ -2761,6 +2774,8 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 responseMessage(data, data.message);
             } catch(err) {
                 console.error(err);
+            } finally {
+                document.getElementById(`loadingScreen`).classList.add(`hidden`);
             }
         });
 
@@ -2780,6 +2795,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
 
         document.getElementById(`resendCode`).addEventListener(`click`, async (e) => {
             e.preventDefault();
+            document.getElementById(`loadingScreen`).classList.remove(`hidden`);
             try {
                 const res = await fetch(`/me/verification/resend`, {
                     method: 'GET'
@@ -2793,10 +2809,13 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 responseMessage(data, data.message);
             } catch(err){
                 console.error(err);
+            } finally {
+                document.getElementById(`loadingScreen`).classList.add(`hidden`);
             }
         });
         document.getElementById(`verifyForm`).addEventListener(`submit`, async (e) => {
             e.preventDefault();
+            document.getElementById(`loadingScreen`).classList.remove(`hidden`);
             const code = document.getElementById(`code`);
             try {
                 const res = await fetch(`/me/verify`, {
@@ -2817,12 +2836,15 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 location.reload();
             } catch(err) {
                 console.error(err);
+            } finally {
+                document.getElementById(`loadingScreen`).classList.add(`hidden`);
             }
         });
 
         const requestAccessBtn = document.getElementById(`requestAccess`);
         requestAccessBtn.addEventListener(`click`, async (e) => {
             e.preventDefault();
+            document.getElementById(`loadingScreen`).classList.remove(`hidden`);
             try {
                 const res = await fetch(`/me/requestAccess`, {
                     method: 'PATCH'
@@ -2837,11 +2859,14 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 location.reload();
             } catch(err) {
                 console.error(err);
+            } finally {
+                document.getElementById(`loadingScreen`).classList.add(`hidden`);
             }
         });
 
         document.getElementById(`editInfoForm`).addEventListener(`submit`, async (e) => {
             e.preventDefault();
+            document.getElementById(`loadingScreen`).classList.remove(`hidden`);
             try{
                 const formdata = new FormData(e.target);
                 const res = await fetch(`/me/update`, {
@@ -2857,6 +2882,8 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 }
             } catch(err){
                 console.error(err);
+            } finally {
+                document.getElementById(`loadingScreen`).classList.add(`hidden`);
             }
         });
 
@@ -3003,6 +3030,338 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
             } catch(err){
                 console.error(err);
             }
+        });
+    }
+
+    const distribution = document.getElementById(`distribution`);
+    if(distribution){
+        const weeks = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday' ]
+        async function assign(id, day){
+            try {
+                const res = await fetch(`/distribute/${id}/assign`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ day: day })
+                });
+
+                const data = await res.json();
+                if(!data.collection){
+                    return;
+                }
+                if(!data.ok){
+                    return responseMessage(data, data.error);
+                }
+                responseMessage(data, data.message);
+            } catch (err){
+                console.error(err);
+            }
+        }
+
+        async function loadUnassignedPatients(){
+            try{
+                const res = await fetch(`/distribute/patients/unassigned`, {
+                    method: 'GET'
+                });
+
+                const data = await res.json();
+                if(!data.collection){
+                    return;
+                }
+
+                const container = document.getElementById(`unassignedPatients`);
+                const template = document.getElementById(`unassignedCard`);
+
+                container.innerHTML = ``;
+                data.collection.forEach(patient => {
+                    const clone = template.content.cloneNode(`true`);
+                    const day = clone.querySelector(`.day`);
+                    clone.querySelector(`.name`).textContent = `${patient.first_name}${patient.last_name ? ' ' + patient.last_name : ``}`;
+                    clone.querySelector(`.assignForm`).action = `/distribute/${patient.id}/assign`;
+                    clone.querySelector(`.assignForm`).addEventListener(`submit`, async(e) => {
+                        e.preventDefault();
+                        document.getElementById(`loadingScreen`).classList.remove(`hidden`);
+                        await assign(patient.id, day.value);
+                        document.getElementById(`loadingScreen`).classList.add(`hidden`);
+                        loadUnassignedPatients();
+                    });
+                    container.appendChild(clone);
+                });
+            } catch(err) {
+                console.error(err);
+            }
+        } loadUnassignedPatients();
+
+        async function getMedicines() {
+            try {
+                const res = await fetch(`/distribute/medicines`, {
+                    method: 'GET'
+                });
+
+                const data = await res.json();
+                if(!data.collection){
+                    return;
+                }
+                const container = document.getElementById(`distribute`);
+                const template = document.getElementById(`distributeCard`);
+                container.innerHTML = ``;
+
+                data.collection.forEach(patient => {
+                    const clone = template.content.cloneNode(true);
+                    clone.querySelector(`.name`).textContent = `${patient.first_name}${patient.last_name ? ` ` + patient.last_name : ``}`;
+                    const subContainer = clone.querySelector(`.medicineGivenList`);
+                    const subTemplate = document.getElementById(`medicineGivenCard`);
+                    subContainer.innerHTML = ``;
+                    patient.medicine_given.forEach(medicine => {
+                        const subClone = subTemplate.content.cloneNode(true);
+                        subClone.querySelector(`.medicineName`).textContent = `${medicine.generic_name}${medicine.brand_name ? `(` + medicine.brand_name + `)` : ``}`;
+                        subClone.querySelector(`.medicineDosage`).textContent = medicine.dosage;
+                        subClone.querySelector(`.medicineForm`).textContent = medicine.form;
+                        if(medicine.is_maintenance){
+                            subClone.querySelector(`.medicineIsMaintenance`).classList.remove(`hidden`);
+                        }
+                        const quantity = subClone.querySelector(`.quantity`);
+                        subClone.querySelector(`.giveBtn`).addEventListener(`click`, () => {
+                            state.item.id = medicine.inventory_id;
+                            adjustQuantity(Number(quantity.value), 'export');
+                            quantity.value = ``;
+                        });
+                        subContainer.appendChild(subClone);
+                    });
+                    container.appendChild(clone);
+                });
+            } catch (err){
+                console.error(err); }
+        } getMedicines();
+
+        let month = new Date().getMonth();
+        let year = new Date().getFullYear();
+        document.getElementById(`date`).textContent =`${months[month]} ${year}`;
+        document.getElementById(`prev`).addEventListener(`click`, () => {
+            month--;
+            if(month < 0){
+                month = 11;
+                year--;
+            }
+            document.getElementById(`date`).textContent =`${months[month]} ${year}`;
+            const weekday = document.querySelector(`.selected`).dataset.day;
+            loadMaintenance(weeks[weekday], Number(weekday));
+        });
+
+        document.getElementById(`next`).addEventListener(`click`, () => {
+            month++;
+            if(month > 11){
+                month = 0;
+                year++;
+            }
+
+            document.getElementById(`date`).textContent =`${months[month]} ${year}`;
+            const weekday = document.querySelector(`.selected`).dataset.day;
+            loadMaintenance(weeks[weekday], Number(weekday));
+        });
+
+        document.getElementById(`todayBtn`).addEventListener(`click`, () => {
+            month = new Date().getMonth();
+            year = new Date().getFullYear();
+            document.getElementById(`date`).textContent =`${months[month]} ${year}`;
+            const weekday = document.querySelector(`.selected`).dataset.day;
+            loadMaintenance(weeks[weekday], Number(weekday));
+        });
+
+        function getDatesOfDay(year, month, weekday){
+            const dates = [];
+
+            const lastDay = new Date(year, month + 1, 0).getDate();
+
+            for(let day = 1; day <= lastDay; day++){
+                const date = new Date(year, month, day);
+
+                if(date.getDay() === weekday){
+                    dates.push(date);
+                }
+            }
+
+            return dates;
+        }
+
+        async function status(id, date, value){
+            try{
+                const res = await fetch(`/distribute/${id}/maintenance`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ date: date, status: value })
+                });
+
+                const data = await res.json();
+                if(!data.ok){
+                    return responseMessage(data, data.error);
+                }
+                responseMessage(data, data.message);
+            } catch(err){
+                console.error(err);
+            }
+        }
+
+        async function loadMaintenance(day, weekday){
+            const dates = getDatesOfDay(year, month, weekday);
+            try {
+                const res = await fetch(`/distribute/maintenance?day=${day}`, {
+                    method: 'GET'
+                });
+
+                const data = await res.json();
+                if(!data.collection){
+                    return;
+                }
+                const container = document.getElementById(`collection`);
+                const template = document.getElementById(`maintenanceCard`);
+                container.innerHTML = ``;
+                data.collection.forEach(patient => {
+                    dates.forEach(pickupDates => {
+                        const clone = template.content.cloneNode(true);
+                        const date = new Date(pickupDates);
+                        date.setDate(date.getDate() + 1);
+                        const dateInput = clone.querySelector(`.date`);
+                        const givenBtn = clone.querySelector(`.given`);
+                        const updateDateInput = clone.querySelector(`.updateDate`);
+                        const updateGivenBtn = clone.querySelector(`.updateGiven`);
+                        const updateDay = clone.querySelector(`.updateDay`);
+                        const newDay = clone.querySelector(`.newDay`);
+                        const notGivenBtn = clone.querySelector(`.notGiven`);
+                        const maintenanceForm = clone.querySelector(`.maintenanceForm`);
+                        updateDay.value = day;
+                        dateInput.value = date.toISOString().split(`T`)[0];
+                        clone.querySelector(`.day`).textContent = `(${weeks[weekday]})`;
+                        clone.querySelector(`.name`).textContent = `${patient.first_name}${patient.last_name ? ` ` + patient.last_name : ``}`;
+                        clone.querySelector(`.age`).textContent = `Age: ${patient.age}`;
+                        maintenanceForm.action = `/distribute/${patient.id}/maintenance`;
+                        clone.querySelector(`.assignForm`).action = `/distribute/${patient.id}/assign`;
+                        clone.querySelector(`.updateAssignForm`).action = `/distribute/${patient.id}/assign`;
+                        givenBtn.addEventListener(`click`, async (e)=> {
+                            e.preventDefault();
+                            document.getElementById(`loadingScreen`).classList.remove(`hidden`);
+                            await status(patient.id, dateInput.value, givenBtn.value);
+                            document.getElementById(`loadingScreen`).classList.add(`hidden`);
+                            const selectedDay = document.querySelector(`.selected`).dataset.day;
+                            loadMaintenance(weeks[selectedDay], Number(selectedDay));
+                        });
+                        notGivenBtn.addEventListener(`click`, async (e)=> {
+                            e.preventDefault();
+                            document.getElementById(`loadingScreen`).classList.remove(`hidden`);
+                            await status(patient.id, dateInput.value, notGivenBtn.value);
+                            document.getElementById(`loadingScreen`).classList.add(`hidden`);
+                            const selectedDay = document.querySelector(`.selected`).dataset.day;
+                            loadMaintenance(weeks[selectedDay], Number(selectedDay));
+                        });
+                        patient.maintenance_report.forEach(report => {
+                            if(report.is_given && report.date === dateInput.value){
+                                state.report.id = report.id;
+                                clone.querySelector(`.maintenanceStatus`).classList.add(`reported`);
+                                clone.querySelector(`.assignForm`).classList.add(`hidden`);
+                                clone.querySelector(`.isGiven`).textContent = `Given`;
+                                clone.querySelector(`.isGiven`).style.color = `var(--good)`;
+                                givenBtn.classList.add(`hidden`);
+                            } else if(!report.is_given && report.date === dateInput.value) {
+                                state.report.id = report.id;
+                                clone.querySelector(`.maintenanceStatus`).classList.add(`reported`);
+                                clone.querySelector(`.assignForm`).classList.add(`hidden`);
+                                clone.querySelector(`.isGiven`).textContent = `Not Given`;
+                                clone.querySelector(`.isGiven`).style.color = `var(--critical)`;
+                                notGivenBtn.classList.add(`hidden`);
+                                updateDateInput.classList.remove(`hidden`);
+                                updateGivenBtn.classList.remove(`hidden`);
+                            }
+                        });
+                        updateGivenBtn.addEventListener(`click`, async (e) => {
+                            e.preventDefault();
+                            document.getElementById(`loadingScreen`).classList.remove(`hidden`);
+                            await status(patient.id, updateDateInput.value, updateGivenBtn.value);
+                            document.getElementById(`loadingScreen`).classList.add(`hidden`);
+                            const selectedDay = document.querySelector(`.selected`).dataset.day;
+                            loadMaintenance(weeks[selectedDay], Number(selectedDay));
+                        });
+                        clone.querySelector(`.assignForm`).addEventListener(`submit`, async(e) => {
+                            e.preventDefault();
+                            document.getElementById(`loadingScreen`).classList.remove(`hidden`);
+                            await assign(patient.id, newDay.value);
+                            document.getElementById(`loadingScreen`).classList.add(`hidden`);
+                            const selectedDay = document.querySelector(`.selected`).dataset.day;
+                            loadMaintenance(weeks[selectedDay], Number(selectedDay));
+                        });
+                        clone.querySelector(`.updateAssignForm`).addEventListener(`submit`, async(e) => {
+                            e.preventDefault();
+                            document.getElementById(`loadingScreen`).classList.remove(`hidden`);
+                            await assign(patient.id, updateDay.value);
+                            document.getElementById(`loadingScreen`).classList.add(`hidden`);
+                            const selectedDay = document.querySelector(`.selected`).dataset.day;
+                            loadMaintenance(weeks[selectedDay], Number(selectedDay));
+                        });
+                        const subContainer = clone.querySelector(`.maintenanceMeds`);
+                        const subTemplate = document.getElementById(`maintenanceMedsCard`);
+                        subContainer.innerHTML = ``;
+                        patient.maintenance_given.forEach(medicine => {
+                            const subClone = subTemplate.content.cloneNode(true);
+                            subClone.querySelector(`.medicineName`).textContent = `${medicine.generic_name}${medicine.brand_name ? `(` + medicine.brand_name + `)` : ``}`;
+                            subClone.querySelector(`.dosage`).textContent = `${medicine.dosage}${medicine.form ? `(`+ medicine.form +`)` : ``}`;
+                            subContainer.appendChild(subClone);
+                        });
+                        container.appendChild(clone);
+                    });
+                });
+            } catch(err){
+                console.error(err);
+            }
+        } loadMaintenance(`Sunday`, 0);
+
+        document.querySelectorAll(`.day-btn`).forEach(dayBtn => {
+            dayBtn.addEventListener(`click`, async (e) => {
+                const weekday = Number(dayBtn.dataset.day);
+                e.preventDefault();
+                document.querySelectorAll(`.day-btn`).forEach(btn => {
+                    btn.classList.remove(`selected`);
+                });
+                dayBtn.classList.add(`selected`);
+
+                loadMaintenance(dayBtn.value, weekday);
+            });
+        });
+
+        document.getElementById(`viewReportBtn`).addEventListener(`click`, async (err) => {
+            document.getElementById(`maintenanceReport`).classList.add(`active`);
+            const [m, d, y] = new Date().toLocaleDateString('en-PH', { month: '2-digit', day: '2-digit', year: 'numeric' }).split('/');
+            document.getElementById(`printDate`).textContent = `${months[m - 1]} ${d}, ${y}`;
+            (async () => {
+                try {
+                    const res = await fetch(`/maintenance/report`, {
+                        method: 'GET'
+                    });
+
+                    const data = await res.json();
+                    const container = document.getElementById(`recordCollection`);
+                    const template = document.getElementById(`reportCard`);
+                    container.innerHTML = ``;
+                    data.collection.forEach(patient => {
+                        const clone = template.content.cloneNode(true);
+                        clone.querySelector(`.printAvatar`).src = patient.avatar ? patient.avatar : `/assets/images/profile.png`;
+                        clone.querySelector(`.name`).textContent = `${patient.first_name}${patient.last_name ? ` ` + patient.last_name : ``}`;
+                        const subContainer = clone.querySelector(`.dates`);
+                        const subTemplate = document.getElementById(`dateCard`);
+                        subContainer.innerHTML = ``;
+                        patient.maintenance_report.forEach(data => {
+                            const subClone = subTemplate.content.cloneNode(true);
+                            subClone.querySelector(`.date`).textContent = data.date;
+                            subClone.querySelector(`.maintenanceReport`).textContent = data.is_given ? `Given` : `Not Given`;
+                            subContainer.appendChild(subClone);
+                        });
+                        container.appendChild(clone);
+                    });
+                } catch(err){
+                    console.error(err);
+                }
+            })();
         });
     }
 })

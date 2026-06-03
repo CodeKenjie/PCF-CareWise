@@ -9,9 +9,7 @@ class RegisterController extends Controller {
             exit;
         }
 
-        $data = [
-            'title' => 'PCF:CareWise - Register Account'
-        ];
+        $data = [];
 
         $this->view('pages/register', $data);
     }

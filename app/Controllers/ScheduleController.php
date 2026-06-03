@@ -10,7 +10,7 @@ class ScheduleController extends Controller {
         $user = $this->getLoggedUser();
 
         $data = [
-            'title' => 'PCF:CareWise - Schedule',
+            'title' => 'PCF CareWise - Schedule',
             'avatar' => $user['avatar'],
             'displayName' => $user['display_name'],
             'position' => $user['position'],
@@ -29,7 +29,7 @@ class ScheduleController extends Controller {
             $time = $_POST['getTime'] ?? '';
             $frequency = $_POST['frequency'] ?? '';
             $firstName = $_POST['firstName'] ?? '';
-            $lastName = $_POST['lastName'] ?? '';
+            $lastName = $this->notApplicable($_POST['lastName'] ?? null);
             $contact = $_POST['contact'] ?? '';
             $exContact = $this->notApplicable($_POST['exContact'] ?? '');
             $schduledFor = $_POST['scheduledFor'] ?? '';
@@ -59,7 +59,7 @@ class ScheduleController extends Controller {
                 exit;
             }
 
-            if(empty($lastName)){
+            if(is_null($lastName)){
                 $response = [ 'ok' => false, 'code' => 400, 'error' => 'Error: please enter patients last name'];
                 echo json_encode($response);
                 exit;
