@@ -542,7 +542,6 @@
     <li class="medicine">
         <span class="p-sm">
             <h4 class="genericName" style="display: flex; gap: 0.5em">testing testing</h4>
-            <h5 class="dosage" style="opacity: 50%;">dosage</h5>
             <h5 class="form" style="opacity: 50%;">form</h5>
         </span>
     </li>

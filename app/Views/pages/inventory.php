@@ -8,7 +8,7 @@
         <div>
             <form action="/inventory/sort" method="get">
                 <span class="sortsSpan">
-                    <button id="sort1" class="btn-highlight" type="button" value="name">Name</button>
+                    <button id="sort1" class="btn-highlight" type="button" value="id">id</button>
                     <button id="sort2" class="btn-highlight" type="button" value="quantity">Quantity</button>
                     <button id="sort3" class="btn-highlight" type="button" value="expiration_date">Expiration</button>
                     <button id="direction" class="btn-highlight" type="button" value="ASC">ASC</button>
@@ -32,13 +32,13 @@
     <form id="adjustQuantForm" class="form-ui">
         <span class="btn-close btn-highlight" style="align-items: center;" onclick="closePopup()"></span>
         <div class="part p-sm" style="align-items: center;">
-            <div class="p-sm" style="display:flex; flex-direction: column; align-items: center; gap: 0.5em;">
+            <div class="p-sm fc aj-c" style="gap: 0.5em;">
                 <h3 style="opacity: 75%; font-size: var(--small);">Item</h3>
-                <h3 id="imName"></h3>
+                <h3 id="imName" class="ctr-text"></h3>
             </div>
-            <div class="p-sm" style="display:flex; flex-direction: column; align-items: center; gap: 0.5em;">
+            <div class="p-sm fc aj-c" style="gap: 0.5em;">
                 <h3 style="opacity: 75%; font-size: var(--small);">Stocks</h3>
-                <h3 id="imCurrentQuant"></h3>
+                <h3 id="imCurrentQuant" class="ctr-text"></h3>
             </div>
         </div>
         <span class="p-sm">
@@ -154,7 +154,7 @@
 </div>
 <div id="editItem" class="popup">
     <form id="editItemForm" class="form-ui" action="/inventory/edit" method="post">
-        <span class="p-sm">
+        <span id="spanItemName" class="p-sm">
             <input id="updateItemName" name="updateItemName" type="text" required>
             <label>Item Name</label>
         </span>
@@ -211,7 +211,6 @@
 <template id="medicineCard">
     <li class="medicine p-sm">
         <h4 class="genericName"></h4>
-        <h4 class="dosage"></h4>
         <h4 class="form"></h4>
     </li>
 </template>

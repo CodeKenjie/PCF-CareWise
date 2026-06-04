@@ -85,13 +85,13 @@
     <form id="adjustQuantForm" class="form-ui">
         <span class="btn-close btn-highlight" style="align-items: center;" onclick="closePopup()"></span>
         <div class="part p-sm" style="align-items: center;">
-            <div class="p-sm" style="display:flex; flex-direction: column; align-items: center; gap: 0.5em;">
+            <div class="p-sm fc aj-c" style="gap: 0.5em;">
                 <h3 style="opacity: 75%; font-size: var(--small);">Item</h3>
-                <h3 id="imName"></h3>
+                <h3 id="imName" class="ctr-text"></h3>
             </div>
-            <div class="p-sm" style="display:flex; flex-direction: column; align-items: center; gap: 0.5em;">
+            <div class="p-sm fc aj-c" style="gap: 0.5em;">
                 <h3 style="opacity: 75%; font-size: var(--small);">Stocks</h3>
-                <h3 id="imCurrentQuant"></h3>
+                <h3 id="imCurrentQuant" class="ctr-text"></h3>
             </div>
         </div>
         <span class="p-sm">

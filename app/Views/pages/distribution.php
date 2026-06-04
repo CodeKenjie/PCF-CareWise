@@ -112,8 +112,8 @@
             <h1 class="isGiven"></h1>
             <div class="f aj-c" style="flex-wrap: wrap;">
                 <div class="f">
-                    <input class="updateDate hidden" type="date" style="background: var(--bg); padding: 0.5em; width:fit-content; color: var(--font-color)" required>
-                    <button class="updateGiven btn-bordered btn-accent hidden" value="true">Given</button>
+                    <input class="updateDate" type="date" style="background: var(--bg); padding: 0.5em; width:fit-content; color: var(--font-color)" required>
+                    <button class="updateGiven btn-bordered btn-accent" value="true">Given</button>
                 </div>
                 <form class="updateAssignForm f">
                     <select class="updateDay" style="background: var(--bg); padding: 0.5em">

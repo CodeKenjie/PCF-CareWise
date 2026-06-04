@@ -66,7 +66,7 @@ class InventoryController extends Controller {
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
             $medicineId = $_POST['medicineId'] ?? '';
             $medicine = $medicineId === '' ? null : $medicineId;
-            $itemName = $_POST['itemName'] ?? '';
+            $itemName = $this->notApplicable($_POST['itemName'] ?? '');
             $category = $_POST['category'] ?? '';
             $quantity = $_POST['quantity'] ?? '';
             $quantityType = $_POST['quantityType'] ?? '';
@@ -108,7 +108,7 @@ class InventoryController extends Controller {
         header('Content-Type: application/json');
         if($_SERVER['REQUEST_METHOD'] === 'PUT'){
             $id = $input['id'];
-            $itemName = $input['itemName'] ?? '';
+            $itemName = $this->notApplicable($input['itemName'] ?? '');
             $category = $input['category'] ?? '';
             $minQuant = $input['minQuant'] ?? '';
             $quantityType = $input['quantityType'] ?? '';
@@ -244,8 +244,12 @@ class InventoryController extends Controller {
                     'type' => 'reminder',
                     'key' => 'mediumStock',
                     'referenceId' => $item['id'],
-                    'title' => 'Keep ' . $item['name'] . ' in mind',
-                    'content' => $item['name'] . ' is about to run out only ' . $item['quantity'] . $item['quantity_type'] . ' left',
+                    'title' => ($item['category'] === 'Medicine') ? 
+                                 'Keep ' . $item['generic_name'] . ' ' . $item['dosage'] . ' ' . '('. $item['form']. ')' . ' in mind': 
+                                 'Keep ' . $item['name'] . ' in mind',
+                    'content' => ($item['category'] === 'Medicine') ? 
+                                 $item['generic_name'] . ' ' . $item['dosage'] . ' ' . '('. $item['form']. ')' . ' is about to run out only ' . $item['quantity'] . $item['quantity_type'] . ' out of ' . $item['minimum_quantity'] . ' left':
+                                 $item['name'] . ' is about to run out only ' . $item['quantity'] . $item['quantity_type'] . ' out of ' . $item['minimum_quantity'] . ' left',
                     'link' => '/inventory'
                 ];
 
@@ -266,8 +270,12 @@ class InventoryController extends Controller {
                     'type' => 'warning',
                     'key' => 'lowStock',
                     'referenceId' => $item['id'],
-                    'title' => $item['name'] . ' IS ALMOST OUT!!!',
-                    'content' => $item['name'] . ' is about to run out only ' . $item['quantity'] . $item['quantity_type'] . ' out of ' . $item['minimum_quantity'] . ' left',
+                    'title' => ($item['category'] === 'Medicine') ? 
+                                 $item['generic_name'] . ' ' . $item['dosage'] . ' ' . '('. $item['form']. ')' . ' IS ALMOST OUT!!!' : 
+                                 $item['name'] . ' IS ALMOST OUT!!!',
+                    'content' => ($item['category'] === 'Medicine') ? 
+                                 $item['generic_name'] . ' ' . $item['dosage'] . ' ' . '('. $item['form']. ')' . ' is about to run out only ' . $item['quantity'] . $item['quantity_type'] . ' out of ' . $item['minimum_quantity'] . ' left':
+                                 $item['name'] . ' is about to run out only ' . $item['quantity'] . $item['quantity_type'] . ' out of ' . $item['minimum_quantity'] . ' left',
                     'link' => '/inventory'
                 ];
 
@@ -288,8 +296,12 @@ class InventoryController extends Controller {
                     'type' => 'reminder',
                     'key' => 'expiringSoon',
                     'referenceId' => $item['id'],
-                    'title' => $item['name'] . ' is expiring soon',
-                    'content' => $item['name'] . ' is about to expire in 30 days keep this in mind: ' . $item['expiration_date'],
+                    'title' => ($item['category'] === 'Medicine') ? 
+                                 $item['generic_name'] . ' ' . $item['dosage'] . ' ' . '('. $item['form']. ')' . ' is expiring soon' : 
+                                 $item['name'] . ' is expiring soon',
+                    'content' => ($item['category'] === 'Medicine') ? 
+                                 $item['generic_name'] . ' ' . $item['dosage'] . ' ' . '('. $item['form']. ')' . ' is about to expire in 30 days keep this in mind: ' . $item['expiration_date'] : 
+                                 $item['name'] . ' is about to expire in 30 days keep this in mind: ' . $item['expiration_date'],
                     'link' => '/inventory'
                 ];
 
@@ -310,8 +322,12 @@ class InventoryController extends Controller {
                     'type' => 'warning',
                     'key' => 'expired',
                     'referenceId' => $item['id'],
-                    'title' => $item['name'] . ' IS EXPIRED',
-                    'content' => $item['name'] . ' is expired ' . $item['expiration_date'] . ' time to remove, and update your inventory',
+                    'title' => ($item['category'] === 'Medicine') ? 
+                                 $item['generic_name'] . ' ' . $item['dosage'] . ' ' . '('. $item['form']. ')' . ' IS EXPIRED' : 
+                                 $item['name'] . ' IS EXPIRED',
+                    'content' => ($item['category'] === 'Medicine') ? 
+                                 $item['generic_name'] . ' ' . $item['dosage'] . ' ' . '('. $item['form']. ')' . ' is expired ' . $item['expiration_date'] . ' time to remove, and update your inventory' : 
+                                 $item['name'] . ' is expired ' . $item['expiration_date'] . ' time to remove, and update your inventory',
                     'link' => '/inventory'
                 ];
 

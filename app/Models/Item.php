@@ -78,18 +78,20 @@ class Item extends Database {
 
     public function getItemById($id){
         try {
-            $query = "SELECT *,
+            $query = "SELECT m.generic_name, m.brand_name, m.dosage, m.form, i.*,
                         CASE 
-                            WHEN quantity <= minimum_quantity THEN 'Low Stocks' 
-                            WHEN quantity <= minimum_quantity * 2 THEN 'Medium Stocks' 
+                            WHEN i.quantity <= i.minimum_quantity THEN 'Low Stocks' 
+                            WHEN i.quantity <= i.minimum_quantity * 2 THEN 'Medium Stocks' 
                             ELSE 'High Stocks'
                         END AS stock_status,
                         CASE
-                            WHEN expiration_date < CURRENT_DATE THEN 'Expired'
-                            WHEN expiration_date <= CURRENT_DATE + INTERVAL '30 days' THEN 'Expiring Soon'
+                            WHEN i.expiration_date < CURRENT_DATE THEN 'Expired'
+                            WHEN i.expiration_date <= CURRENT_DATE + INTERVAL '30 days' THEN 'Expiring Soon'
                             ELSE 'Good'
                         END AS expiration_status 
-                      FROM inventory WHERE id = ?";
+                      FROM inventory i
+                      LEFT JOIN medicines m ON i.medicine_id = m.id
+                      WHERE i.id = ?";
             $stmt = $this->db->prepare($query);
             $stmt->execute([$id]);
             return $stmt->fetch(PDO::FETCH_ASSOC);
@@ -100,18 +102,20 @@ class Item extends Database {
 
     public function sortAllItems($order, $direction){
         try {
-            $query = "SELECT *,
+            $query = "SELECT m.generic_name, m.brand_name, m.dosage, m.form, i.*,
                         CASE 
-                            WHEN quantity <= minimum_quantity THEN 'Low Stocks' 
-                            WHEN quantity <= minimum_quantity * 2 THEN 'Medium Stocks' 
+                            WHEN i.quantity <= i.minimum_quantity THEN 'Low Stocks' 
+                            WHEN i.quantity <= i.minimum_quantity * 2 THEN 'Medium Stocks' 
                             ELSE 'High Stocks'
                         END AS stock_status,
                         CASE
-                            WHEN expiration_date < CURRENT_DATE THEN 'Expired'
-                            WHEN expiration_date <= CURRENT_DATE + INTERVAL '30 days' THEN 'Expiring Soon'
+                            WHEN i.expiration_date < CURRENT_DATE THEN 'Expired'
+                            WHEN i.expiration_date <= CURRENT_DATE + INTERVAL '30 days' THEN 'Expiring Soon'
                             ELSE 'Good'
                         END AS expiration_status 
-                      FROM inventory ORDER BY $order $direction";
+                      FROM inventory i
+                      LEFT JOIN medicines m ON i.medicine_id = m.id
+                      ORDER BY $order $direction";
             $stmt = $this->db->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -141,44 +145,49 @@ class Item extends Database {
             $id = is_numeric($keyWord) ?  (int)$keyWord : null;
             $expiration = preg_match('/^\d{4}-\d{2}-\d{2}$/', $keyWord) ? $keyWord : null;
             $keyword = ($id === null && $expiration === null && $isDonated === null) ? $keyWord : null;
-            $query = "SELECT *,
+            $query = "SELECT m.generic_name, m.brand_name, m.dosage, m.form, i.*,
                         CASE 
-                            WHEN quantity <= minimum_quantity THEN 'Low Stocks' 
-                            WHEN quantity <= minimum_quantity * 2 THEN 'Medium Stocks' 
+                            WHEN i.quantity <= i.minimum_quantity THEN 'Low Stocks' 
+                            WHEN i.quantity <= i.minimum_quantity * 2 THEN 'Medium Stocks' 
                             ELSE 'High Stocks'
                         END AS stock_status,
                         CASE
-                            WHEN expiration_date < CURRENT_DATE THEN 'Expired'
-                            WHEN expiration_date <= CURRENT_DATE + INTERVAL '30 days' THEN 'Expiring Soon'
+                            WHEN i.expiration_date < CURRENT_DATE THEN 'Expired'
+                            WHEN i.expiration_date <= CURRENT_DATE + INTERVAL '30 days' THEN 'Expiring Soon'
                             ELSE 'Good'
                         END AS expiration_status,
                         ts_rank(
-                            to_tsvector('english', name || ' ' || quantity_type || ' ' || category || ' ' || description),
+                            to_tsvector('english', name || ' ' || generic_name || ' ' || brand_name || ' ' || dosage || ' ' || form || ' ' || quantity_type || ' ' || category || ' ' || description),
                             plainto_tsquery('english', COALESCE(:kw, ''))
                         ) AS rank
-                        FROM inventory
-                        WHERE (:kw IS NULL OR to_tsvector('english', name || ' ' || quantity_type || ' ' || category || ' ' || description)
+                        FROM inventory i
+                        LEFT JOIN medicines m ON i.medicine_id = m.id
+                        WHERE (:kw IS NULL OR to_tsvector('english', name || ' ' || generic_name || ' ' || brand_name || ' ' || dosage || ' ' || form || ' ' || quantity_type || ' ' || category || ' ' || description)
                             @@ plainto_tsquery('english', :kw)
                             OR name ILIKE '%' || :kw || '%'
+                            OR generic_name ILIKE '%' || :kw || '%'
+                            OR brand_name ILIKE '%' || :kw || '%'
+                            OR dosage ILIKE '%' || :kw || '%'
+                            OR form ILIKE '%' || :kw || '%'
                             OR quantity_type ILIKE '%' || :kw || '%'
                             OR category ILIKE '%' || :kw || '%'
                             OR description ILIKE '%' || :kw || '%'
                             OR (
                                 CASE 
-                                    WHEN quantity <= minimum_quantity THEN 'Low Stocks' 
-                                    WHEN quantity <= minimum_quantity * 2 THEN 'Medium Stocks' 
+                                    WHEN i.quantity <= i.minimum_quantity THEN 'Low Stocks' 
+                                    WHEN i.quantity <= i.minimum_quantity * 2 THEN 'Medium Stocks' 
                                     ELSE 'High Stocks'
                                 END
                             ) ILIKE '%' || :kw || '%'
                             OR (
                                 CASE
-                                    WHEN expiration_date < CURRENT_DATE THEN 'Expired'
-                                    WHEN expiration_date <= CURRENT_DATE + INTERVAL '30 days' THEN 'Expiring Soon'
+                                    WHEN i.expiration_date < CURRENT_DATE THEN 'Expired'
+                                    WHEN i.expiration_date <= CURRENT_DATE + INTERVAL '30 days' THEN 'Expiring Soon'
                                     ELSE 'Good'
                                 END
                             ) ILIKE '%' || :kw || '%' )
-                        AND (id = :id OR :id IS NULL)
-                        AND (is_donated = :is_donated OR :is_donated IS NULL)
+                        AND (i.id = :id OR :id IS NULL)
+                        AND (i.is_donated = :is_donated OR :is_donated IS NULL)
                         AND (expiration_date <= :expiration_date OR :expiration_date IS NULL)
                         ORDER BY rank ASC";
             $stmt = $this->db->prepare($query);
@@ -200,18 +209,20 @@ class Item extends Database {
 
     public function getAllItems() {
         try {
-            $query = "SELECT *,
+            $query = "SELECT m.generic_name, m.brand_name, m.dosage, m.form, i.*,
                         CASE 
-                            WHEN quantity <= minimum_quantity THEN 'Low Stocks' 
-                            WHEN quantity <= minimum_quantity * 2 THEN 'Medium Stocks' 
+                            WHEN i.quantity <= i.minimum_quantity THEN 'Low Stocks' 
+                            WHEN i.quantity <= i.minimum_quantity * 2 THEN 'Medium Stocks' 
                             ELSE 'High Stocks'
                         END AS stock_status,
                         CASE
-                            WHEN expiration_date < CURRENT_DATE THEN 'Expired'
-                            WHEN expiration_date <= CURRENT_DATE + INTERVAL '30 days' THEN 'Expiring Soon'
+                            WHEN i.expiration_date < CURRENT_DATE THEN 'Expired'
+                            WHEN i.expiration_date <= CURRENT_DATE + INTERVAL '30 days' THEN 'Expiring Soon'
                             ELSE 'Good'
                         END AS expiration_status 
-                      FROM inventory ORDER BY id ASC";
+                      FROM inventory i
+                      LEFT JOIN medicines m ON i.medicine_id = m.id
+                      ORDER BY id ASC";
             $stmt = $this->db->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -222,18 +233,19 @@ class Item extends Database {
 
     public function getItemLowStocks(){
         try {
-            $query = "SELECT id, name, category, quantity, minimum_quantity, quantity_type, expiration_date,
+            $query = "SELECT m.generic_name, m.brand_name, m.dosage, m.form, i.id, i.name, i.category, i.quantity, i.quantity_type, i.minimum_quantity, i.expiration_date,
                         CASE 
-                            WHEN quantity <= minimum_quantity THEN 'Low Stocks' 
-                            WHEN quantity <= minimum_quantity * 2 THEN 'Medium Stocks' 
+                            WHEN i.quantity <= i.minimum_quantity THEN 'Low Stocks' 
+                            WHEN i.quantity <= i.minimum_quantity * 2 THEN 'Medium Stocks' 
                             ELSE 'High Stocks'
                         END AS stock_status,
                         CASE
-                            WHEN expiration_date < CURRENT_DATE THEN 'Expired'
-                            WHEN expiration_date <= CURRENT_DATE + INTERVAL '30 days' THEN 'Expiring Soon'
+                            WHEN i.expiration_date < CURRENT_DATE THEN 'Expired'
+                            WHEN i.expiration_date <= CURRENT_DATE + INTERVAL '30 days' THEN 'Expiring Soon'
                             ELSE 'Good'
                         END AS expiration_status 
-                        FROM inventory 
+                        FROM inventory i
+                        LEFT JOIN medicines m ON i.medicine_id = m.id
                         WHERE quantity <= minimum_quantity * 2
                         ORDER BY quantity ASC";
             $stmt = $this->db->prepare($query);
@@ -246,18 +258,20 @@ class Item extends Database {
 
     public function stocks(){
         try{
-            $query = "SELECT
+            $query = "SELECT m.generic_name, m.brand_name, m.dosage, m.form, i.*,
                         CASE 
-                            WHEN quantity <= minimum_quantity THEN 'Low Stocks' 
-                            WHEN quantity <= minimum_quantity * 2 THEN 'Medium Stocks' 
+                            WHEN i.quantity <= i.minimum_quantity THEN 'Low Stocks' 
+                            WHEN i.quantity <= i.minimum_quantity * 2 THEN 'Medium Stocks' 
                             ELSE 'High Stocks'
                         END AS stock_status,
                         CASE
-                            WHEN expiration_date < CURRENT_DATE THEN 'Expired'
-                            WHEN expiration_date <= CURRENT_DATE + INTERVAL '30 days' THEN 'Expiring Soon'
+                            WHEN i.expiration_date < CURRENT_DATE THEN 'Expired'
+                            WHEN i.expiration_date <= CURRENT_DATE + INTERVAL '30 days' THEN 'Expiring Soon'
                             ELSE 'Good'
                         END AS expiration_status
-                        FROM inventory";
+                        FROM inventory i
+                        LEFT JOIN medicines m ON i.medicine_id = m.id
+                        ";
             $stmt = $this->db->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -268,19 +282,20 @@ class Item extends Database {
 
     public function getItemsNotify(){
         try{
-            $query = "SELECT id, name, quantity, quantity_type, minimum_quantity, expiration_date,
+            $query = "SELECT m.generic_name, m.brand_name, m.dosage, m.form, i.id, i.name, i.category, i.quantity, i.quantity_type, i.minimum_quantity, i.expiration_date,
                         CASE 
-                            WHEN quantity <= minimum_quantity THEN 'Low Stocks' 
-                            WHEN quantity <= minimum_quantity * 2 THEN 'Medium Stocks' 
+                            WHEN i.quantity <= i.minimum_quantity THEN 'Low Stocks' 
+                            WHEN i.quantity <= i.minimum_quantity * 2 THEN 'Medium Stocks' 
                             ELSE 'High Stocks'
                         END AS stock_status,
                         CASE
-                            WHEN expiration_date < CURRENT_DATE THEN 'Expired'
-                            WHEN expiration_date <= CURRENT_DATE + INTERVAL '30 days' THEN 'Expiring Soon'
+                            WHEN i.expiration_date < CURRENT_DATE THEN 'Expired'
+                            WHEN i.expiration_date <= CURRENT_DATE + INTERVAL '30 days' THEN 'Expiring Soon'
                             ELSE 'Good'
                         END AS expiration_status
-                        FROM inventory 
-                        WHERE (quantity <= (minimum_quantity * 2) OR expiration_date <= CURRENT_DATE + INTERVAL '30 days')";
+                        FROM inventory i
+                        LEFT JOIN medicines m ON i.medicine_id = m.id
+                        WHERE (i.quantity <= (i.minimum_quantity * 2) OR i.expiration_date <= CURRENT_DATE + INTERVAL '30 days')";
             $stmt = $this->db->prepare($query);
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);

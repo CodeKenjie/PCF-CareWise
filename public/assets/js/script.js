@@ -561,21 +561,20 @@ function renderMedsDrop(data){
         const clone = template.content.cloneNode(true);
 
         clone.querySelector(`.genericName`).innerHTML = `${medicine.generic_name} <span style="opacity: 50%">(${medicine.dosage ? medicine.dosage : `N/A`})</span>`;
-        clone.querySelector(`.dosage`).textContent = medicine.dosage;
         clone.querySelector(`.form`).textContent = medicine.form;
 
         clone.querySelector(`.medicine`).addEventListener(`click`, () => {
             document.getElementById(`medicineOptn`).classList.remove(`active`);
             if(inventory){
                 document.getElementById(`medicineId`).value = medicine.id;
-                document.getElementById(`itemName`).value = `${medicine.generic_name} (${medicine.dosage})`;
+                document.getElementById(`itemName`).value = `${medicine.generic_name} ${medicine.dosage} (${medicine.form})`;
                 document.getElementById(`category`).value = `Medicine`;
-                document.getElementById(`description`).value = `${medicine.brand_name} ${medicine.dosage} ${medicine.form}`;
+                document.getElementById(`description`).value = `${medicine.brand_name}`;
             }
 
             if(patients) {
                 document.getElementById(`medicineId`).value = medicine.id;
-                document.getElementById(`medicineName`).value = `${medicine.generic_name} ${medicine.dosage}`;
+                document.getElementById(`medicineName`).value = `${medicine.generic_name} ${medicine.dosage} (${medicine.form})`;
                 document.getElementById(`doseUnit`).value = medicine.form;
             }
         });
@@ -594,7 +593,11 @@ function renderItemData(data){
         const stockStatus = clone.querySelector(`.stockStatus`);
         const exprStatus = clone.querySelector(`.exprStatus`);
 
-        clone.querySelector(`.name`).textContent = item.name;
+        if(item.category === `Medicine`){
+            clone.querySelector(`.name`).textContent = `${item.generic_name} ${item.dosage} (${item.form})`;
+        } else {
+            clone.querySelector(`.name`).textContent = item.name;
+        }
         if(item.is_donated){
             clone.querySelector(`.name`).classList.add(`donated`);
         }
@@ -622,13 +625,21 @@ function renderItemData(data){
             state.item.id = item.id;
             document.getElementById(`adjust`).classList.add(`active`);
             document.getElementById(`imCurrentQuant`).textContent = `${item.quantity} ${item.quantity_type}`;
-            document.getElementById(`imName`).textContent = item.name;
+            if(item.category === `Medicine`){
+                document.getElementById(`imName`).textContent = `${item.generic_name} ${item.dosage}(${item.form})`;
+            } else {
+                document.getElementById(`imName`).textContent = item.name;
+            }
         });
 
         clone.querySelector(`.previewItemBtn`).addEventListener(`click`, () => {
             document.getElementById(`itemPreview`).classList.add(`active`);
             document.getElementById(`iId`).textContent = item.id;
-            document.getElementById(`iName`).textContent = item.name;
+            if(item.category === `Medicine`){
+                document.getElementById(`iName`).textContent = `${item.generic_name} ${item.dosage} (${item.form})`;
+            } else {
+                document.getElementById(`iName`).textContent = item.name;
+            }
             document.getElementById(`iCategory`).textContent = item.category;
             document.getElementById(`iDescription`).textContent = item.description;
             document.getElementById(`iQuantity`).textContent = `${item.quantity} ${item.quantity_type}`;
@@ -642,7 +653,13 @@ function renderItemData(data){
         clone.querySelector(`.editItemBtn`).addEventListener(`click`, () => {
             state.item.id = item.id;
             document.getElementById(`editItem`).classList.add(`active`);
-            document.getElementById(`updateItemName`).value = item.name;
+            if(item.category === `Medicine`){
+                document.getElementById(`spanItemName`).style.display = `none`;
+                document.getElementById(`updateItemName`).value = `N/A`;
+            } else {
+                document.getElementById(`spanItemName`).style.display = `flex`;
+                document.getElementById(`updateItemName`).value = item.name;
+            }
             document.getElementById(`updateCategory`).value = item.category;
             document.getElementById(`updateMinQuant`).value = item.minimum_quantity;
             document.getElementById(`updateQuantityType`).value = item.quantity_type;
@@ -652,7 +669,11 @@ function renderItemData(data){
         clone.querySelector(`.deleteItemBtn`).addEventListener(`click`, () => {
             state.item.id = item.id;
             document.getElementById(`deleteItem`).classList.add(`active`);
-            document.getElementById(`name`).textContent = item.name;
+            if(item.category === `Medicine`){
+                document.getElementById(`name`).textContent = `${item.generic_name} ${item.dosage} (${item.form})`;
+            } else {
+                document.getElementById(`name`).textContent = item.name;
+            }
             document.getElementById(`id`).textContent = item.id;
         });
 
@@ -1842,7 +1863,11 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                     const status = clone.querySelector(`.itemStatus`);
                     const itemQuant = clone.querySelector(`.itemQuant`);
                     const [year, month, day] = item.expiration_date.split('-');
-                    clone.querySelector(`.itemName`).textContent = item.name;
+                    if(item.category === `Medicine`){
+                        clone.querySelector(`.itemName`).textContent = `${item.generic_name} ${item.dosage}(${item.form})`;
+                    } else {
+                        clone.querySelector(`.itemName`).textContent = item.name;
+                    }
                     clone.querySelector(`.itemCategory`).textContent = item.category;
                     status.textContent = item.stock_status;
                     itemQuant.textContent = `Quantity: ${item.quantity} / ${item.minimum_quantity} ${item.quantity_type}`;
@@ -1879,13 +1904,21 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                     clone.querySelector(`.adjustBtn`).addEventListener(`click`, () => {
                         state.item.id = item.id;
                         document.getElementById(`adjust`).classList.add(`active`);
-                        document.getElementById(`imName`).textContent = item.name;
+                        if(item.category === `Medicine`){
+                            document.getElementById(`imName`).textContent = `${item.generic_name} ${item.dosage}(${item.form})`;
+                        } else {
+                            document.getElementById(`imName`).textContent = item.name;
+                        }
                         document.getElementById(`imCurrentQuant`).textContent = `${item.quantity} ${item.quantity_type}`;
                     });
                     clone.querySelector(`.deleteBtn`).addEventListener(`click`, () => {
                         state.item.id = item.id;
                         document.getElementById(`deleteItem`).classList.add(`active`);
-                        document.getElementById(`name`).textContent = item.name;
+                        if(item.category === `Medicine`){
+                            document.getElementById(`name`).textContent = `${item.generic_name} ${item.dosage}(${item.form})`;
+                        } else {
+                            document.getElementById(`name`).textContent = item.name;
+                        }
                         document.getElementById(`id`).textContent = item.id;
                     });
 
@@ -3277,8 +3310,6 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                                 clone.querySelector(`.isGiven`).textContent = `Not Given`;
                                 clone.querySelector(`.isGiven`).style.color = `var(--critical)`;
                                 notGivenBtn.classList.add(`hidden`);
-                                updateDateInput.classList.remove(`hidden`);
-                                updateGivenBtn.classList.remove(`hidden`);
                             }
                         });
                         updateGivenBtn.addEventListener(`click`, async (e) => {
