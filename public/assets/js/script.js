@@ -687,7 +687,7 @@ function renderSchedulesData(data){
             clone.querySelector(`.viewBtn`).classList.add(`hidden`);
 
             if(schedule.frequency === `Everyday`){
-                date.setDate(date.getDate() + (now.getDate() + 1));
+                date.setDate(date.getDate() + 1);
                 const newDate = date.toISOString().split('T')[0];
                 reschedule(schedule.id, newDate);
             } else if(schedule.frequency === `Every week`) {
@@ -1334,6 +1334,9 @@ function passwordCheck(input, input2){
 
 document.addEventListener(`DOMContentLoaded`, function(e) {
     e.preventDefault();
+    setInterval(() => {
+        loadList('notifications', renderNotifications);
+    }, 30000);
     const goodColor = localStorage.getItem(`good-color`);
     const moderateColor = localStorage.getItem(`moderate-color`);
     const criticalColor = localStorage.getItem(`critical-color`);
@@ -1559,6 +1562,9 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
     const notificationBtn = document.getElementById(`notifBtn`);
     if(notificationBtn){
         loadList(`notifications`, renderNotifications);
+        setInterval(() => {
+            loadList('notifications', renderNotifications);
+        }, 30000);
         notificationBtn.addEventListener(`click`, () => {
             document.getElementById(`notificationPanel`).classList.toggle(`open`);
             document.querySelector(`#notifBtn > .new`).classList.add(`hidden`);
@@ -1808,7 +1814,7 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                     });
                     clone.querySelector(`.schedDate`).textContent = `${months[month - 1]} ${day}, ${year}`;
                     clone.querySelector(`.schedTime`).textContent = `${timeFormat} (${schedule.frequency})`;
-                    clone.querySelector(`.clientName`).textContent = `${schedule.last_name}, ${schedule.first_name}`;
+                    clone.querySelector(`.clientName`).textContent = `${schedule.first_name}${schedule.last_name ? ` ` + schedule.last_name : ``}`;
                     clone.querySelector(`.scheduledFor`).textContent = schedule.scheduled_for;
                     container.appendChild(clone);
                 });

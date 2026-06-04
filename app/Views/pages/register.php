@@ -51,6 +51,7 @@
                     <span>
                         <select name="position" required>
                             <option value="" hidden></option>
+                            <option value="ADMIN">Admin</option>
                             <option value="Doctor">Doctor</option>
                             <option value="staff">Staff</option>
                         </select>

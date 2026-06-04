@@ -126,12 +126,9 @@ class Schedule extends Database {
     public function getSchedulesToNotify(){
         date_default_timezone_set('Asia/Manila');
         try{
-            $query = "SELECT * FROM schedules WHERE date <= :date AND time = :time";
+            $query = "SELECT * FROM schedules WHERE date = CURRENT_DATE";
             $stmt = $this->db->prepare($query);
-            $stmt->execute([
-                ':date' => date('Y-m-d'),
-                ':time' => date('H:i:s', strtotime("+10 minutes"))
-            ]);
+            $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch(PDOException $err){
             $this->logger->error($err->getMessage());

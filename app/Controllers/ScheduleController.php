@@ -253,7 +253,7 @@ class ScheduleController extends Controller {
                     'key' => 'scheduleToday',
                     'referenceId' => $sched['id'],
                     'title' => 'Your schedule is up!',
-                    'content' => $sched['last_name'] . ', ' . $sched['first_name'] . ' is scheduled today for ' . $sched['scheduled_for'],
+                    'content' => $sched['first_name'] . ' ' . $sched['last_name'] . ' is scheduled today for ' . $sched['scheduled_for'],
                     'link' => '/schedule'
                 ];
 
