@@ -502,7 +502,7 @@ ul {
     padding: 1em;
     border-radius: var(--radius);
     max-width: 60rem;
-    max-height: 50rem;
+    max-height: 40rem;
     overflow: auto;
 }
 
