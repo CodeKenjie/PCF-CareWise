@@ -72,7 +72,7 @@
             <h3 class="medicineIsMaintenance hidden">Maintenance</h3>
         </div>
         <div class="f fit" style="align-items: center; margin-left: auto">
-            <input class="quantity" type="number" style="width:6rem;" maxlength="2">
+            <input class="quantity" type="number" style="width:6rem; font-size: var(--small);"maxlength="2">
             <button class="giveBtn btn-bordered btn-accent">Give</button>
         </div>
     </li>

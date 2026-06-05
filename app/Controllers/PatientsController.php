@@ -10,7 +10,7 @@ class PatientsController extends Controller {
         $user = $this->getLoggedUser();
 
         $data = [
-            'title' => 'PCF Care - Patients',
+            'title' => 'PCF CareWise - Patients',
             'avatar' => $user['avatar'],
             'displayName' => $user['display_name'],
             'position' => $user['position'],

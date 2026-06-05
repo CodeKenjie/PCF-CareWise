@@ -2411,12 +2411,14 @@ ul {
         flex-wrap: wrap;
         gap: 0.5em;
         align-items: center;
+
         input {
+            font-size: var(--small);
             padding: 0.5em;
         }
 
         h3{
-            font-size: var(--normal);
+            font-size: var(--small);
         }
     }
 }

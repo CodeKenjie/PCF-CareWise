@@ -9,7 +9,7 @@ class InventoryController extends Controller {
     public function index() {
         $user = $this->getLoggedUser();
         $data = [
-            'title' => 'PCF Care - Inventory',
+            'title' => 'PCF CareWise - Inventory',
             'avatar' => $user['avatar'],
             'displayName' => $user['display_name'],
             'position' => $user['position'],
