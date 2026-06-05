@@ -82,6 +82,10 @@ class InventoryController extends Controller {
                 exit;
             }
 
+            if($category === 'Medicine'){
+                $itemName = '';
+            }
+
             $data = [
                 'medicineId' => $medicine,
                 'itemName' => ucwords($itemName),
@@ -157,12 +161,18 @@ class InventoryController extends Controller {
                 exit;
             }
 
+            $item = new Item();
+            $selected = $item->getItemById($id);
+            $name = $selected['category'] === 'Medicine' ?
+                    $selected['generic_name'] . ' ' . $selected['dosage'] . '(' . $selected['form'] . ')' :
+                    $selected['name'];
+
             if($type === 'export'){
                 $value = -$value;
-                $message = 'Successfully exported: ' . $value;
+                $message = 'Successfully exported: ' . abs($value) . ' from ' . $name;
                 $type = 'exported';
             } else {
-                $message = 'Successfully imported: ' . $value;
+                $message = 'Successfully imported: ' . $value . ' from ' . $name;
                 $type = 'imported';
             }
 
@@ -171,16 +181,14 @@ class InventoryController extends Controller {
                 'value' => (int) $value
             ];
 
-            $item = new Item();
             $adjust = $item->adjustItemQuantity($data);
-            $selected = $item->getItemById($id);
             if(!$adjust){
                 $response = [ 'ok' => false, 'code' => 400, 'error' => 'Insufficient stock'];
                 echo json_encode($response);
                 exit;
             }
 
-            $this->log('Ajusted Item Quantity', $value . ' was ' . $type . ' to ' . ucwords($selected['name']));
+            $this->log('Ajusted Item Quantity', abs($value) . ' was ' . $type . ' to ' . ucwords($name));
             $response = [ 'ok' => true, 'code' => 200, 'message' => $message ];
             echo json_encode($response);
         }

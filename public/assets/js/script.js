@@ -1419,6 +1419,14 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         }
     }
 
+    document.addEventListener(`click`, (event) => {
+        const profilePop = document.querySelector(`.additional`);
+        const profile = document.getElementById(`profile`);
+
+        if (!profile.contains(event.target)){
+            profilePop.classList.remove(`active`);
+        }
+    });
     document.addEventListener('keydown', (event) => {
         if (event.key === "Escape"){
             closePopup();
@@ -2227,16 +2235,13 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         });
 
         const symptomsInput = document.getElementById(`symptomsInput`);
-        symptomsInput.addEventListener(`click`, () => {
-            document.getElementById(`results`).classList.toggle(`active`);
-        });
         symptomsInput.addEventListener(`input`, () => {
             clearTimeout(timeout);
 
-            if(symptomsInput.value === ``){
-                document.getElementById(`results`).classList.remove(`active`);
-            } else {
+            if(symptomsInput.value.length >= 1){
                 document.getElementById(`results`).classList.add(`active`);
+            } else {
+                document.getElementById(`results`).classList.remove(`active`);
             }
 
             timeout = setTimeout(async () => {
@@ -2255,8 +2260,21 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                     container.innerHTML = ``;
                     data.collection.results.forEach(result => {
                         const clone = template.content.cloneNode(true);
-                        clone.querySelector(`li`).addEventListener(`click`, () => {
-                            document.getElementById(`conditionName`).value = result.condition;
+                        clone.querySelector(`li`).addEventListener(`click`, async (e) => {
+                            e.preventDefault();
+                            document.getElementById(`results`).classList.remove(`active`);
+                            try {
+                                const res = await fetch(`/care/patient/${state.patient.id}/condition/diagnosis`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({ conditionName: result.condition })
+                                });
+                                loadPatientDiagnosis(state.patient.id);
+                            } catch(err) {
+                                console.error(err);
+                            }
                         });
                         clone.querySelector(`.condition`).textContent = result.condition;
                         clone.querySelector(`.confidence`).textContent = `${result.confidence}%  (${result.confidenceLevel})`;

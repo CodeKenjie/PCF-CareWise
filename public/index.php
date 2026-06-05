@@ -54,6 +54,7 @@ $router->get('/care/prescription/{id}/all', 'App\Controllers\PrescriptionItemsCo
 $router->get('/care/patient/{id}/diagnosis', 'App\Controllers\DiagnosisController@all');
 $router->get('/care/patient/{id}/prescriptions', 'App\Controllers\PrescriptionsController@all');
 $router->post('/care/patient/{id}/diagnosis', 'App\Controllers\DiagnosisController@add');
+$router->post('/care/patient/{id}/condition/diagnosis', 'App\Controllers\SymptomsCheckerController@diagnosis');
 $router->post('/care/prescription/{id}', 'App\Controllers\PrescriptionsController@create');
 $router->post('/care/prescribe/{id}', 'App\Controllers\PrescriptionItemsController@prescribe');
 $router->post('/care/prescribe/{id}/maintenance', 'App\Controllers\PrescriptionItemsController@maintenance');

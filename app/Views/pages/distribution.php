@@ -43,7 +43,7 @@
 <template id="unassignedCard">
     <li class="f flswb" style="flex-wrap: wrap;">
         <h4 class="name">Patient Name</h4>
-        <form class="assignForm" style="margin-left: auto;">
+        <form class="assignForm f" style="margin-left: auto;">
             <select class="day">
                 <option value="Sunday">Sunday</option>
                 <option value="Monday">Monday</option>

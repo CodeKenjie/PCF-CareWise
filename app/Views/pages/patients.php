@@ -153,7 +153,7 @@
         </div>
         <span class="text-area p-sm">
             <textarea id="allergies" name="allergies" type="text" placeholder="None" required></textarea>
-            <label>allergies</label>
+            <label>Allergies</label>
         </span>
         <div class="part p-sm">
             <button class="btn-accent btn-pill" type="submit">Submit</button>

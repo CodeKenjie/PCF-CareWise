@@ -32,10 +32,6 @@ class ConditionMatcher {
 
             $confidence = round(($score / $maxScore) * 100);
 
-            if($confidence < 25){
-                continue;
-            }
-
             $confidenceLevel = match (true){
                 $confidence >= 80 => 'High',
                 $confidence >= 50 => 'MODERATE',
