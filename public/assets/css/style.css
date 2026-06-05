@@ -175,7 +175,7 @@ main {
     gap: 1em;
     width: inherit;
     height: 100dvh;
-    overflow: auto;
+    overflow-y: auto;
     scrollbar-width: none;
     scroll-behavior: smooth;
     scroll-padding: 1em;
@@ -279,8 +279,8 @@ ul {
 
 #ham-menu {
     position: relative;
-    width: 3em;
-    height: 3rem;
+    width: 2em;
+    height: 2rem;
     border-radius: 50%;
     margin: 0.5em;
     cursor: pointer;
@@ -296,12 +296,12 @@ ul {
 #ham-menu span{
     content: "";
     position: absolute;
-    top: 32%;
+    top: 30%;
     left: 49%;
     background: var(--font-color);
     border-radius: 1em;
-    width: 1.5em;
-    height: 0.3em;
+    width: 1em;
+    height: 0.2em;
     transform: translate(-50%, -50%);
 }
 
@@ -318,7 +318,7 @@ ul {
     color: var(--alt-font-color);
     font-size: var(--bigger);
     font-weight: var(--bold);
-    margin: 2em;
+    margin: 1em 2em;
     background: var(--button-color);
     border-radius: 1.5em 0 1.5em 0;
     z-index: 3;
@@ -441,7 +441,6 @@ ul {
 #register header {
     display: flex;
     align-items: center;
-    margin: 2rem;
     gap: 1em;
 }
 
@@ -451,11 +450,26 @@ ul {
     height: 3em;
 }
 
+.mediaRedirect {
+    display: none;
+    justify-content: center;
+    align-items: center;
+    font-weight: var(--bold);
+    font-size: var(--bigger);
+    color: var(--alt-font-color);
+    text-align: center;
+    padding: 1em;
+    background: var(--button-color);
+    min-width: 100%;
+    border-radius: 2em;
+}
+
 #register form, #login form {
     flex: 1 1 0;
     background: var(--bg);
     padding:0 5em;
     display: flex;
+    justify-content: center;
     flex-direction: column;
 }
 
@@ -488,7 +502,7 @@ ul {
     padding: 1em;
     border-radius: var(--radius);
     max-width: 60rem;
-    max-height: 60rem;
+    max-height: 50rem;
     overflow: auto;
 }
 
@@ -571,7 +585,7 @@ ul {
 }
 
 .sortsSpan button {
-    font-size: var(--small);
+    font-size: var(--super-small);
     padding: 0.5em 1em;
     border: var(--border);
     border-radius: var(--radius);
@@ -750,10 +764,11 @@ ul {
 .goto {
     display: flex;
     align-items: center;
+    margin: 0.2em;
 }
 
 .goto button {
-    margin-left: -3.9rem;
+    margin-left: -3.5rem;
     font-size: var(--normal);
     padding: 1em;
     background: transparent;
@@ -933,7 +948,7 @@ ul {
 }
 
 #sidebar {
-    width: 20rem;
+    width: 13rem;
     height: 100vh;
     display: flex;
     flex-direction: column;
@@ -942,13 +957,13 @@ ul {
 }
 
 #sidebar.close {
-    width: 4.5rem;
+    width: 4rem;
     transition: width 300ms ease;
 }
 
 #sidebar.close .sm-icon {
-    width: 1.5em;
-    height: 1.5em;
+    width: 1em;
+    height: 1em;
     transition: width 300ms ease;
 }
 
@@ -957,7 +972,6 @@ ul {
     align-items: center;
     justify-content: center;
 }
-
 
 #sidebar.close ul {
     align-items: center;
@@ -973,7 +987,7 @@ ul {
 } 
 
 #sidebar.close header img,
-#sidebar.close header h2 {
+#sidebar.close header h4 {
     display: none;
 }
 
@@ -981,6 +995,15 @@ ul {
     display: flex;
     align-items: center;
     gap: 0.5em;
+
+    img {
+        width: 1.5rem;
+        height: 1.5rem;
+    }
+}
+
+#sidebar.close header{
+    justify-content: center;
 }
 
 #sidebar section {
@@ -988,13 +1011,13 @@ ul {
     position: relative;
     display: flex;
     gap: 0.5em;
-    padding: 2em 1em;
+    padding: 1em 1em;
     cursor: pointer;
     margin-bottom: 2em;
 }
 
 #sidebar.close section {
-    padding: 2em 0.5em
+    padding: 1em 0.5em;
 }
 
 #sidebar section:hover {
@@ -1002,8 +1025,8 @@ ul {
 }
 
 #sidebar section span {
-    width: var(--header);
-    height: var(--header);
+    width: 2rem;
+    height: 2rem;
     box-shadow: var(--shadow);
     border: 0.1rem solid var(--bg);
     border-radius: 50%;
@@ -1025,7 +1048,7 @@ ul {
     flex: 1 1 0;
     display: flex;
     flex-direction: column;
-    font-size: var(--super-small-header);
+    font-size: var(--normal);
     font-weight: var(--bold);
     margin: 1em 0;
 }
@@ -1121,13 +1144,13 @@ ul {
 
 #notifBtn {
     position: absolute;
-    top: 1em;
-    right: 2em;
+    top: 0.5em;
+    right: 0.5em;
     padding: 1em;
     background: var(--bg);
     box-shadow: var(--shadow);
     border: var(--border);
-    border-radius: 1.5rem;
+    border-radius: 1rem;
     cursor: pointer;
     z-index: 10;
 }
@@ -1136,8 +1159,8 @@ ul {
 #notifBtn .new {
     top: 0;
     right: 0;
-    width: 1.2rem;
-    height: 1.2rem;
+    width: 1rem;
+    height: 1rem;
     background-color: var(--critical);
     border: solid 3px var(--bg);
     border-radius: 50%;
@@ -1154,7 +1177,7 @@ ul {
 
 #notificationPanel {
     position: fixed;
-    top: 5em;
+    top: 4.2rem;
     right: 0;
     width: 0;
     height: 0;
@@ -1166,8 +1189,8 @@ ul {
 }
 
 #notificationPanel.open {
-    width: clamp(25rem, 40% + 1rem, 40rem);
-    height: clamp(40rem, 70% + 1rem, 80rem);
+    width: clamp(22rem, 40% + 1rem, 40rem);
+    height: clamp(37rem, 70% + 1rem, 80rem);
     transition: width 300ms ease, height 300ms ease;
 }
 
@@ -1221,12 +1244,18 @@ ul {
     height: fit-content;
     padding: 0;
     align-self: flex-end;
+    .sub-section {
+        display: flex;
+        flex-wrap: wrap;
+        width: 100%;
+        gap: 0.5em;
+    }
 }
 
 #dashboard > .sub-sec {
     flex: 1 1 0;
     width: 50%;
-    min-width: 25rem;
+    min-width: 15rem;
     display: flex;
     flex-direction: column;
     gap: 1em;
@@ -1240,12 +1269,12 @@ ul {
 #dashboard .mini {
     flex: 1 1 0;
     min-height: 100%;
-    min-width: 20em;
+    min-width: 10em;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 2em;
-    border-radius: 2em;
+    padding: 1em;
+    border-radius: 1em;
     text-align: center;
     vertical-align: middle;
 }
@@ -1264,6 +1293,7 @@ ul {
     border-radius: var(--radius);
 
     h3{
+        font-size: var(--super-small);
         flex: 1 1 0;
         text-align: center;
     }
@@ -1326,13 +1356,16 @@ ul {
 #dashboard #inventoryRestock li {
     display: flex;
     padding: 0.5em;
+    flex-wrap: wrap;
     border: var(--border);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     align-items: center;
+    height: fit-content;
     gap: 0.5em;
 
     h3 {
+        font-size: var(--super-small);
         flex: 1 1 0;
         text-align: center;
         padding: 0.5em;
@@ -1346,6 +1379,7 @@ ul {
     }
 
     .quantities.up {
+        flex: 1 1 0;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -1355,15 +1389,20 @@ ul {
         border-radius: var(--radius);
         height: 100%;
         width: 100%;
+        padding: 1em;
         transition: height 300ms ease;
         text-align: center;
         vertical-align: middle;
     }
+
+    h5 {
+        font-size: var(--super-small);
+    }
 }
 
 #dashboard .donut-chart {
-    width: 20rem;
-    height: 20rem;
+    width: 10rem;
+    height: 10rem;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -1377,6 +1416,7 @@ ul {
     gap: 1em;
     p {
         display: flex;
+        font-size: var(--super-small);
         gap: 1em;
     }
 
@@ -1633,6 +1673,7 @@ ul {
     padding: 0.5em;
     gap: 1em;
 }
+
 .prescribedMeds > li > div > h3 {
     flex: 1 1 0;
     text-align: center;
@@ -1642,8 +1683,6 @@ ul {
 .prescribedMeds > li > button {
     background-color: transparent;
 }
-
-
 
 .profile {
     justify-self: center;
@@ -1770,7 +1809,7 @@ ul {
 }
 
 .addBtn {
-    font-size: var(--bigger);
+    font-size: var(--small);
     font-weight: var(--bold);
     background: var(--button-color);
     color: var(--alt-font-color);
@@ -1829,7 +1868,7 @@ ul {
 
 #calendar #weekdays span {
     text-align: center;
-    font-size: var(--bigger);
+    font-size: var(--super-small);
     font-weight: var(--bold);
 }
 
@@ -1837,7 +1876,7 @@ ul {
     flex: 1 1 0;
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    font-size: var(--small-header);
+    font-size: var(--super-small);
     font-weight: var(--semi-bold);
     gap: 0.5em;
 }
@@ -1846,7 +1885,7 @@ ul {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    font-size: var(--bigger);
+    font-size: var(--super-small);
     font-weight: var(--bold);
     align-items: center;
     cursor: pointer;
@@ -1874,7 +1913,6 @@ ul {
     color: var(--alt-font-color);
     background: var(--button-color);
 }
-
 
 #calendar .next-days,
 #calendar .prev-days{
@@ -2017,7 +2055,6 @@ ul {
     gap: 1em;
     flex-wrap: wrap;
 }
-
 
 #setSched #patientOption .profile {
     width: var(--big-header);
@@ -2183,7 +2220,7 @@ ul {
     align-items: center;
     padding: 2em;
     gap: 1em;
-    min-width: 25rem;
+    min-width: 15rem;
 }
 
 #me section:nth-of-type(1) {
@@ -2223,12 +2260,13 @@ ul {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    font-size: var(--bigger);
+    font-size: var(--small);
     padding: 1em;
     gap: 1em;
     vertical-align: middle;
+
     strong {
-        font-size: var(--small);
+        font-size: var(--super-small);
         min-width: 5rem;
     }
 }
@@ -2511,7 +2549,7 @@ ul {
         align-items: center;
         justify-content: center;
         align-self: unset;
-        font-size: var(--normal);
+        font-size: var(--super-small);
         font-weight: var(--bold);
         padding: 1em;
         gap: 0.5em;

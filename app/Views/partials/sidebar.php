@@ -5,8 +5,8 @@
             <span></span>
             <span></span>
         </div>
-        <img class="icon" src="/assets/images/logo.png" alt="">
-        <h2 class="sm-h">PCF CareWise</h2>
+        <img src="/assets/images/logo.png" alt="">
+        <h4>PCF Care</h4>
     </header>
     <ul>
         <li>
@@ -71,8 +71,8 @@
             <img src="<?= empty($avatar ?? '') ? 'assets/images/profile.png' : ($avatar ?? '')?>" alt="">
         </span>
         <div>
-            <h4 class="sm-h"><?= htmlspecialchars($displayName ?? '') ?></h4>
-            <h4 class="sb-h"><?= htmlspecialchars($position ?? '') ?></h4>
+            <h4 style="font-size: var(--small);"><?= htmlspecialchars($displayName ?? '') ?></h4>
+            <h4 style="font-size: var(--super-small); opacity: 75%;"><?= htmlspecialchars($position ?? '') ?></h4>
         </div>
     </section>
 </aside>

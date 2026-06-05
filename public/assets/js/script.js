@@ -1355,9 +1355,7 @@ function passwordCheck(input, input2){
 
 document.addEventListener(`DOMContentLoaded`, function(e) {
     e.preventDefault();
-    setInterval(() => {
-        loadList('notifications', renderNotifications);
-    }, 30000);
+
     const goodColor = localStorage.getItem(`good-color`);
     const moderateColor = localStorage.getItem(`moderate-color`);
     const criticalColor = localStorage.getItem(`critical-color`);
@@ -1739,6 +1737,12 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
                 console.error(err);
             }
         });
+    }
+
+    if(!register || !login){
+        setInterval(() => {
+            loadList('notifications', renderNotifications);
+        }, 30000);
     }
 
     const dashboard = document.getElementById(`dashboard`);

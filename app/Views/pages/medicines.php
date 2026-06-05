@@ -8,9 +8,9 @@
         <div>
             <form action="/patients/sort" method="get">
                 <span class="sortsSpan">
+                    <button id="sort3" class="btn-highlight" type="button" value="id">Id</button>
                     <button id="sort1" class="btn-highlight" type="button" value="brand_name">Brand</button>
                     <button id="sort2" class="btn-highlight" type="button" value="generic_name">Generic</button>
-                    <button id="sort3" class="btn-highlight" type="button" value="inventory.quantity">Quantity</button>
                     <button id="direction" class="btn-highlight" type="button" value="ASC">ASC</button>
                 </span>
             </form>

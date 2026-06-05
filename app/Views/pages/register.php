@@ -3,26 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PCF CareWise - Register</title>
+    <title>PCF Care - Register</title>
     <link rel="icon" href="assets/images/logo.png"/>
     <link rel="stylesheet" href="assets/css/style.css"/>
     <link rel="stylesheet" href="assets/css/media.css"/>
 </head>
 <body>
     <div id="responseContainer"></div>
-    <main id="register">
-        <a class="redirect p-md" href="/login">Login</a>
+    <main id="register" class="rel">
         <div class="site">
+            <a class="redirect p-md" href="/login">Login</a>
             <img src="assets/images/register-site.jpg" alt="">
         </div>
         <section>
             <header>
                 <img class="logo" src="/assets/images/logo.png" alt="">
-                <h2>PCF CareWise</h2>
+                <h2>PCF Care</h2>
             </header>
             <form class="form-ui" action="/register" method="post">
                 <span class="p-sm">
-                    <h1 class="ctr-text spr-h">Join our team</h1>
+                    <h1 class="ctr-text m-h">Join our team</h1>
                     <h2 class="ctr-text sb-h">help our community</h2>
                 </span>
                 <span class="p-sm">
@@ -84,7 +84,10 @@
                     <input name="accept" type="checkbox" required>
                     <label for="accept" style="display:flex; gap: 0.25em">Accept the<span id="TCBtn" style="font-weight: var(-bold); color: purple; cursor:pointer">terms and condition</span></label>
                 </div>
-                <input type="submit" value="Register Account">
+                <div class="fc" style="gap: 0.5em">
+                    <input type="submit" value="Register Account">
+                    <a class="mediaRedirect" href="/login">I already have an account</a>
+                </div>
             </form>
         </section>
     </main>

@@ -9,7 +9,7 @@ class ProfileController extends Controller{
         $user = $this->getLoggedUser();
 
         $data = [
-            'title' => 'PCF CareWise - ' . $user['last_name'] . ', ' . $user['first_name'],
+            'title' => 'PCF Care - ' . $user['last_name'] . ', ' . $user['first_name'],
             'avatar' => $user['avatar'],
             'displayName' => $user['display_name'],
             'position' => $user['position'],

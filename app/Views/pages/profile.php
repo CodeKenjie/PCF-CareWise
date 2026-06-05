@@ -1,6 +1,6 @@
 <?php require __DIR__ . "/../partials/header.php" ?>
 <main id="me">
-    <section class="acrylic-bg">
+    <section class="acrylic-bg main-panel">
         <div class="avatar">
             <span class="rel profile">
                 <img src="<?= empty($avatar ?? '') ? 'assets/images/profile.png' : ($avatar ?? '')?>" alt="">
