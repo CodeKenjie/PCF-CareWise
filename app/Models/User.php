@@ -146,7 +146,7 @@ class User extends Database {
 
     public function getAllEditor($id){
         try {
-            $query = "SELECT id, first_name, last_name, position, is_editor FROM users WHERE is_editor IS TRUE AND id != ?";
+            $query = "SELECT id, first_name, last_name, position, is_editor FROM users WHERE is_editor IS TRUE AND position != 'ADMIN' AND id != ?";
             $stmt = $this->db->prepare($query);
             $stmt->execute([$id]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
