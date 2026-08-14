@@ -5,7 +5,6 @@ use App\Core\Migration;
 use App\Core\Router;
 
 $migration = new Migration();
-$migration->migrate();
 $router = new Router();
 
 $router->middleware(function () {
