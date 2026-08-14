@@ -10,7 +10,7 @@ class ScheduleController extends Controller {
         $user = $this->getLoggedUser();
 
         $data = [
-            'title' => 'PCF CareWise - Schedule',
+            'title' => 'PCF Care - Schedule',
             'avatar' => $user['avatar'],
             'displayName' => $user['display_name'],
             'position' => $user['position'],

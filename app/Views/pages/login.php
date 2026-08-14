@@ -14,12 +14,12 @@
         <section>
             <header>
                 <img class="logo" src="/assets/images/logo.png" alt="">
-                <h2>PCF CareWise</h2>
+                <h2>PCF Care</h2>
             </header>
             <form class="form-ui" action="/login" method="post">
                 <span class="p-sm">
                     <h1 class="ctr-text spr-h">Good Day!</h1>
-                    <h2 class="ctr-text sb-h">Welcome to PCF CareWise</h2>
+                    <h2 class="ctr-text sb-h">Welcome to PCF Care</h2>
                 </span>
                 <span class="p-sm">
                     <input id="email" name="email" type="email" maxlength="150" required>

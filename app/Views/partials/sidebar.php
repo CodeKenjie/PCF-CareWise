@@ -6,7 +6,7 @@
             <span></span>
         </div>
         <img src="/assets/images/logo.png" alt="">
-        <h4>PCF CareWise</h4>
+        <h4>PCF Care</h4>
     </header>
     <ul>
         <li>

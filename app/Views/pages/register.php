@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PCF CareWise - Register</title>
+    <title>PCF Care - Register</title>
     <link rel="icon" href="assets/images/logo.png"/>
     <link rel="stylesheet" href="assets/css/style.css"/>
     <link rel="stylesheet" href="assets/css/media.css"/>
@@ -18,7 +18,7 @@
         <section>
             <header>
                 <img class="logo" src="/assets/images/logo.png" alt="">
-                <h2>PCF CareWise</h2>
+                <h2>PCF Care</h2>
             </header>
             <form class="form-ui" action="/register" method="post">
                 <span class="p-sm">

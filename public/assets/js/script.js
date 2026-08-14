@@ -1423,8 +1423,10 @@ document.addEventListener(`DOMContentLoaded`, function(e) {
         const profilePop = document.querySelector(`.additional`);
         const profile = document.getElementById(`profile`);
 
-        if (!profile.contains(event.target)){
-            profilePop.classList.remove(`active`);
+        if(profile){
+            if (!profile.contains(event.target)){
+                profilePop.classList.remove(`active`);
+            }
         }
     });
     document.addEventListener('keydown', (event) => {

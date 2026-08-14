@@ -7,7 +7,7 @@ class DashboardController extends Controller  {
         $user = $this->getLoggedUser();
 
         $data = [
-            'title' => 'PCF CareWise - Dashboard',
+            'title' => 'PCF Care - Dashboard',
             'avatar' => $user['avatar'],
             'displayName' => $user['display_name'],
             'position' => $user['position'],
